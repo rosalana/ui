@@ -1,14 +1,14 @@
 export type ThemeMode = "light" | "dark" | "system";
-export type Environment = "local" | "production" | "maintenance" | "staging";
+export type Environment = "developement" | "production" | "maintenance" | "staging";
 
 export type Adapter<T> = {
-  get: (key?: keyof T) => T | T[keyof T] | null
-  update: (value: Partial<T>) => Promise<T>
-}
+  get: (key?: keyof T) => T | T[keyof T] | null;
+  update: (value: Partial<T>) => Promise<T>;
+};
 
 export type CreateAdapterOptions<T> = {
-  source: () => T | null
-  name: string
+  source: () => T | null;
+  name: string;
 };
 
 export type Preferences = {
@@ -26,6 +26,8 @@ export type User = {
 };
 
 export type CreateRosalanaUIOptions = {
+  name?: string;
+  env?: Environment;
   theme?: ThemeMode;
   colors?: {
     primary?: string;
@@ -46,8 +48,6 @@ export type CreateRosalanaUIOptions = {
 };
 
 export type RosalanaUIContext = CreateRosalanaUIOptions & {
-  name: string;
-  env: Environment;
   preferences: Preferences | null;
   user: User | null;
   permissions: Permissions | null;

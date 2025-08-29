@@ -12,7 +12,7 @@ export const useUser = <
 >(): UserWithExtras<T> | null => {
   const ctx = useAppContext();
   const page = usePage().props as any;
-  ctx.user = page.user || null;
+  ctx.user = page.auth.user || null;
 
   return ctx.user as UserWithExtras<T> | null;
 };

@@ -3,29 +3,35 @@
   "version": "0.0.1",
   "private": false,
   "type": "module",
-  "module": "dist/index.mjs",
-  "main": "dist/index.cjs",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs.js",
       "types": "./dist/index.d.ts"
     }
   },
   "files": [
-    "dist",
-    "tailwind-preset.js"
+    "dist"
   ],
-  "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npm run build -- --watch",
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "clean": "rm -rf dist"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "michaelbany <mobany526@gmail.com>",
+  "license": "UNLICENSED",
   "devDependencies": {
+    "vite": "^5.2.0",
+    "typescript": "^5.4.0",
     "vue": "^3.5.20",
+    "@vitejs/plugin-vue": "^5.0.4",
     "@inertiajs/vue3": "^2.1.3"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "@inertiajs/vue3": "^2.1.0"
   }
 }

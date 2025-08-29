@@ -1,7 +1,7 @@
 import { CreateRosalanaUIOptions, RosalanaUIContext } from "./types";
 
 export default function buildContext(config: CreateRosalanaUIOptions) {
-  const builders = [
+  const builders: Record<string, (config: CreateRosalanaUIOptions) => any> = {
     name,
     env,
     theme,
@@ -11,23 +11,23 @@ export default function buildContext(config: CreateRosalanaUIOptions) {
     preferences,
     user,
     permissions,
-  ];
+  };
 
-  const build = (fn: (config: CreateRosalanaUIOptions) => any) => fn(config);
+  const context = {} as RosalanaUIContext;
 
-  return builders.reduce((acc, fn) => {
-    const result = build(fn);
-    return { ...acc, [fn.name]: result };
-  }, {} as RosalanaUIContext);
+  for (const key in builders) {
+    context[key as keyof RosalanaUIContext] = builders[key](config);
+  }
+
+  return context;
 }
 
 function name(config: CreateRosalanaUIOptions): RosalanaUIContext["name"] {
-  return (import.meta as any)?.env?.APP_NAME || "Rosalana";
+  return config.name || "Rosalana";
 }
 
 function env(config: CreateRosalanaUIOptions): RosalanaUIContext["env"] {
-  return ((import.meta as any)?.env?.APP_ENV ||
-    "production") as RosalanaUIContext["env"];
+  return config.env || "production";
 }
 
 function theme(config: CreateRosalanaUIOptions): RosalanaUIContext["theme"] {
@@ -77,5 +77,3 @@ function permissions(
 ): RosalanaUIContext["permissions"] {
   return null;
 }
-
-// sem přidat funkce pro nastaveni defaultu configu pro každou položku zvlášť
