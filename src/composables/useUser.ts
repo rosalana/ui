@@ -1,13 +1,18 @@
-import { usePage } from '@inertiajs/vue3';
-import { User } from '../plugin/types';
-import { useAppContext } from '../plugin/context';
+import { usePage } from "@inertiajs/vue3";
+import { User } from "../plugin/types";
+import { useAppContext } from "../plugin/context";
 
 type UserWithExtras<T> = User & T;
 
-export default function useUser<T>(): UserWithExtras<T> | null {
-    const ctx = useAppContext();
-    const page = usePage().props as any;
-    ctx.user = page.user || null;
+/**
+ * Composable to access the current authenticated user.
+ */
+export const useUser = <
+  T extends Record<string, any> = {}
+>(): UserWithExtras<T> | null => {
+  const ctx = useAppContext();
+  const page = usePage().props as any;
+  ctx.user = page.user || null;
 
-    return ctx.user as UserWithExtras<T> | null;
-}
+  return ctx.user as UserWithExtras<T> | null;
+};
