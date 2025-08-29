@@ -1,6 +1,5 @@
 import type { CreateRosalanaUIOptions } from "./types";
 import { createContext, provideContext } from "./context";
-
 /**
  * Vue plugin to initialize Rosalana UI context.
  */

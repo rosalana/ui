@@ -11,6 +11,7 @@ export default function buildContext(config: CreateRosalanaUIOptions) {
     preferences,
     user,
     permissions,
+    after,
   };
 
   const context = {} as RosalanaUIContext;
@@ -31,7 +32,7 @@ function env(config: CreateRosalanaUIOptions): RosalanaUIContext["env"] {
 }
 
 function theme(config: CreateRosalanaUIOptions): RosalanaUIContext["theme"] {
-  return config.theme || "system";
+  return config.theme || 'system';
 }
 
 function colors(config: CreateRosalanaUIOptions): RosalanaUIContext["colors"] {
@@ -76,4 +77,10 @@ function permissions(
   config: CreateRosalanaUIOptions
 ): RosalanaUIContext["permissions"] {
   return null;
+}
+
+function after(
+  config: CreateRosalanaUIOptions
+): RosalanaUIContext["after"] {
+  return config.after || (() => {});
 }

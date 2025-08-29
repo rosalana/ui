@@ -1,4 +1,5 @@
 export type ThemeMode = "light" | "dark" | "system";
+
 export type Environment = "developement" | "production" | "maintenance" | "staging";
 
 export type Adapter<T> = {
@@ -9,6 +10,8 @@ export type Adapter<T> = {
 export type CreateAdapterOptions<T> = {
   source: () => T | null;
   name: string;
+  update?: (value: Partial<T>) => Promise<T> | T; // run before updating the context
+  sync?: boolean; // if true, run update function in config
 };
 
 export type Preferences = {
@@ -42,6 +45,7 @@ export type CreateRosalanaUIOptions = {
       fast?: number;
     };
   };
+  after?: () => void;
   adapters?: {
     preferences?: Adapter<Preferences>["update"];
   } & Record<string, Adapter<any>["update"]>;
