@@ -16,6 +16,8 @@ export type Preferences = {
   locale?: string;
 };
 
+export type Permissions = Record<string, boolean>;
+
 export type User = {
   id: number | string;
   name: string;
@@ -48,5 +50,5 @@ export type RosalanaUIContext = CreateRosalanaUIOptions & {
   env: Environment;
   preferences: Preferences | null;
   user: User | null;
-  permissions: string[] | null;
+  permissions: Permissions | null;
 } & Record<string, any>; // to allow dynamic properties like `cart`, `notifications`
