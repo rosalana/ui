@@ -24,7 +24,7 @@ export function createAdapter<T, K extends Record<string, any> = {}>(
     update: async (value: Partial<T & K>): Promise<T & K> => {
       const sync = options.sync ?? true;
 
-      // 1. Pokud není sync režim, použij pouze `update()` callback
+      // When sync is disabled, just update the context directly
       if (!sync) {
         const result = options.update ? options.update(value) : value;
         const newValue = result instanceof Promise ? await result : result;
@@ -39,7 +39,7 @@ export function createAdapter<T, K extends Record<string, any> = {}>(
         return ctx[name];
       }
 
-      // 2. Pokud je sync režim, očekáváme adapterFn definovaný v contextu
+      // When sync is enabled, use the adapter function from config
       const adapterFn: Adapter<T & K>["update"] | undefined =
         ctx.adapters?.[name];
 
