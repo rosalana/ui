@@ -1,0 +1,1 @@
+export type CreateModelOptions<T> = Record<string, Promise<T> | Promise<T>[]>;
