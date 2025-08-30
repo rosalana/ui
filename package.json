@@ -17,7 +17,8 @@
     "dist"
   ],
   "scripts": {
-    "dev": "npm run build -- --watch",
+    "dev:vite": "vite build --watch",
+    "dev:tsc": "tsc --emitDeclarationOnly --watch",
     "build": "vite build && tsc --emitDeclarationOnly",
     "clean": "rm -rf dist"
   },
