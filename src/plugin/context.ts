@@ -1,4 +1,4 @@
-import { type App, reactive, inject as injectVue } from "vue";
+import { type App, reactive } from "vue";
 import { CreateRosalanaUIOptions, RosalanaUIContext } from "./types";
 import buildContext from "./builder";
 import { inject, provide, type RegistryKey } from "./provider";
@@ -21,6 +21,8 @@ export function provideContext(app: App, context: RosalanaUIContext): void {
 
   app.provide(ROSALANA_UI_CONTEXT, inject(ROSALANA_UI_CONTEXT));
   app.provide(ROSALANA_UI_DEFAULTS, inject(ROSALANA_UI_DEFAULTS));
+
+  context.after?.();
 }
 
 /**

@@ -19,6 +19,7 @@
   "scripts": {
     "dev:vite": "vite build --watch",
     "dev:tsc": "tsc --emitDeclarationOnly --watch",
+    "dev": "npm run build -- --watch",
     "build": "vite build && tsc --emitDeclarationOnly",
     "clean": "rm -rf dist"
   },
