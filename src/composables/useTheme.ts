@@ -1,6 +1,7 @@
 import type { ThemeMode } from "../plugin/types";
 import { createAdapter } from "../plugin/adapter";
 import { usePreferences } from "./usePreferences";
+import { useAppContext } from "../plugin";
 
 export function useTheme() {
   const adapter = useThemeAdapter();
@@ -46,12 +47,15 @@ const updateLocalTheme = (value: ThemeMode) => {
   return value;
 };
 
-const useThemeAdapter = () =>
-  createAdapter<ThemeMode>({
+const useThemeAdapter = () => {
+console.log('useThemeAdapter');
+ return createAdapter<ThemeMode>({
     source: () => {
       const currentTheme = localStorage.getItem(
         "appearance"
       ) as ThemeMode | null;
+      console.log('useTheme',usePreferences().get("theme"));
+      console.log('useTheme', useAppContext().preferences);
       const savedTheme = usePreferences().get("theme") as ThemeMode | null;
       return savedTheme || currentTheme || "system";
     },
@@ -59,3 +63,4 @@ const useThemeAdapter = () =>
     update: (value) => updateLocalTheme(value || "system"),
     sync: false,
   });
+}
