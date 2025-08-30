@@ -1,7 +1,7 @@
 import type { ThemeMode } from "../plugin/types";
 import { createAdapter } from "../plugin/adapter";
 import { usePreferences } from "./usePreferences";
-import { useAppContext } from "../plugin";
+import { computed, watch } from "vue";
 
 export function useTheme() {
   const adapter = useThemeAdapter();
@@ -12,7 +12,14 @@ export function useTheme() {
     },
     initializeTheme() {
       const theme = adapter.get() as ThemeMode;
-      updateLocalTheme(theme);
+      updateLocalTheme(theme as ThemeMode);
+      watch(
+        () => adapter.get(),
+        (newTheme) => {
+          console.log("Theme changed to", newTheme);
+          updateLocalTheme(newTheme as ThemeMode);
+        }
+      );
     },
     async update(value: ThemeMode) {
       return adapter.update(value);
@@ -48,19 +55,18 @@ const updateLocalTheme = (value: ThemeMode) => {
 };
 
 const useThemeAdapter = () => {
-console.log('useThemeAdapter');
- return createAdapter<ThemeMode>({
-    source: () => {
-      const currentTheme = localStorage.getItem(
-        "appearance"
-      ) as ThemeMode | null;
-      console.log('useTheme',usePreferences().get("theme"));
-      console.log('useTheme', useAppContext().preferences);
-      const savedTheme = usePreferences().get("theme") as ThemeMode | null;
-      return savedTheme || currentTheme || "system";
-    },
+  const sync = computed<boolean>(() => usePreferences().get("syncTheme") as boolean || false);
+
+  return createAdapter<ThemeMode>({
+    source: computed<ThemeMode>(() => {
+      const local = localStorage.getItem("appearance") as ThemeMode | null;
+      if (!sync.value) return local || "system";
+
+      const preferences = usePreferences().get("theme") as ThemeMode | null;
+      return preferences || local || "system";
+    }),
     name: "theme",
     update: (value) => updateLocalTheme(value || "system"),
-    sync: false,
+    sync: sync.value,
   });
-}
+};

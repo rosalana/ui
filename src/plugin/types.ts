@@ -21,6 +21,7 @@ export type CreateAdapterOptions<T> = {
 export type Preferences = {
   theme?: ThemeMode;
   locale?: string;
+  syncTheme?: boolean;
 };
 
 export type Permissions = Record<string, boolean>;
