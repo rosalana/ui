@@ -1,3 +1,5 @@
+import { ComputedRef, Ref } from "vue";
+
 export type ThemeMode = "light" | "dark" | "system";
 
 export type Environment = "developement" | "production" | "maintenance" | "staging";
@@ -7,8 +9,10 @@ export type Adapter<T> = {
   update: (value: Partial<T>) => Promise<T>;
 };
 
+export type ValueOrFn<T> = T | (() => T);
+
 export type CreateAdapterOptions<T> = {
-  source: () => T | null;
+  source: ValueOrFn<Ref<T> | ComputedRef<T>>;
   name: string;
   update?: (value: Partial<T>) => Promise<T> | T; // run before updating the context
   sync?: boolean; // if true, run update function in config
