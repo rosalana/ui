@@ -16,7 +16,6 @@ export function useTheme() {
       watch(
         () => adapter.get(),
         (newTheme) => {
-          console.log("Theme changed to", newTheme);
           updateLocalTheme(newTheme as ThemeMode);
         }
       );
@@ -55,7 +54,9 @@ const updateLocalTheme = (value: ThemeMode) => {
 };
 
 const useThemeAdapter = () => {
-  const sync = computed<boolean>(() => usePreferences().get("syncTheme") as boolean || false);
+  const sync = computed<boolean>(
+    () => (usePreferences().get("syncTheme") as boolean) || false
+  );
 
   return createAdapter<ThemeMode>({
     source: computed<ThemeMode>(() => {
