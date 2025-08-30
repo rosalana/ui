@@ -1,11 +1,12 @@
-import { type App, type InjectionKey, reactive, inject } from "vue";
+import { type App, reactive, inject as injectVue } from "vue";
 import { CreateRosalanaUIOptions, RosalanaUIContext } from "./types";
 import buildContext from "./builder";
+import { inject, provide, type RegistryKey } from "./provider";
 
-const ROSALANA_UI_CONTEXT: InjectionKey<RosalanaUIContext> =
+const ROSALANA_UI_CONTEXT: RegistryKey<RosalanaUIContext> =
   Symbol("RosalanaUI");
 
-const ROSALANA_UI_DEFAULTS: InjectionKey<RosalanaUIContext> =
+const ROSALANA_UI_DEFAULTS: RegistryKey<RosalanaUIContext> =
   Symbol("RosalanaUIDefaults");
 
 export function createContext(
@@ -15,8 +16,11 @@ export function createContext(
 }
 
 export function provideContext(app: App, context: RosalanaUIContext): void {
-  app.provide(ROSALANA_UI_DEFAULTS, context);
-  app.provide(ROSALANA_UI_CONTEXT, reactive(context));
+  provide(ROSALANA_UI_CONTEXT, reactive(context));
+  provide(ROSALANA_UI_DEFAULTS, context);
+
+  app.provide(ROSALANA_UI_CONTEXT, inject(ROSALANA_UI_CONTEXT));
+  app.provide(ROSALANA_UI_DEFAULTS, inject(ROSALANA_UI_DEFAULTS));
 }
 
 /**
@@ -31,7 +35,7 @@ export function useAppContext(): RosalanaUIContext {
 /**
  * Composable to access the default Rosalana UI configuration.
  */
-export function useAppDefaults(): CreateRosalanaUIOptions {
+export function useAppDefaults(): RosalanaUIContext {
   const ctx = inject(ROSALANA_UI_DEFAULTS);
   if (!ctx) throw new Error("RosalanaUI plugin is not initialized");
   return ctx;
