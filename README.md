@@ -1,6 +1,10 @@
 # Run
 To run this locally for testing, run:
 ```
+npm install
+```
+Then link the package globally:
+```
 npm link
 ```
 Then in your project:
