@@ -75,8 +75,16 @@ export type TailwindShadeLevel =
   | "950";
 
 export type UiColorPalette = {
-  name: TailwindColorName | string; // 'blue' nebo custom
+  name: TailwindColorName | string;
   shades: Record<TailwindShadeLevel, string> | string;
+  default: UiColorProp;
+} & {
+  [key: string]: UiColorProp;
+};
+
+export type UiColorProp = {
+  light: keyof UiColorPalette["shades"] | string;
+  dark: keyof UiColorPalette["shades"] | string;
 };
 
 export type UiColorSlot = {
@@ -88,13 +96,13 @@ export type UiColorSlot = {
 /**
  * Možnosti zápisu barvy do property
  * - zapisuju jako string skoro jako class v tailwindu.
- * 
+ *
  * 'gray-500 dark:gray-800'
  * nebo pokud chci použít barvu z rodiče
  * '500 dark:800' (použije se z rodiče)
- * 
+ *
  */
-type ColorProperty = ''
+type ColorProperty = "";
 
 type ColorConfig = {
   white?: string;
@@ -105,11 +113,11 @@ type ColorConfig = {
     text?: string;
     border?: string; // něco jako gray-200 -> bere se z color() funkce
     ring?: string; // něco jako blue-500
-  },
+  };
   primary?: {
-    color: string // -> to pallete
+    color: string; // -> to pallete
     use?: string;
-  },
+  };
 };
 
 export type CreateRosalanaUIOptions = {
@@ -122,15 +130,15 @@ export type CreateRosalanaUIOptions = {
     theme?: {
       color: string; // -> to pallete
       default?: string;
-      // background?: string;
+      background?: string;
       // text?: string;
       // border?: string;
-    }
+    };
     // --
     primary?: {
       color: string; // -> to pallete
       default?: string; // něco jako `500 dark:500`
-    }
+    };
     //... add more colors here later
   };
   motion?: {

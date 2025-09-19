@@ -1,6 +1,15 @@
-import { RosalanaUIContext, TailwindShadeLevel, UiColorPalette } from "./types";
+import {
+  CreateAdapterOptions,
+  RosalanaUIContext,
+  TailwindShadeLevel,
+  UiColorPalette,
+  UiColorProp,
+} from "./types";
 import { inject, provide, RegistryKey } from "./provider";
 import tailwindColors from "tailwindcss/colors";
+
+let darkStyles: string[] = [];
+let lightStyles: string[] = [];
 
 const ROSALANA_UI_COLORS: RegistryKey<UiColorPalette[]> =
   Symbol("RosalanaUIColors");
@@ -10,133 +19,104 @@ export function processConfigColors(context: RosalanaUIContext): void {
 
   const processed = process(context.colors);
 
-  console.log("New process:", processed);
+  console.log("Processed colors:", processed);
 
-  simpleApply(
-    "white",
-    (processed.find((c) => c?.key === "white")?.color as string) || ""
-  ); // !
-  simpleApply(
-    "black",
-    (processed.find((c) => c?.key === "black")?.color as string) || ""
-  ); // !
+  const css = createCSS(processed);
 
-  applyFullColors(
-    "theme",
-    (processed.find((c) => c?.key === "theme")
-      ?.color as UiColorPalette["shades"])!
-  ); // !
-  applyFullColors(
-    "primary",
-    (processed.find((c) => c?.key === "primary")
-      ?.color as UiColorPalette["shades"])!
-  ); // !
+  console.log("Generated CSS:", css);
 
-  applyDefaults(
-    "theme",
-    processed.find((c) => c?.key === "theme")
-  ); // !
-  applyDefaults(
-    "primary",
-    processed.find((c) => c?.key === "primary")
-  ); // !
+  injectCSSVars(css);
 
   // ještě nám chybí aplikovat background, text, border, ring atd...
 }
 
-function simpleApply(name: string, color: string) {
-  document.documentElement.style.setProperty(`--color-${name}`, color);
-}
-
-function applyFullColors(name: string, color: UiColorPalette["shades"]) {
-  Object.entries(color).forEach(([shade, value]) => {
-    document.documentElement.style.setProperty(
-      `--color-${name}-${shade}`,
-      value
-    );
-  });
-}
-
-function applyDefaults(name: string, slot: any) {
-  if (!slot) return;
-
-  Object.entries(slot.default).forEach(([mode, c]) => {
-    // c je color - mode - light/dark
-
-    if (mode === "light") {
-      const whiteOrBlack = document.documentElement.style.getPropertyValue(
-        `--color-${pickContrast(c)}`
-      );
-
-      document.documentElement.style.setProperty(
-        `--color-${name}-foreground`,
-        whiteOrBlack
-      );
-
-      document.documentElement.style.setProperty(`--color-${name}`, c);
-
-    } else if (mode === "dark") {
-      const whiteOrBlack = document.documentElement.style.getPropertyValue(
-        `--color-${pickContrast(c)}`
-      );
-
-      // tady se to musí udělat k html.dark
-      // což ale nejde udělat předem takže celé by to mělo být jako
-      //       const style = document.createElement("style");
-      //       style.innerHTML = `
-      //   :root {
-      //     --color-primary: ${lightValue};
-      //     --color-primary-foreground: ${pickContrast(lightValue)};
-      //   }
-      //   .dark {
-      //     --color-primary: ${darkValue};
-      //     --color-primary-foreground: ${pickContrast(darkValue)};
-      //   }
-      // `;
-      //       document.head.appendChild(style);
+function createCSS(processed: UiColorPalette[]): string {
+  console.log("Creating CSS from processed colors:", processed);
+  processed.forEach((p) => {
+    if (typeof p.shades === "string") {
+      return applyProp(p.name, p.shades);
     }
+
+    if (typeof p.shades === "object") {
+      const { default: slot, shades, name, ...others } = p;
+      Object.entries(others).forEach(([k, v]) => {
+        const { light, dark } = v as UiColorProp;
+        if (light && dark) {
+          applyProp(`${k}`, light, "light");
+          applyProp(`${k}`, dark, "dark");
+        }
+      });
+    }
+
+    return applySlot(p);
   });
+
+  return `
+:root {
+${"\t" + lightStyles.join("\n\t")}
 }
 
-// POZOR NENÍ BRÁN V POTAZ ZATÍM REŽIM (dark/light)
-// TOTO APLIKUJE FULL COLORS I JEDNOTLIVE BARVY
+.dark { 
+${"\t" + darkStyles.join("\n\t")}
+}
+`;
+}
 
-// -> mělo by se aplikovat prvně full colors do tailwindu a potom až jednotlivé barvy např. co má být {light: má být primary-500 nebo primary-800 nebo tak a pak se dopočítá foreground}
-function apply(name: string, color: UiColorPalette["shades"] | string) {
-  if (typeof color === "string") {
-    document.documentElement.style.setProperty(`--color-${name}`, color);
+function applyProp(
+  name: string,
+  color: string,
+  mode: "light" | "dark" = "light"
+) {
+  if (mode === "light") {
+    lightStyles.push(`--color-${name}: ${color};`);
   } else {
-    Object.entries(color).forEach(([shade, value]) => {
-      document.documentElement.style.setProperty(
-        `--color-${name}-${shade}`,
-        value
-      );
-
-      if (shade === "500") {
-        const whiteOrBlack = document.documentElement.style.getPropertyValue(
-          `--color-${pickContrast(value)}`
-        );
-        document.documentElement.style.setProperty(
-          `--color-${name}-foreground`,
-          whiteOrBlack
-        );
-      }
-    });
+    darkStyles.push(`--color-${name}: ${color};`);
   }
 }
 
+function applySlot(pallete: UiColorPalette) {
+  if (!pallete) return;
+  const { name, shades, default: slot } = pallete;
+  const { light, dark } = slot;
+
+  Object.entries(shades).forEach(([shade, value]) => {
+    lightStyles.push(`--color-${name}-${shade}: ${value};`);
+  });
+
+  lightStyles.push(
+    `--color-${name}: ${light};`,
+    `--color-${name}-foreground: ${pickContrast(light)};`
+  );
+
+  darkStyles.push(
+    `--color-${name}: ${dark};`,
+    `--color-${name}-foreground: ${pickContrast(dark)};`
+  );
+}
+
+function injectCSSVars(css: string) {
+  const id = "rosalana-ui-colors";
+  let style = document.getElementById(id) as HTMLStyleElement;
+  if (!style) {
+    style = document.createElement("style");
+    style.id = id;
+    document.head.appendChild(style);
+  }
+  style.innerHTML = css;
+}
+
 function process(colors: RosalanaUIContext["colors"]) {
-  return Object.entries(colors || {}).map(([key, value]) => {
+  return Object.entries(colors || {}).map(([name, value]) => {
     if (typeof value === "string") {
-      return { key, color: color(value) || value };
+      return { name, shades: color(value) || value };
     }
 
     if (typeof value === "object" && value.color) {
       const c = color(value.color) || value.color;
 
       return {
-        key,
-        color: c,
+        name,
+        shades: c,
         default: applyParentColor(parseColorProperty(value.default), c),
         ...Object.fromEntries(
           Object.entries(value)
@@ -193,25 +173,16 @@ function parseColorProperty(prop?: string) {
 }
 
 function pickContrast(color: string): string {
-  // Create a temporary element to parse any CSS color format
-  const temp = document.createElement("div");
-  temp.style.color = color;
-  document.body.appendChild(temp);
-
-  const computedColor = getComputedStyle(temp).color;
-  document.body.removeChild(temp);
-
-  // Handle oklch format
-  const oklchMatch = computedColor.match(/oklch\(([^)]+)\)/);
+  // Parse oklch format
+  const oklchMatch = color.match(/oklch\(([^)]+)\)/);
   if (oklchMatch) {
     const values = oklchMatch[1].split(/\s+/);
     const lightness = parseFloat(values[0]);
-    // In OKLCH, lightness ranges from 0-1, where 0.5 is roughly the midpoint
     return lightness > 0.65 ? "black" : "white";
   }
 
   // Parse rgb/rgba format
-  const rgbMatch = computedColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
   if (rgbMatch) {
     const r = parseInt(rgbMatch[1]);
     const g = parseInt(rgbMatch[2]);
@@ -220,7 +191,7 @@ function pickContrast(color: string): string {
     return brightness > 140 ? "black" : "white";
   }
 
-  // Fallback to original hex parsing
+  // Parse hex format
   if (color.startsWith("#")) {
     const r = parseInt(color.slice(1, 3), 16);
     const g = parseInt(color.slice(3, 5), 16);

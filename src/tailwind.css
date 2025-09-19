@@ -44,11 +44,12 @@
   --color-theme-900: var(--color-theme-900);
   --color-theme-950: var(--color-theme-950);
   --color-theme: var(--color-theme);
+
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
   /* z tohoto potom budou sestavené color-background atd */
 
   /*  */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
 
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -59,21 +60,21 @@
   /* --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground); */
 
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary); /*TODO*/
+  --color-secondary-foreground: var(--secondary-foreground); /*TODO*/
 
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted); /*TODO*/
+  --color-muted-foreground: var(--muted-foreground); /*TODO*/
 
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent); /*TODO*/
+  --color-accent-foreground: var(--accent-foreground); /*TODO*/
 
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive); /*TODO*/
+  --color-destructive-foreground: var(--destructive-foreground); /*TODO*/
 
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-border: var(--border); /*TODO*/
+  --color-input: var(--input); /*TODO*/
+  --color-ring: var(--ring); /*TODO*/
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);

@@ -41,12 +41,13 @@ function theme(config: CreateRosalanaUIOptions): RosalanaUIContext["theme"] {
 function colors(config: CreateRosalanaUIOptions): RosalanaUIContext["colors"] {
 
   const defaultTheme = {
-    color: "slate",
+    color: "neutral",
     default: "500",
+    background: "50 dark:950",
   }
 
   const defaultPrimary = {
-    color: "slate",
+    color: "neutral",
     default: "500",
   }
 
