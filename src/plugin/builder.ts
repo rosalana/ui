@@ -16,6 +16,9 @@ export default function buildContext(config: CreateRosalanaUIOptions) {
 
   const context = {} as RosalanaUIContext;
 
+  context.before = before(config);
+  context.before?.();
+  
   for (const key in builders) {
     context[key as keyof RosalanaUIContext] = builders[key](config);
   }
@@ -83,4 +86,10 @@ function after(
   config: CreateRosalanaUIOptions
 ): RosalanaUIContext["after"] {
   return config.after || (() => {});
+}
+
+function before(
+  config: CreateRosalanaUIOptions
+): RosalanaUIContext["before"] {
+  return config.before || (() => {});
 }

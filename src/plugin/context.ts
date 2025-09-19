@@ -2,6 +2,7 @@ import { type App, reactive } from "vue";
 import { CreateRosalanaUIOptions, RosalanaUIContext } from "./types";
 import buildContext from "./builder";
 import { inject, provide, type RegistryKey } from "./provider";
+import { processConfigColors } from "./colors";
 
 const ROSALANA_UI_CONTEXT: RegistryKey<RosalanaUIContext> =
   Symbol("RosalanaUI");
@@ -24,6 +25,7 @@ export function provideContext(app: App, context: RosalanaUIContext): void {
 }
 
 export function afterAppCreated(app: App, context: RosalanaUIContext): void {
+  processConfigColors(context);
   context.after?.();
 }
 
