@@ -62,17 +62,17 @@ export type TailwindColorName =
   | "rose";
 
 export type TailwindShadeLevel =
-  | 50
-  | 100
-  | 200
-  | 300
-  | 400
-  | 500
-  | 600
-  | 700
-  | 800
-  | 900
-  | 950;
+  | "50"
+  | "100"
+  | "200"
+  | "300"
+  | "400"
+  | "500"
+  | "600"
+  | "700"
+  | "800"
+  | "900"
+  | "950";
 
 export type UiColorPalette = {
   name: TailwindColorName | string; // 'blue' nebo custom
@@ -85,6 +85,33 @@ export type UiColorSlot = {
   dark?: keyof UiColorPalette["shades"] | string; // default 500
 };
 
+/**
+ * Možnosti zápisu barvy do property
+ * - zapisuju jako string skoro jako class v tailwindu.
+ * 
+ * 'gray-500 dark:gray-800'
+ * nebo pokud chci použít barvu z rodiče
+ * '500 dark:800' (použije se z rodiče)
+ * 
+ */
+type ColorProperty = ''
+
+type ColorConfig = {
+  white?: string;
+  black?: string;
+  theme?: {
+    color: string; // -> to pallete
+    background?: string; // nebo to může být jen 200/800 light/dark
+    text?: string;
+    border?: string; // něco jako gray-200 -> bere se z color() funkce
+    ring?: string; // něco jako blue-500
+  },
+  primary?: {
+    color: string // -> to pallete
+    use?: string;
+  },
+};
+
 export type CreateRosalanaUIOptions = {
   name?: string;
   env?: Environment;
@@ -92,9 +119,18 @@ export type CreateRosalanaUIOptions = {
   colors?: {
     white?: string;
     black?: string;
-    theme?: string; // -> z toho bude odvozena barva pozadí a další
+    theme?: {
+      color: string; // -> to pallete
+      default?: string;
+      // background?: string;
+      // text?: string;
+      // border?: string;
+    }
     // --
-    primary?: string; // musí být jako UiColorSlot aby bylo možné přesně definovat která je ta primary barva z toho spektra
+    primary?: {
+      color: string; // -> to pallete
+      default?: string; // něco jako `500 dark:500`
+    }
     //... add more colors here later
   };
   motion?: {

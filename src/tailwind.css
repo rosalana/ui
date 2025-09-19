@@ -28,7 +28,7 @@
   --color-primary-800: var(--color-primary-800);
   --color-primary-900: var(--color-primary-900);
   --color-primary-950: var(--color-primary-950);
-  --color-primary: var(--color-primary-500);
+  --color-primary: var(--color-primary);
   --color-primary-foreground: var(--color-primary-foreground);
 
 
@@ -43,7 +43,7 @@
   --color-theme-800: var(--color-theme-800);
   --color-theme-900: var(--color-theme-900);
   --color-theme-950: var(--color-theme-950);
-  --color-theme: var(--color-theme-500);
+  --color-theme: var(--color-theme);
   /* z tohoto potom budou sestavené color-background atd */
 
   /*  */

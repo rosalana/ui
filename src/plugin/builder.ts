@@ -39,15 +39,38 @@ function theme(config: CreateRosalanaUIOptions): RosalanaUIContext["theme"] {
 }
 
 function colors(config: CreateRosalanaUIOptions): RosalanaUIContext["colors"] {
+
+  const defaultTheme = {
+    color: "slate",
+    default: "500",
+  }
+
+  const defaultPrimary = {
+    color: "slate",
+    default: "500",
+  }
+
   const defaults: RosalanaUIContext["colors"] = {
     white: "white",
     black: "black",
-    theme: "slate",
-    // --
-    primary: "slate",
   };
 
-  return { ...defaults, ...config.colors };
+  const theme = {
+    ...defaultTheme,
+    ...(config.colors?.theme || {}),
+  }
+
+  const primary = {
+    ...defaultPrimary,
+    ...(config.colors?.primary || {}),
+  }
+
+  return {
+    ...defaults,
+    ...(config.colors || {}),
+    theme,
+    primary,
+  };
 }
 
 function motion(config: CreateRosalanaUIOptions): RosalanaUIContext["motion"] {
