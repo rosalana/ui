@@ -21,7 +21,7 @@ export function processConfigColors(context: RosalanaUIContext): void {
 
   console.log("Processed colors:", processed);
 
-  const css = createCSS(processed);
+  const css = createCSS(processed as UiColorPalette[]);
 
   console.log("Generated CSS:", css);
 
@@ -31,7 +31,9 @@ export function processConfigColors(context: RosalanaUIContext): void {
 }
 
 function createCSS(processed: UiColorPalette[]): string {
-  console.log("Creating CSS from processed colors:", processed);
+  darkStyles = [];
+  lightStyles = [];
+
   processed.forEach((p) => {
     if (typeof p.shades === "string") {
       return applyProp(p.name, p.shades);
@@ -172,35 +174,36 @@ function parseColorProperty(prop?: string) {
   return { light, dark };
 }
 
-function pickContrast(color: string): string {
+function pickContrast(c: string): string {
   // Parse oklch format
-  const oklchMatch = color.match(/oklch\(([^)]+)\)/);
+
+  const oklchMatch = c.match(/oklch\(([^)]+)\)/);
   if (oklchMatch) {
     const values = oklchMatch[1].split(/\s+/);
     const lightness = parseFloat(values[0]);
-    return lightness > 0.65 ? "black" : "white";
+    return lightness > 0.65 ? (color("black") as string) : (color("white") as string);
   }
 
   // Parse rgb/rgba format
-  const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  const rgbMatch = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
   if (rgbMatch) {
     const r = parseInt(rgbMatch[1]);
     const g = parseInt(rgbMatch[2]);
     const b = parseInt(rgbMatch[3]);
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 140 ? "black" : "white";
+    return brightness > 140 ? (color("black") as string) : (color("white") as string);
   }
 
   // Parse hex format
-  if (color.startsWith("#")) {
-    const r = parseInt(color.slice(1, 3), 16);
-    const g = parseInt(color.slice(3, 5), 16);
-    const b = parseInt(color.slice(5, 7), 16);
+  if (c.startsWith("#")) {
+    const r = parseInt(c.slice(1, 3), 16);
+    const g = parseInt(c.slice(3, 5), 16);
+    const b = parseInt(c.slice(5, 7), 16);
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 140 ? "black" : "white";
+    return brightness > 140 ? (color("black") as string) : (color("white") as string);
   }
 
-  return "black"; // Default fallback
+  return color("black") as string; // Default fallback
 }
 
 export function createColor(name: string, shades: UiColorPalette["shades"]) {
@@ -208,7 +211,7 @@ export function createColor(name: string, shades: UiColorPalette["shades"]) {
   // odstranit případnou duplicitní definici
   const idx = registry.findIndex((p) => p.name === name);
   if (idx !== -1) registry.splice(idx, 1);
-  registry.push({ name, shades });
+  registry.push({ name, shades } as UiColorPalette);
 }
 
 function palettes(): UiColorPalette[] {
@@ -221,8 +224,8 @@ function palettes(): UiColorPalette[] {
   }
 }
 
-function color(name: string): UiColorPalette["shades"] | undefined {
-  return palettes().find((color) => color.name === name)?.["shades"];
+function color(name: string): UiColorPalette["shades"] | string {
+  return palettes().find((color) => color.name === name)?.["shades"] || name;
 }
 
 function registerTailwindPalettes(): void {
