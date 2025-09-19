@@ -40,7 +40,11 @@ function theme(config: CreateRosalanaUIOptions): RosalanaUIContext["theme"] {
 
 function colors(config: CreateRosalanaUIOptions): RosalanaUIContext["colors"] {
   const defaults: RosalanaUIContext["colors"] = {
-    primary: "#3b82f6", // default blue-500
+    white: "white",
+    black: "black",
+    theme: "slate",
+    // --
+    primary: "slate",
   };
 
   return { ...defaults, ...config.colors };

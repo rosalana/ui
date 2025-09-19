@@ -90,7 +90,11 @@ export type CreateRosalanaUIOptions = {
   env?: Environment;
   theme?: ThemeMode;
   colors?: {
-    primary?: string;
+    white?: string;
+    black?: string;
+    theme?: string; // -> z toho bude odvozena barva pozadí a další
+    // --
+    primary?: string; // musí být jako UiColorSlot aby bylo možné přesně definovat která je ta primary barva z toho spektra
     //... add more colors here later
   };
   motion?: {
