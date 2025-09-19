@@ -21,7 +21,9 @@ export function provideContext(app: App, context: RosalanaUIContext): void {
 
   app.provide(ROSALANA_UI_CONTEXT, inject(ROSALANA_UI_CONTEXT));
   app.provide(ROSALANA_UI_DEFAULTS, inject(ROSALANA_UI_DEFAULTS));
+}
 
+export function afterAppCreated(app: App, context: RosalanaUIContext): void {
   context.after?.();
 }
 

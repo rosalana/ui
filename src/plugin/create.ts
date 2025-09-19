@@ -1,5 +1,5 @@
 import type { CreateRosalanaUIOptions } from "./types";
-import { createContext, provideContext } from "./context";
+import { afterAppCreated, createContext, provideContext } from "./context";
 /**
  * Vue plugin to initialize Rosalana UI context.
  */
@@ -11,5 +11,6 @@ export const createRosalanaApp = {
     const resolved = typeof options === "function" ? options() : options || {};
     const context = createContext(resolved);
     provideContext(app, context);
+    afterAppCreated(app, context);
   },
 };
