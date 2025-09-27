@@ -123,9 +123,12 @@ export type ColorsConfig = {
 }
 
 export type CreateRosalanaUIOptions = {
+  /** Application name */
   name?: string;
+  /** Application environment */
   env?: Environment;
   // theme?: ThemeMode; // removed [NOT USING PROBABLY] -> mohlo by to být používané v useTheme ale tam je fallback na system a to asi stačí 
+  /** Configuration for colors used in the UI */
   colors?: ColorsConfig;
   motion?: {
     reduce?: boolean;
@@ -136,8 +139,11 @@ export type CreateRosalanaUIOptions = {
       fast?: number;
     };
   };
+  /** Runs after the app is created and all providers are set */
   after?: () => void;
+  /** Runs before building the context */
   before?: () => void;
+  /** Adapters to connect Rosalana UI with your backend */
   adapters?: {
     preferences?: Adapter<Preferences>["update"];
   } & Record<string, Adapter<any>["update"]>;

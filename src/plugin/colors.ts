@@ -15,6 +15,9 @@ let lightStyles: string[] = [];
 const ROSALANA_UI_COLORS: RegistryKey<UiColorPalette[]> =
   Symbol("RosalanaUIColors");
 
+/**
+ * Process the colors configuration and generate CSS variables.
+ */
 export function processConfigColors(context: RosalanaUIContext): void {
   registerTailwindPalettes();
 
@@ -212,9 +215,13 @@ function pickContrast(c: string): string {
   return color("black") as string; // Default fallback
 }
 
+/**
+ * Create and register a new color palette.
+ * @param name color name
+ * @param shades shades of the color palette similar to Tailwind palette
+ */
 export function createColor(name: string, shades: UiColorPalette["shades"]) {
   const registry = palettes();
-  // odstranit případnou duplicitní definici
   const idx = registry.findIndex((p) => p.name === name);
   if (idx !== -1) registry.splice(idx, 1);
   registry.push({ name, shades } as UiColorPalette);
