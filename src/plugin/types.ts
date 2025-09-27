@@ -87,18 +87,12 @@ export type UiColorProp = {
   dark: keyof UiColorPalette["shades"] | string;
 };
 
-export type UiColorSlot = {
-  color: UiColorPalette; // základní paleta
-  light?: keyof UiColorPalette["shades"] | string; // default 500
-  dark?: keyof UiColorPalette["shades"] | string; // default 500
-};
-
 type ColorProperty = {
   /**
    * Name of the color from Tailwind palette or custom defined
    * e.g. `red`, `blue`, `slate`,..., `customColorName`
    */
-  color: string;
+  color: TailwindColorName | string;
   /**
    * Default shade for light and dark mode (default is `500`)
    * e.g. `200 dark:900`

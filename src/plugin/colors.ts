@@ -6,7 +6,7 @@ import {
   UiColorPalette,
   UiColorProp,
 } from "./types";
-import { inject, provide, RegistryKey } from "./provider";
+import { flush, inject, provide, RegistryKey } from "./provider";
 import tailwindColors from "tailwindcss/colors";
 
 let darkStyles: string[] = [];
@@ -19,16 +19,11 @@ export function processConfigColors(context: RosalanaUIContext): void {
   registerTailwindPalettes();
 
   const processed = process(context.colors);
-
-  console.log("Processed colors:", processed);
-
   const css = createCSS(processed as UiColorPalette[]);
-
-  console.log("Generated CSS:", css);
 
   injectCSSVars(css);
 
-  // ještě nám chybí aplikovat background, text, border, ring atd...
+  flush(ROSALANA_UI_COLORS);
 }
 
 function createCSS(processed: UiColorPalette[]): string {
@@ -163,30 +158,30 @@ function applyParentColor(
 
 function parseColorProperty(prop?: string) {
   let light: string = "500";
-  let dark: string = "500";
-  if (!prop) return { light, dark };
+  let dark: string | undefined;
+
+  if (!prop) return { light, dark: light };
 
   const parts = prop.split(" ");
 
   parts.forEach((p) => {
-    if (p.includes("dark")) {
-      dark = p.replace("dark:", "") || dark;
+    if (p.startsWith("dark:")) {
+      dark = p.replace("dark:", "") || light;
     } else {
       light = p || light;
     }
   });
 
-  return { light, dark };
+  return { light, dark: dark ?? light };
 }
 
 function pickContrast(c: string): string {
   // Parse oklch format
-
   const oklchMatch = c.match(/oklch\(([^)]+)\)/);
   if (oklchMatch) {
     const values = oklchMatch[1].split(/\s+/);
     const lightness = parseFloat(values[0]);
-    return lightness > 0.65
+    return lightness > 65
       ? (color("black") as string)
       : (color("white") as string);
   }
@@ -250,27 +245,18 @@ export function mergeConfigColors(
   config: CreateRosalanaUIOptions["colors"]
 ): ColorsConfig {
   return {
-    white: config?.white || ("white" as ColorsConfig["white"]),
-    black: config?.black || ("black" as ColorsConfig["black"]),
-    theme: { ...theme(), ...(config?.theme || {}) } as ColorsConfig["theme"],
-    primary: {
-      ...primary(),
-      ...(config?.primary || {}),
-    } as ColorsConfig["primary"],
-    secondary: {
-      ...secondary(),
-      ...(config?.secondary || {}),
-    } as ColorsConfig["secondary"],
-    muted: { ...muted(), ...(config?.muted || {}) } as ColorsConfig["muted"],
-    destructive: {
-      ...destructive(),
-      ...(config?.destructive || {}),
-    } as ColorsConfig["destructive"],
+    white: config?.white || "white",
+    black: config?.black || "black",
+    theme: { ...theme(), ...(config?.theme || {}) },
+    primary: { ...primary(), ...(config?.primary || {}) },
+    secondary: { ...secondary(), ...(config?.secondary || {}) },
+    muted: { ...muted(), ...(config?.muted || {}) },
+    destructive: { ...destructive(), ...(config?.destructive || {}) },
     //... more colors here later
   };
 }
 
-const theme = (): ColorsConfig["theme"] => ({
+const theme = (): NonNullable<Required<ColorsConfig["theme"]>> => ({
   color: "neutral",
   default: "500",
   background: "50 dark:950",
@@ -280,22 +266,22 @@ const theme = (): ColorsConfig["theme"] => ({
   ring: "300 dark:800",
 });
 
-const primary = (): ColorsConfig["primary"] => ({
+const primary = (): NonNullable<Required<ColorsConfig["primary"]>> => ({
   color: "neutral",
   default: "500",
 });
 
-const secondary = (): ColorsConfig["secondary"] => ({
-  color: "neutral",
+const secondary = (): NonNullable<Required<ColorsConfig["secondary"]>> => ({
+  color: theme().color,
   default: "500",
 });
 
-const muted = (): ColorsConfig["muted"] => ({
-  color: "neutral",
+const muted = (): NonNullable<Required<ColorsConfig["muted"]>> => ({
+  color: theme().color,
   default: "500",
 });
 
-const destructive = (): ColorsConfig["destructive"] => ({
+const destructive = (): NonNullable<Required<ColorsConfig["destructive"]>> => ({
   color: "red",
   default: "500",
 });

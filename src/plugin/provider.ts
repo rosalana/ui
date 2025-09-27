@@ -24,6 +24,6 @@ export function inject<T>(key: RegistryKey<T> | string): T {
 /**
  * Clear a value from the registry by its key.
  */
-export function clear<T>(key: RegistryKey<T> | string): void {
+export function flush<T>(key: RegistryKey<T> | string): void {
   registry.delete(key);
 }
