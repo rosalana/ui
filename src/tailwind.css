@@ -135,22 +135,18 @@
   --color-theme: var(--color-theme);
 
   --color-background: var(--color-background);
-  --color-foreground: var(--color-foreground); /** chybí **/
+  --color-foreground: var(--color-foreground);
   --color-input: var(--color-input);
   --color-border: var(--color-border);
   --color-ring: var(--color-ring);
-  /* z tohoto potom budou sestavené color-background atd */
 
   /*  */
 
-  --color-card: var(--card);
+  /* --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
 
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-
-  --color-accent: var(--accent); /*TODO*/
-  --color-accent-foreground: var(--accent-foreground); /*TODO*/
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -165,7 +161,7 @@
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-ring: var(--sidebar-ring); */
 }
 
 /*

@@ -264,9 +264,9 @@ const theme = (): NonNullable<Required<ColorsConfig["theme"]>> => ({
   default: "500",
   background: "50 dark:950",
   foreground: "black dark:white",
-  border: "200 dark:700",
-  input: "200 dark:700",
-  ring: "300 dark:800",
+  border: "200 dark:800",
+  input: "200 dark:800",
+  ring: "950 dark:300",
 });
 
 const primary = (): NonNullable<Required<ColorsConfig["primary"]>> => ({
@@ -275,33 +275,31 @@ const primary = (): NonNullable<Required<ColorsConfig["primary"]>> => ({
 });
 
 const secondary = (): NonNullable<Required<ColorsConfig["secondary"]>> => ({
-  color: theme().color,
-  default: "500",
+  color: theme().color, // sdílíme barvu celého Theme
+  default: "200 dark:800",
 });
 
 const muted = (): NonNullable<Required<ColorsConfig["muted"]>> => ({
-  color: theme().color,
-  default: "500",
+  color: theme().color, // sdílíme barvu celého Theme
+  default: "100 dark:700",
 });
 
 const destructive = (): NonNullable<Required<ColorsConfig["destructive"]>> => ({
   color: "red",
-  default: "500",
+  default: "600",
 });
 
 const info = (): NonNullable<Required<ColorsConfig["info"]>> => ({
   color: "blue",
-  default: "500",
+  default: "500 dark:400",
 });
 
 const success = (): NonNullable<Required<ColorsConfig["success"]>> => ({
   color: "green",
-  default: "500",
+  default: "600 dark:500",
 });
 
 const warning = (): NonNullable<Required<ColorsConfig["warning"]>> => ({
-  color: "orange",
-  default: "500",
+  color: "yellow",
+  default: "500 dark:400",
 });
-
-// přidat info, warning, success...
