@@ -240,7 +240,8 @@ function registerTailwindPalettes(): void {
   });
 }
 
-/** DEFAULTS: */
+/* ↓↓ DEFAULTS FOR COLORS CONFIG ↓↓ */
+
 export function mergeConfigColors(
   config: CreateRosalanaUIOptions["colors"]
 ): ColorsConfig {
@@ -275,12 +276,12 @@ const primary = (): NonNullable<Required<ColorsConfig["primary"]>> => ({
 });
 
 const secondary = (): NonNullable<Required<ColorsConfig["secondary"]>> => ({
-  color: theme().color, // sdílíme barvu celého Theme
+  color: theme().color, // shared color with Theme
   default: "200 dark:800",
 });
 
 const muted = (): NonNullable<Required<ColorsConfig["muted"]>> => ({
-  color: theme().color, // sdílíme barvu celého Theme
+  color: theme().color, // shared color with Theme
   default: "100 dark:700",
 });
 

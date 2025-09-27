@@ -125,7 +125,7 @@ export type ColorsConfig = {
 export type CreateRosalanaUIOptions = {
   name?: string;
   env?: Environment;
-  theme?: ThemeMode;
+  // theme?: ThemeMode; // removed [NOT USING PROBABLY] -> mohlo by to být používané v useTheme ale tam je fallback na system a to asi stačí 
   colors?: ColorsConfig;
   motion?: {
     reduce?: boolean;

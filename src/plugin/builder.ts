@@ -5,7 +5,6 @@ export default function buildContext(config: CreateRosalanaUIOptions) {
   const builders: Record<string, (config: CreateRosalanaUIOptions) => any> = {
     name,
     env,
-    theme,
     colors,
     motion,
     adapters,
@@ -33,10 +32,6 @@ function name(config: CreateRosalanaUIOptions): RosalanaUIContext["name"] {
 
 function env(config: CreateRosalanaUIOptions): RosalanaUIContext["env"] {
   return config.env || "production";
-}
-
-function theme(config: CreateRosalanaUIOptions): RosalanaUIContext["theme"] {
-  return config.theme || "system";
 }
 
 function colors(config: CreateRosalanaUIOptions): RosalanaUIContext["colors"] {
