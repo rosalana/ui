@@ -130,15 +130,15 @@ export type CreateRosalanaUIOptions = {
   // theme?: ThemeMode; // removed [NOT USING PROBABLY] -> mohlo by to být používané v useTheme ale tam je fallback na system a to asi stačí 
   /** Configuration for colors used in the UI */
   colors?: ColorsConfig;
-  motion?: {
-    reduce?: boolean;
-    disable?: boolean;
-    timeline?: {
-      slow?: number;
-      normal?: number;
-      fast?: number;
-    };
-  };
+  // motion?: {
+  //   reduce?: boolean;
+  //   disable?: boolean;
+  //   timeline?: {
+  //     slow?: number;
+  //     normal?: number;
+  //     fast?: number;
+  //   };
+  // };
   /** Runs after the app is created and all providers are set */
   after?: () => void;
   /** Runs before building the context */

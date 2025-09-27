@@ -6,7 +6,7 @@ export default function buildContext(config: CreateRosalanaUIOptions) {
     name,
     env,
     colors,
-    motion,
+    // motion,
     adapters,
     preferences,
     user,
@@ -38,19 +38,19 @@ function colors(config: CreateRosalanaUIOptions): RosalanaUIContext["colors"] {
   return mergeConfigColors(config.colors);
 }
 
-function motion(config: CreateRosalanaUIOptions): RosalanaUIContext["motion"] {
-  const defaults: RosalanaUIContext["motion"] = {
-    reduce: false,
-    disable: false,
-    timeline: {
-      slow: 1000,
-      normal: 500,
-      fast: 250,
-    },
-  };
+// function motion(config: CreateRosalanaUIOptions): RosalanaUIContext["motion"] {
+//   const defaults: RosalanaUIContext["motion"] = {
+//     reduce: false,
+//     disable: false,
+//     timeline: {
+//       slow: 1000,
+//       normal: 500,
+//       fast: 250,
+//     },
+//   };
 
-  return { ...defaults, ...config.motion };
-}
+//   return { ...defaults, ...config.motion };
+// }
 
 function adapters(
   config: CreateRosalanaUIOptions
