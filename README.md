@@ -22,3 +22,4 @@ npm run dev:tsc
 ```
 
 
+TODO: OPRAVIT TYPOVANI VUE KOMPONENT
