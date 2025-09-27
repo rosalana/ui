@@ -18,7 +18,12 @@ export function processConfigColors(context: RosalanaUIContext): void {
   registerTailwindPalettes();
 
   const processed = process(context.colors);
+
+  console.log("Processed colors:", processed);
+
   const css = createCSS(processed as UiColorPalette[]);
+
+  console.log("Generated CSS:", css);
 
   injectCSSVars(css);
 
@@ -138,8 +143,12 @@ function applyParentColor(
       // je to se stringem takže zkusíme najít tu barvu
       const findColor = color(c.split("-")[0]);
       if (findColor) {
-        prop[mode as "light" | "dark"] =
+        if (typeof findColor === "string") {
+          prop[mode as "light" | "dark"] = findColor;
+        } else {
+          prop[mode as "light" | "dark"] =
           findColor[c.split("-")[1] as TailwindShadeLevel] || c;
+        }
       }
     } else {
       // je to číslo takže použijeme parent
