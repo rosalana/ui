@@ -116,6 +116,9 @@ export type ColorsConfig = {
   secondary?: ColorProperty;
   muted?: ColorProperty;
   destructive?: ColorProperty;
+  info?: ColorProperty;
+  success?: ColorProperty;
+  warning?: ColorProperty;
   //... more colors here later
 }
 

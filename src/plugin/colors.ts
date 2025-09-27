@@ -252,6 +252,9 @@ export function mergeConfigColors(
     secondary: { ...secondary(), ...(config?.secondary || {}) },
     muted: { ...muted(), ...(config?.muted || {}) },
     destructive: { ...destructive(), ...(config?.destructive || {}) },
+    info: { ...info(), ...(config?.info || {}) },
+    success: { ...success(), ...(config?.success || {}) },
+    warning: { ...warning(), ...(config?.warning || {}) },
     //... more colors here later
   };
 }
@@ -260,7 +263,7 @@ const theme = (): NonNullable<Required<ColorsConfig["theme"]>> => ({
   color: "neutral",
   default: "500",
   background: "50 dark:950",
-  foreground: "950 dark:50",
+  foreground: "black dark:white",
   border: "200 dark:700",
   input: "200 dark:700",
   ring: "300 dark:800",
@@ -283,6 +286,21 @@ const muted = (): NonNullable<Required<ColorsConfig["muted"]>> => ({
 
 const destructive = (): NonNullable<Required<ColorsConfig["destructive"]>> => ({
   color: "red",
+  default: "500",
+});
+
+const info = (): NonNullable<Required<ColorsConfig["info"]>> => ({
+  color: "blue",
+  default: "500",
+});
+
+const success = (): NonNullable<Required<ColorsConfig["success"]>> => ({
+  color: "green",
+  default: "500",
+});
+
+const warning = (): NonNullable<Required<ColorsConfig["warning"]>> => ({
+  color: "orange",
   default: "500",
 });
 
