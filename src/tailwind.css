@@ -30,7 +30,48 @@
   --color-primary-950: var(--color-primary-950);
   --color-primary: var(--color-primary);
   --color-primary-foreground: var(--color-primary-foreground);
+  
+  --color-secondary-50: var(--color-secondary-50);
+  --color-secondary-100: var(--color-secondary-100);
+  --color-secondary-200: var(--color-secondary-200);
+  --color-secondary-300: var(--color-secondary-300);
+  --color-secondary-400: var(--color-secondary-400);
+  --color-secondary-500: var(--color-secondary-500);
+  --color-secondary-600: var(--color-secondary-600);
+  --color-secondary-700: var(--color-secondary-700);
+  --color-secondary-800: var(--color-secondary-800);
+  --color-secondary-900: var(--color-secondary-900);
+  --color-secondary-950: var(--color-secondary-950);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
 
+  --color-muted-50: var(--color-muted-50);
+  --color-muted-100: var(--color-muted-100);
+  --color-muted-200: var(--color-muted-200);
+  --color-muted-300: var(--color-muted-300);
+  --color-muted-400: var(--color-muted-400);
+  --color-muted-500: var(--color-muted-500);
+  --color-muted-600: var(--color-muted-600);
+  --color-muted-700: var(--color-muted-700);
+  --color-muted-800: var(--color-muted-800);
+  --color-muted-900: var(--color-muted-900);
+  --color-muted-950: var(--color-muted-950);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+
+  --color-destructive-50: var(--color-destructive-50);
+  --color-destructive-100: var(--color-destructive-100);
+  --color-destructive-200: var(--color-destructive-200);
+  --color-destructive-300: var(--color-destructive-300);
+  --color-destructive-400: var(--color-destructive-400);
+  --color-destructive-500: var(--color-destructive-500);
+  --color-destructive-600: var(--color-destructive-600);
+  --color-destructive-700: var(--color-destructive-700);
+  --color-destructive-800: var(--color-destructive-800);
+  --color-destructive-900: var(--color-destructive-900);
+  --color-destructive-950: var(--color-destructive-950);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
 
   --color-theme-50: var(--color-theme-50);
   --color-theme-100: var(--color-theme-100);
@@ -46,7 +87,10 @@
   --color-theme: var(--color-theme);
 
   --color-background: var(--color-background);
-  --color-foreground: var(--color-foreground);
+  --color-foreground: var(--color-foreground); /** chybí **/
+  --color-input: var(--color-input);
+  --color-border: var(--color-border);
+  --color-ring: var(--color-ring);
   /* z tohoto potom budou sestavené color-background atd */
 
   /*  */
@@ -57,24 +101,8 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
 
-  /* --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground); */
-
-  --color-secondary: var(--secondary); /*TODO*/
-  --color-secondary-foreground: var(--secondary-foreground); /*TODO*/
-
-  --color-muted: var(--muted); /*TODO*/
-  --color-muted-foreground: var(--muted-foreground); /*TODO*/
-
   --color-accent: var(--accent); /*TODO*/
   --color-accent-foreground: var(--accent-foreground); /*TODO*/
-
-  --color-destructive: var(--destructive); /*TODO*/
-  --color-destructive-foreground: var(--destructive-foreground); /*TODO*/
-
-  --color-border: var(--border); /*TODO*/
-  --color-input: var(--input); /*TODO*/
-  --color-ring: var(--ring); /*TODO*/
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);

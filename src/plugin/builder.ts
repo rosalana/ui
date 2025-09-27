@@ -1,3 +1,4 @@
+import { mergeConfigColors } from "./colors";
 import { CreateRosalanaUIOptions, RosalanaUIContext } from "./types";
 
 export default function buildContext(config: CreateRosalanaUIOptions) {
@@ -18,7 +19,7 @@ export default function buildContext(config: CreateRosalanaUIOptions) {
 
   context.before = before(config);
   context.before?.();
-  
+
   for (const key in builders) {
     context[key as keyof RosalanaUIContext] = builders[key](config);
   }
@@ -35,43 +36,11 @@ function env(config: CreateRosalanaUIOptions): RosalanaUIContext["env"] {
 }
 
 function theme(config: CreateRosalanaUIOptions): RosalanaUIContext["theme"] {
-  return config.theme || 'system';
+  return config.theme || "system";
 }
 
 function colors(config: CreateRosalanaUIOptions): RosalanaUIContext["colors"] {
-
-  const defaultTheme = {
-    color: "neutral",
-    default: "500",
-    background: "50 dark:950",
-  }
-
-  const defaultPrimary = {
-    color: "neutral",
-    default: "500",
-  }
-
-  const defaults: RosalanaUIContext["colors"] = {
-    white: "white",
-    black: "black",
-  };
-
-  const theme = {
-    ...defaultTheme,
-    ...(config.colors?.theme || {}),
-  }
-
-  const primary = {
-    ...defaultPrimary,
-    ...(config.colors?.primary || {}),
-  }
-
-  return {
-    ...defaults,
-    ...(config.colors || {}),
-    theme,
-    primary,
-  };
+  return mergeConfigColors(config.colors);
 }
 
 function motion(config: CreateRosalanaUIOptions): RosalanaUIContext["motion"] {
@@ -110,14 +79,10 @@ function permissions(
   return null;
 }
 
-function after(
-  config: CreateRosalanaUIOptions
-): RosalanaUIContext["after"] {
+function after(config: CreateRosalanaUIOptions): RosalanaUIContext["after"] {
   return config.after || (() => {});
 }
 
-function before(
-  config: CreateRosalanaUIOptions
-): RosalanaUIContext["before"] {
+function before(config: CreateRosalanaUIOptions): RosalanaUIContext["before"] {
   return config.before || (() => {});
 }

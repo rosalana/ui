@@ -1,5 +1,6 @@
 import {
-  CreateAdapterOptions,
+  ColorsConfig,
+  CreateRosalanaUIOptions,
   RosalanaUIContext,
   TailwindShadeLevel,
   UiColorPalette,
@@ -147,7 +148,7 @@ function applyParentColor(
           prop[mode as "light" | "dark"] = findColor;
         } else {
           prop[mode as "light" | "dark"] =
-          findColor[c.split("-")[1] as TailwindShadeLevel] || c;
+            findColor[c.split("-")[1] as TailwindShadeLevel] || c;
         }
       }
     } else {
@@ -185,7 +186,9 @@ function pickContrast(c: string): string {
   if (oklchMatch) {
     const values = oklchMatch[1].split(/\s+/);
     const lightness = parseFloat(values[0]);
-    return lightness > 0.65 ? (color("black") as string) : (color("white") as string);
+    return lightness > 0.65
+      ? (color("black") as string)
+      : (color("white") as string);
   }
 
   // Parse rgb/rgba format
@@ -195,7 +198,9 @@ function pickContrast(c: string): string {
     const g = parseInt(rgbMatch[2]);
     const b = parseInt(rgbMatch[3]);
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 140 ? (color("black") as string) : (color("white") as string);
+    return brightness > 140
+      ? (color("black") as string)
+      : (color("white") as string);
   }
 
   // Parse hex format
@@ -204,7 +209,9 @@ function pickContrast(c: string): string {
     const g = parseInt(c.slice(3, 5), 16);
     const b = parseInt(c.slice(5, 7), 16);
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 140 ? (color("black") as string) : (color("white") as string);
+    return brightness > 140
+      ? (color("black") as string)
+      : (color("white") as string);
   }
 
   return color("black") as string; // Default fallback
@@ -237,3 +244,60 @@ function registerTailwindPalettes(): void {
     createColor(name, shades as UiColorPalette["shades"]);
   });
 }
+
+/** DEFAULTS: */
+export function mergeConfigColors(
+  config: CreateRosalanaUIOptions["colors"]
+): ColorsConfig {
+  return {
+    white: config?.white || ("white" as ColorsConfig["white"]),
+    black: config?.black || ("black" as ColorsConfig["black"]),
+    theme: { ...theme(), ...(config?.theme || {}) } as ColorsConfig["theme"],
+    primary: {
+      ...primary(),
+      ...(config?.primary || {}),
+    } as ColorsConfig["primary"],
+    secondary: {
+      ...secondary(),
+      ...(config?.secondary || {}),
+    } as ColorsConfig["secondary"],
+    muted: { ...muted(), ...(config?.muted || {}) } as ColorsConfig["muted"],
+    destructive: {
+      ...destructive(),
+      ...(config?.destructive || {}),
+    } as ColorsConfig["destructive"],
+    //... more colors here later
+  };
+}
+
+const theme = (): ColorsConfig["theme"] => ({
+  color: "neutral",
+  default: "500",
+  background: "50 dark:950",
+  foreground: "950 dark:50",
+  border: "200 dark:700",
+  input: "200 dark:700",
+  ring: "300 dark:800",
+});
+
+const primary = (): ColorsConfig["primary"] => ({
+  color: "neutral",
+  default: "500",
+});
+
+const secondary = (): ColorsConfig["secondary"] => ({
+  color: "neutral",
+  default: "500",
+});
+
+const muted = (): ColorsConfig["muted"] => ({
+  color: "neutral",
+  default: "500",
+});
+
+const destructive = (): ColorsConfig["destructive"] => ({
+  color: "red",
+  default: "500",
+});
+
+// přidat info, warning, success...

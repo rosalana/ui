@@ -93,54 +93,43 @@ export type UiColorSlot = {
   dark?: keyof UiColorPalette["shades"] | string; // default 500
 };
 
-/**
- * Možnosti zápisu barvy do property
- * - zapisuju jako string skoro jako class v tailwindu.
- *
- * 'gray-500 dark:gray-800'
- * nebo pokud chci použít barvu z rodiče
- * '500 dark:800' (použije se z rodiče)
- *
- */
-type ColorProperty = "";
+type ColorProperty = {
+  /**
+   * Name of the color from Tailwind palette or custom defined
+   * e.g. `red`, `blue`, `slate`,..., `customColorName`
+   */
+  color: string;
+  /**
+   * Default shade for light and dark mode (default is `500`)
+   * e.g. `200 dark:900`
+   * or use directly different palette
+   * e.g. `red-500 dark:800` -> light mode use `red-500` and dark mode `customColorName-800`
+   */
+  default?: string;
+};
 
-type ColorConfig = {
+export type ColorsConfig = {
   white?: string;
   black?: string;
-  theme?: {
-    color: string; // -> to pallete
-    background?: string; // nebo to může být jen 200/800 light/dark
-    text?: string;
-    border?: string; // něco jako gray-200 -> bere se z color() funkce
-    ring?: string; // něco jako blue-500
+  theme?: ColorProperty & {
+    background?: string; // otázka jestli toto spojovat s colorProperty a neudělat to zvlášť
+    foreground?: string;
+    border?: string;
+    input?: string;
+    ring?: string;
   };
-  primary?: {
-    color: string; // -> to pallete
-    use?: string;
-  };
-};
+  primary?: ColorProperty;
+  secondary?: ColorProperty;
+  muted?: ColorProperty;
+  destructive?: ColorProperty;
+  //... more colors here later
+}
 
 export type CreateRosalanaUIOptions = {
   name?: string;
   env?: Environment;
   theme?: ThemeMode;
-  colors?: {
-    white?: string;
-    black?: string;
-    theme?: {
-      color: string; // -> to pallete
-      default?: string;
-      background?: string;
-      // text?: string;
-      // border?: string;
-    };
-    // --
-    primary?: {
-      color: string; // -> to pallete
-      default?: string; // něco jako `500 dark:500`
-    };
-    //... add more colors here later
-  };
+  colors?: ColorsConfig;
   motion?: {
     reduce?: boolean;
     disable?: boolean;
