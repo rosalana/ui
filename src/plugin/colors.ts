@@ -18,12 +18,7 @@ export function processConfigColors(context: RosalanaUIContext): void {
   registerTailwindPalettes();
 
   const processed = process(context.colors);
-
-  console.log("Processed colors:", processed);
-
   const css = createCSS(processed as UiColorPalette[]);
-
-  console.log("Generated CSS:", css);
 
   injectCSSVars(css);
 
