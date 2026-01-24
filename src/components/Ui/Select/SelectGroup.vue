@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { SelectGroupProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
-import { SelectGroup, useForwardProps } from "reka-ui"
+import type { SelectGroupProps } from "reka-ui";
+import type { HTMLAttributes } from "vue";
+import { SelectGroup, useForwardProps } from "reka-ui";
 
 interface Props extends SelectGroupProps {
-  class?: HTMLAttributes["class"]
+  class?: HTMLAttributes["class"];
 }
 
-const props = defineProps<Props>()
-const forwarded = useForwardProps(props)
+const props = defineProps<Props>();
+const forwarded = useForwardProps(props);
 </script>
 
 <template>
