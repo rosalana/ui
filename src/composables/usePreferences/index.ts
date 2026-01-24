@@ -1,6 +1,6 @@
-import type { Preferences } from "../plugin/types";
-import { createAdapter } from "../plugin/adapter";
-import { useComputedPage } from "./useComputedPage";
+import type { Preferences } from "../../plugin/types";
+import { createAdapter } from "../../plugin/adapter";
+import { useComputedPage } from "../useComputedPage/index";
 
 /**
  * Composable to access user preferences.

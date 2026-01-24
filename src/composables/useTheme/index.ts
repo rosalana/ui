@@ -1,6 +1,6 @@
-import type { ThemeMode } from "../plugin/types";
-import { createAdapter } from "../plugin/adapter";
-import { usePreferences } from "./usePreferences";
+import type { ThemeMode } from "../../plugin/types";
+import { createAdapter } from "../../plugin/adapter";
+import { usePreferences } from "../usePreferences";
 import { computed, watch } from "vue";
 
 export function useTheme() {

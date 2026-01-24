@@ -1,8 +1,7 @@
 import { usePage } from "@inertiajs/vue3";
-import { User } from "../plugin/types";
-import { useAppContext } from "../plugin/context";
+import { useAppContext } from "../../plugin/context";
+import { UserWithExtras } from "./types";
 
-type UserWithExtras<T> = User & T;
 
 /**
  * Composable to access the current authenticated user.
