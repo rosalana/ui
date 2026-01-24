@@ -568,6 +568,7 @@ export function useTable<T = any>(config: TableConfig<T>) {
     getInstanceId: () => {
       return config.options?.id;
     },
+    getRowId
   };
 }
 
