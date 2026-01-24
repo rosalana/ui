@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import type { ToggleGroupItemProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
-import { ToggleGroupItem, useForwardProps } from "reka-ui"
-import { tv, type VariantProps } from "tailwind-variants"
-import { inject } from "vue"
+import type { ToggleGroupItemProps } from "reka-ui";
+import type { HTMLAttributes } from "vue";
+import { ToggleGroupItem, useForwardProps } from "reka-ui";
+import { tv, type VariantProps } from "tailwind-variants";
+import { inject } from "vue";
 
 const toggleGroupItem = tv({
   base: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   variants: {
     variant: {
       default: "bg-transparent",
-      outline: "border border-input bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground",
+      outline:
+        "border border-input bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground",
     },
     size: {
       default: "h-9 px-3 min-w-9",
@@ -22,28 +23,34 @@ const toggleGroupItem = tv({
     variant: "default",
     size: "default",
   },
-})
+});
 
-type ToggleGroupItemVariants = VariantProps<typeof toggleGroupItem>
+type ToggleGroupItemVariants = VariantProps<typeof toggleGroupItem>;
 
 interface Props extends ToggleGroupItemProps {
-  variant?: ToggleGroupItemVariants["variant"]
-  size?: ToggleGroupItemVariants["size"]
-  class?: HTMLAttributes["class"]
+  variant?: ToggleGroupItemVariants["variant"];
+  size?: ToggleGroupItemVariants["size"];
+  class?: HTMLAttributes["class"];
 }
 
-const props = defineProps<Props>()
-const forwarded = useForwardProps(props)
+const props = defineProps<Props>();
+const forwarded = useForwardProps(props);
 
-const variant = inject<ToggleGroupItemVariants["variant"]>("toggleGroupVariant", props.variant ?? "default")
-const size = inject<ToggleGroupItemVariants["size"]>("toggleGroupSize", props.size ?? "default")
+const variant = inject<ToggleGroupItemVariants["variant"]>(
+  "toggleGroupVariant",
+  props.variant ?? "default",
+);
+const size = inject<ToggleGroupItemVariants["size"]>(
+  "toggleGroupSize",
+  props.size ?? "default",
+);
 </script>
 
 <template>
   <ToggleGroupItem
     data-slot="toggle-group-item"
     v-bind="forwarded"
-    :class="[toggleGroupItem({ variant, size }), props.class]"
+    :class="[toggleGroupItem({ variant, size, class: props.class })]"
   >
     <slot />
   </ToggleGroupItem>
