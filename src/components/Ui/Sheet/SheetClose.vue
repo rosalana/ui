@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { DialogCloseProps } from "reka-ui"
-import { DialogClose, useForwardProps } from "reka-ui"
+import type { DialogCloseProps } from "reka-ui";
+import { DialogClose, useForwardProps } from "reka-ui";
 
-const props = defineProps<DialogCloseProps>()
-const forwarded = useForwardProps(props)
+const props = defineProps<DialogCloseProps>();
+const forwarded = useForwardProps(props);
 </script>
 
 <template>
