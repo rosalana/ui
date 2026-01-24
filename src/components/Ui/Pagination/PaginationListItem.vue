@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { PaginationListItemProps } from "reka-ui"
-import { PaginationListItem, useForwardProps } from "reka-ui"
+import type { PaginationListItemProps } from "reka-ui";
+import { PaginationListItem, useForwardProps } from "reka-ui";
 
-const props = defineProps<PaginationListItemProps>()
-const forwarded = useForwardProps(props)
+const props = defineProps<PaginationListItemProps>();
+const forwarded = useForwardProps(props);
 </script>
 
 <template>
