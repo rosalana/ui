@@ -294,7 +294,7 @@ const muted = (): NonNullable<Required<ColorsConfig["muted"]>> => ({
 
 const destructive = (): NonNullable<Required<ColorsConfig["destructive"]>> => ({
   color: "red",
-  default: "600",
+  default: "500",
 });
 
 const info = (): NonNullable<Required<ColorsConfig["info"]>> => ({
