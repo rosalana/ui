@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { DialogPortalProps } from "reka-ui"
-import { DialogPortal, useForwardProps } from "reka-ui"
+import type { DialogPortalProps } from "reka-ui";
+import { DialogPortal, useForwardProps } from "reka-ui";
 
-const props = defineProps<DialogPortalProps>()
-const forwarded = useForwardProps(props)
+const props = defineProps<DialogPortalProps>();
+const forwarded = useForwardProps(props);
 </script>
 
 <template>
