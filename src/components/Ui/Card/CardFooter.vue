@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { PrimitiveProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
-import { Primitive } from "reka-ui"
-import { tv } from "tailwind-variants"
+import type { PrimitiveProps } from "reka-ui";
+import type { HTMLAttributes } from "vue";
+import { Primitive } from "reka-ui";
+import { tv } from "tailwind-variants";
 
 const cardFooter = tv({
   base: "flex items-center p-6 pt-0",
-})
+});
 
 interface Props extends PrimitiveProps {
-  class?: HTMLAttributes["class"]
+  class?: HTMLAttributes["class"];
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 </script>
 
 <template>
@@ -20,7 +20,7 @@ const props = defineProps<Props>()
     data-slot="card-footer"
     :as="as ?? 'div'"
     :as-child="asChild"
-    :class="[cardFooter(), props.class]"
+    :class="[cardFooter({ class: props.class })]"
   >
     <slot />
   </Primitive>
