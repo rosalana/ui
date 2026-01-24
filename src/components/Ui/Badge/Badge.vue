@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import type { PrimitiveProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
-import { Primitive } from "reka-ui"
-import { tv, type VariantProps } from "tailwind-variants"
+import type { PrimitiveProps } from "reka-ui";
+import type { HTMLAttributes } from "vue";
+import { Primitive } from "reka-ui";
+import { tv, type VariantProps } from "tailwind-variants";
 
 const badge = tv({
   base: "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   variants: {
     variant: {
-      default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-      secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      destructive: "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-      success: "border-transparent bg-success text-success-foreground shadow hover:bg-success/80",
-      warning: "border-transparent bg-warning text-warning-foreground shadow hover:bg-warning/80",
+      default:
+        "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+      secondary:
+        "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+      destructive:
+        "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
+      success:
+        "border-transparent bg-success text-success-foreground shadow hover:bg-success/80",
+      warning:
+        "border-transparent bg-warning text-warning-foreground shadow hover:bg-warning/80",
       info: "border-transparent bg-info text-info-foreground shadow hover:bg-info/80",
       outline: "text-foreground",
     },
@@ -20,18 +25,18 @@ const badge = tv({
   defaultVariants: {
     variant: "default",
   },
-})
+});
 
-type BadgeVariants = VariantProps<typeof badge>
+type BadgeVariants = VariantProps<typeof badge>;
 
 interface Props extends PrimitiveProps {
-  variant?: BadgeVariants["variant"]
-  class?: HTMLAttributes["class"]
+  variant?: BadgeVariants["variant"];
+  class?: HTMLAttributes["class"];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variant: "default",
-})
+});
 </script>
 
 <template>
@@ -39,7 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
     data-slot="badge"
     :as="as ?? 'div'"
     :as-child="asChild"
-    :class="[badge({ variant }), props.class]"
+    :class="[badge({ variant, class: props.class })]"
   >
     <slot />
   </Primitive>
