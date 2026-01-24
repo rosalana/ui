@@ -48,16 +48,18 @@ export function useTable<T = any>(config: TableConfig<T>) {
       additional: false,
       value: (row: T) => getValueByPath(row, column.key),
       content: (row: T) =>
-        column.render && column.render(row) ? column.render(row) : getValueByPath(row, column.key),
+        column.render && column.render(row)
+          ? column.render(row)
+          : getValueByPath(row, column.key),
       ...column,
-    })
+    }),
   );
 
   const originalData = computed(() =>
     config.data.map((row) => ({
       ...row,
       [ROW_UNIQUE_ID]: getRowId(row),
-    }))
+    })),
   );
 
   /**
@@ -98,15 +100,16 @@ export function useTable<T = any>(config: TableConfig<T>) {
     (newPage) => {
       if (config.on?.page && shouldCatch.page) config.on.page(newPage);
       shouldCatch.page = true;
-    }
+    },
   );
 
   watch(
     () => state.pageSize,
     (newPageSize) => {
-      if (config.on?.pageSize && shouldCatch.pageSize) config.on.pageSize(newPageSize);
+      if (config.on?.pageSize && shouldCatch.pageSize)
+        config.on.pageSize(newPageSize);
       shouldCatch.pageSize = true;
-    }
+    },
   );
 
   watch(
@@ -114,7 +117,7 @@ export function useTable<T = any>(config: TableConfig<T>) {
     (newFilter) => {
       if (config.on?.filter && shouldCatch.filter) config.on.filter(newFilter);
       shouldCatch.filter = true;
-    }
+    },
   );
 
   watch(
@@ -122,15 +125,15 @@ export function useTable<T = any>(config: TableConfig<T>) {
     (newSearch) => {
       if (config.on?.search && shouldCatch.search) config.on.search(newSearch);
       shouldCatch.search = true;
-    }
+    },
   );
 
   watch(state.select, (newSelect) => {
     if (config.on?.select && shouldCatch.select) {
       config.on.select(
         Array.from(newSelect).map((id) =>
-          originalData.value.find((row) => row[ROW_UNIQUE_ID] === id)
-        )
+          originalData.value.find((row) => row[ROW_UNIQUE_ID] === id),
+        ),
       );
     }
     shouldCatch.search = true;
@@ -181,7 +184,8 @@ export function useTable<T = any>(config: TableConfig<T>) {
       }
       const result = getValueByPath(row, key);
       const isUnique =
-        config.data.filter((row) => getValueByPath(row, key) === result).length === 1;
+        config.data.filter((row) => getValueByPath(row, key) === result)
+          .length === 1;
 
       if (
         result === undefined ||
@@ -294,7 +298,9 @@ export function useTable<T = any>(config: TableConfig<T>) {
   });
 
   const filteredData = computed(() => {
-    return sortedData.value.filter((row) => state.filter(row) && searchToFilterFn(row));
+    return sortedData.value.filter(
+      (row) => state.filter(row) && searchToFilterFn(row),
+    );
   });
 
   const paginatedData = computed(() => {
@@ -325,7 +331,7 @@ export function useTable<T = any>(config: TableConfig<T>) {
       },
       get selected() {
         return Array.from(state.select).map((id) =>
-          originalData.value.find((row) => row[ROW_UNIQUE_ID] === id)
+          originalData.value.find((row) => row[ROW_UNIQUE_ID] === id),
         );
       },
     },
@@ -350,8 +356,12 @@ export function useTable<T = any>(config: TableConfig<T>) {
               ? column.render(row)
               : getValueByPath(row, column.key),
           ...column,
-        })
-        if (column.index !== undefined && column.index >= 0 && column.index < columns.value.length) {
+        });
+        if (
+          column.index !== undefined &&
+          column.index >= 0 &&
+          column.index < columns.value.length
+        ) {
           columns.value.splice(column.index, 0, resolved);
         } else {
           columns.value.push(resolved);
@@ -364,6 +374,55 @@ export function useTable<T = any>(config: TableConfig<T>) {
           columns.value.splice(index, 1);
         }
       },
+      move(column: ResolvedColumn, newIndex: number) {
+        const currentIndex = columns.value.findIndex(
+          (col) => col.id === column.id,
+        );
+        if (currentIndex === -1) return;
+
+        if (newIndex < 0) newIndex = 0;
+        if (newIndex >= columns.value.length)
+          newIndex = columns.value.length - 1;
+
+        columns.value.splice(currentIndex, 1);
+        columns.value.splice(newIndex, 0, column);
+      },
+      moveToEnd(column: ResolvedColumn) {
+        this.move(column, columns.value.length - 1);
+      },
+      moveToStart(column: ResolvedColumn) {
+        this.move(column, 0);
+      },
+      moveAfter(column: ResolvedColumn, targetColumn: ResolvedColumn) {
+        const targetColumnIndex = columns.value.findIndex(
+          (col) => col.id === targetColumn.id,
+        );
+        if (targetColumnIndex === -1) return;
+        this.move(column, targetColumnIndex + 1);
+      },
+      moveBefore(column: ResolvedColumn, targetColumn: ResolvedColumn) {
+        const targetColumnIndex = columns.value.findIndex(
+          (col) => col.id === targetColumn.id,
+        );
+        if (targetColumnIndex === -1) return;
+        this.move(column, targetColumnIndex);
+      },
+      moveLeft(column: ResolvedColumn) {
+        const currentIndex = columns.value.findIndex(
+          (col) => col.id === column.id,
+        );
+        if (currentIndex > 0) {
+          this.move(column, currentIndex - 1);
+        }
+      },
+      moveRight(column: ResolvedColumn) {
+        const currentIndex = columns.value.findIndex(
+          (col) => col.id === column.id,
+        );
+        if (currentIndex < columns.value.length - 1) {
+          this.move(column, currentIndex + 1);
+        }
+      },
       get visible() {
         return this.all.filter((col) => col.hidden !== true);
         // return columns.value.filter((col) => !col.hidden);
@@ -372,7 +431,12 @@ export function useTable<T = any>(config: TableConfig<T>) {
         return this.all.filter((col) => col.hidden === true);
       },
       get relevant() {
-        return this.all.filter((col) => col.relevant === true || col.filterable === true || col.key === 'id');
+        return this.all.filter(
+          (col) =>
+            col.relevant === true ||
+            col.filterable === true ||
+            col.key === "id",
+        );
       },
       get toggleable() {
         return this.all.filter((col) => col.toggleable === true);
@@ -395,7 +459,9 @@ export function useTable<T = any>(config: TableConfig<T>) {
 
         const flat = rawValues.flatMap((value) => {
           if (Array.isArray(value)) {
-            return value.filter((v) => v !== null && v !== undefined && v !== "");
+            return value.filter(
+              (v) => v !== null && v !== undefined && v !== "",
+            );
           } else if (value !== null && value !== undefined && value !== "") {
             return [value];
           }
@@ -410,13 +476,17 @@ export function useTable<T = any>(config: TableConfig<T>) {
     },
     select: {
       isIndeterminate() {
-        return state.select.size > 0 && state.select.size < originalData.value.length;
+        return (
+          state.select.size > 0 && state.select.size < originalData.value.length
+        );
       },
       isAllSelected() {
         return state.select.size === filteredData.value.length;
       },
       isAllOnPage() {
-        return paginatedData.value.every((row: any) => state.select.has(row[ROW_UNIQUE_ID]));
+        return paginatedData.value.every((row: any) =>
+          state.select.has(row[ROW_UNIQUE_ID]),
+        );
       },
       isSelected(row: any) {
         return state.select.has(row[ROW_UNIQUE_ID]);
@@ -425,13 +495,19 @@ export function useTable<T = any>(config: TableConfig<T>) {
         if (!this.isAllSelected()) {
           if (this.isIndeterminate()) {
             if (this.isAllOnPage()) {
-              paginatedData.value.forEach((row: any) => state.select.delete(row[ROW_UNIQUE_ID]));
+              paginatedData.value.forEach((row: any) =>
+                state.select.delete(row[ROW_UNIQUE_ID]),
+              );
             } else {
-              paginatedData.value.forEach((row: any) => state.select.add(row[ROW_UNIQUE_ID]));
+              paginatedData.value.forEach((row: any) =>
+                state.select.add(row[ROW_UNIQUE_ID]),
+              );
             }
           } else {
             state.select.clear();
-            paginatedData.value.forEach((row: any) => state.select.add(row[ROW_UNIQUE_ID]));
+            paginatedData.value.forEach((row: any) =>
+              state.select.add(row[ROW_UNIQUE_ID]),
+            );
           }
         } else {
           state.select.clear();
@@ -514,7 +590,9 @@ export function useTable<T = any>(config: TableConfig<T>) {
         const values = originalData.value.map((row) => column.value(row));
         const flat = values.flatMap((value) => {
           if (Array.isArray(value)) {
-            return value.filter((v) => v !== null && v !== undefined && v !== "");
+            return value.filter(
+              (v) => v !== null && v !== undefined && v !== "",
+            );
           } else if (value !== null && value !== undefined && value !== "") {
             return [value];
           }
@@ -568,7 +646,7 @@ export function useTable<T = any>(config: TableConfig<T>) {
     getInstanceId: () => {
       return config.options?.id;
     },
-    getRowId
+    getRowId,
   };
 }
 
@@ -595,7 +673,7 @@ export const HeaderRender = defineComponent({
           console.warn(
             ...TableErrors.render.invalidType.null,
             `${props.column.key} header`,
-            result
+            result,
           );
         }
         return String(result);
@@ -626,7 +704,7 @@ export const ColumnRender = defineComponent({
             ...TableErrors.render.invalidType.null,
             `${props.column.key} reading`,
             value,
-            props.context
+            props.context,
           );
         }
         return String(value);
@@ -638,7 +716,7 @@ export const ColumnRender = defineComponent({
             ...TableErrors.render.invalidType.object,
             `${props.column.key} reading`,
             value,
-            props.context
+            props.context,
           );
         }
         return String(value);
