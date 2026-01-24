@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { MenubarGroupProps } from "reka-ui"
-import { MenubarGroup, useForwardProps } from "reka-ui"
+import type { MenubarGroupProps } from "reka-ui";
+import { MenubarGroup, useForwardProps } from "reka-ui";
 
-const props = defineProps<MenubarGroupProps>()
-const forwarded = useForwardProps(props)
+const props = defineProps<MenubarGroupProps>();
+const forwarded = useForwardProps(props);
 </script>
 
 <template>
