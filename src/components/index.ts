@@ -265,5 +265,5 @@ export { default as UiTooltipProvider } from "./Ui/Tooltip/TooltipProvider.vue";
 // Blocks
 
 // DataTable
-export { default as DataTable } from "./blocks/DataTable/DataTable.vue";
+export { default as DataTable } from "./blocks/DataTable/index.vue";
 export type { DataTableProps } from "./blocks/DataTable/types";

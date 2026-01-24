@@ -1,33 +1,31 @@
-import type { HTMLAttributes } from "vue"
-import type { Column } from "../../../composables/useTable/types"
+import type { HTMLAttributes } from "vue";
+import type { Column } from "../../../composables/useTable/types";
 
 export interface DataTableProps<T = any> {
   /** Data array to display in the table */
-  data: T[]
+  data: T[];
   /** Column definitions */
-  columns: Column<T>[]
-  /** Unique key in data objects for row identification */
-  rowKey?: string
+  columns: Column<T>[];
+  /** Unique key for each row */
+  rowKey?: string;
   /** Initial page number */
-  page?: number
+  page?: number;
   /** Initial page size */
-  pageSize?: number
+  pageSize?: number;
   /** Available page size options */
-  pageSizeOptions?: number[]
+  pageSizeOptions?: number[];
   /** Show search input */
-  searchable?: boolean
-  /** Search input placeholder */
-  searchPlaceholder?: string
+  showSearch?: boolean;
   /** Show row selection checkboxes */
-  selectable?: boolean
+  selectable?: boolean;
   /** Show column visibility toggle */
-  columnToggle?: boolean
+  columnToggle?: boolean;
+  /** Show data filters */
+  showFilters?: boolean;
   /** Show pagination controls */
-  pagination?: boolean
-  /** Empty state message */
-  emptyMessage?: string
+  paginate?: boolean;
   /** Enable debug mode */
-  debug?: boolean
+  debug?: boolean;
   /** Custom class */
-  class?: HTMLAttributes["class"]
+  class?: HTMLAttributes["class"];
 }
