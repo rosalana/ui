@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ScrollAreaRootProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
+import type { ScrollAreaRootProps } from "reka-ui";
+import type { HTMLAttributes } from "vue";
 import {
   ScrollAreaCorner,
   ScrollAreaRoot,
@@ -8,12 +8,12 @@ import {
   ScrollAreaThumb,
   ScrollAreaViewport,
   useForwardProps,
-} from "reka-ui"
-import { tv } from "tailwind-variants"
+} from "reka-ui";
+import { tv } from "tailwind-variants";
 
 const scrollArea = tv({
   base: "relative overflow-hidden",
-})
+});
 
 const scrollbar = tv({
   base: "flex touch-none select-none transition-colors",
@@ -23,34 +23,43 @@ const scrollbar = tv({
       horizontal: "h-2.5 flex-col border-t border-t-transparent p-px",
     },
   },
-})
+});
 
 const thumb = tv({
   base: "relative flex-1 rounded-full bg-border",
-})
+});
 
 interface Props extends ScrollAreaRootProps {
-  class?: HTMLAttributes["class"]
-  viewportClass?: HTMLAttributes["class"]
+  class?: HTMLAttributes["class"];
+  viewportClass?: HTMLAttributes["class"];
 }
 
-const props = defineProps<Props>()
-const forwarded = useForwardProps(props)
+const props = defineProps<Props>();
+const forwarded = useForwardProps(props);
 </script>
 
 <template>
   <ScrollAreaRoot
     data-slot="scroll-area"
     v-bind="forwarded"
-    :class="[scrollArea(), props.class]"
+    :class="[scrollArea({ class: props.class })]"
   >
-    <ScrollAreaViewport class="h-full w-full rounded-[inherit]" :class="viewportClass">
+    <ScrollAreaViewport
+      class="h-full w-full rounded-[inherit]"
+      :class="viewportClass"
+    >
       <slot />
     </ScrollAreaViewport>
-    <ScrollAreaScrollbar :class="scrollbar({ orientation: 'vertical' })" orientation="vertical">
+    <ScrollAreaScrollbar
+      :class="scrollbar({ orientation: 'vertical' })"
+      orientation="vertical"
+    >
       <ScrollAreaThumb :class="thumb()" />
     </ScrollAreaScrollbar>
-    <ScrollAreaScrollbar :class="scrollbar({ orientation: 'horizontal' })" orientation="horizontal">
+    <ScrollAreaScrollbar
+      :class="scrollbar({ orientation: 'horizontal' })"
+      orientation="horizontal"
+    >
       <ScrollAreaThumb :class="thumb()" />
     </ScrollAreaScrollbar>
     <ScrollAreaCorner />
