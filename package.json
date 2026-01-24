@@ -15,7 +15,9 @@
     "./tailwind.css": "./src/tailwind.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "src/tailwind.css",
+    "src/components"
   ],
   "scripts": {
     "dev:vite": "vite build --watch",
