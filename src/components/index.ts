@@ -267,3 +267,7 @@ export { default as UiTooltipProvider } from "./Ui/Tooltip/TooltipProvider.vue";
 // DataTable
 export { default as DataTable } from "./blocks/DataTable/index.vue";
 export type { DataTableProps } from "./blocks/DataTable/types";
+
+// Actions
+export { default as Actions } from "./blocks/Actions/index.vue";
+export type { ActionsProps, ActionsEmits, ActionItem } from "./blocks/Actions/types";
