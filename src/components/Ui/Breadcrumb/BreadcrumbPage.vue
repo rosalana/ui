@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { PrimitiveProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
-import { Primitive } from "reka-ui"
-import { tv } from "tailwind-variants"
+import type { PrimitiveProps } from "reka-ui";
+import type { HTMLAttributes } from "vue";
+import { Primitive } from "reka-ui";
+import { tv } from "tailwind-variants";
 
 const breadcrumbPage = tv({
   base: "font-normal text-foreground",
-})
+});
 
 interface Props extends PrimitiveProps {
-  class?: HTMLAttributes["class"]
+  class?: HTMLAttributes["class"];
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 </script>
 
 <template>
@@ -23,7 +23,7 @@ const props = defineProps<Props>()
     role="link"
     aria-disabled="true"
     aria-current="page"
-    :class="[breadcrumbPage(), props.class]"
+    :class="[breadcrumbPage({ class: props.class })]"
   >
     <slot />
   </Primitive>
