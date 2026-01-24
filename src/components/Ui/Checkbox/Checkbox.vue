@@ -6,7 +6,7 @@ import { tv } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const checkbox = tv({
-  base: "peer size-4 shrink-0 rounded-sm border border-primary shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+  base: "peer size-4 shrink-0 rounded-sm border border-primary shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground",
 });
 
 interface Props extends CheckboxRootProps {
@@ -26,7 +26,12 @@ const forwarded = useForwardPropsEmits(props, emit);
     :class="[checkbox({ class: props.class })]"
   >
     <CheckboxIndicator class="flex items-center justify-center text-current">
-      <UiIcon name="lucide:check" class="size-3.5" />
+      <UiIcon
+        name="lucide:minus"
+        class="size-3.5"
+        v-if="props.modelValue === 'indeterminate'"
+      />
+      <UiIcon v-else name="lucide:check" class="size-3.5" />
     </CheckboxIndicator>
   </CheckboxRoot>
 </template>
