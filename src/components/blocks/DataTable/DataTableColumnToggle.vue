@@ -37,7 +37,7 @@ const props = defineProps<{
         >
           <HeaderRender :column="column" :context="null" />
         </UiDropdownMenuCheckboxItem>
-        <div v-else class="p-2 text-sm text-muted">
+        <div v-else class="p-2 text-sm text-muted-foreground">
           All columns are fixed
         </div>
       </UiDropdownMenuContent>

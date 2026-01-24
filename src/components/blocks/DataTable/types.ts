@@ -1,5 +1,7 @@
 import type { HTMLAttributes } from "vue";
 import type { Column } from "../../../composables/useTable/types";
+import { ActionItem } from "../Actions/types";
+import { useTable } from "../../../composables";
 
 export interface DataTableProps<T = any> {
   /** Data array to display in the table */
@@ -22,10 +24,17 @@ export interface DataTableProps<T = any> {
   columnToggle?: boolean;
   /** Show data filters */
   showFilters?: boolean;
+  /** Header actions */
+  headerActions?:
+    | ActionItem[]
+    | ((table: ReturnType<typeof useTable>) => ActionItem[]);
+  /** Row actions */
+  rowActions?: ActionItem[] | ((row: T) => ActionItem[]);
   /** Show pagination controls */
   paginate?: boolean;
   /** Enable debug mode */
   debug?: boolean;
+  hello?: string;
   /** Custom class */
   class?: HTMLAttributes["class"];
 }

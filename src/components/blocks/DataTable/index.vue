@@ -6,15 +6,11 @@ import { DataTableProps } from "./types";
 import DataTableColumnToggle from "./DataTableColumnToggle.vue";
 import DataTableSearch from "./DataTableSearch.vue";
 import {
+  Actions,
   UiButton,
   UiCheckbox,
   UiIcon,
   UiScrollArea,
-  UiSelect,
-  UiSelectContent,
-  UiSelectItem,
-  UiSelectTrigger,
-  UiSelectValue,
   UiTable,
   UiTableBody,
   UiTableCell,
@@ -23,6 +19,7 @@ import {
   UiTableRow,
 } from "../../index";
 import DataTablePagination from "./DataTablePagination.vue";
+import { h, onMounted } from "vue";
 
 const styles = tv({
   base: "w-full",
@@ -81,11 +78,71 @@ const getSortIcon = (columnId: string) => {
     ? "lucide:arrow-up"
     : "lucide:arrow-down";
 };
+
+onMounted(() => {
+  if (props.selectable) {
+    table.columns.add({
+      key: "__select_column__",
+      header: (table) =>
+        h(UiCheckbox, {
+          modelValue: table.select.isAllSelected()
+            ? true
+            : table.select.isIndeterminate()
+              ? "indeterminate"
+              : false,
+          "onUpdate:modelValue": () => table.select.toggleAll(),
+        }),
+      render: (row) =>
+        h(UiCheckbox, {
+          modelValue: table.select.isSelected(row),
+          "onUpdate:modelValue": () => table.select.toggle(row),
+        }),
+      filterable: false,
+      index: 0,
+      searchable: false,
+      sortable: false,
+      toggleable: false,
+      relevant: false,
+    });
+  }
+
+  if (props.rowActions || props.headerActions) {
+    table.columns.add({
+      key: "__actions_column__",
+      header: (table) => {
+        return props.headerActions
+          ? h(Actions, {
+              items:
+                typeof props.headerActions === "function"
+                  ? props.headerActions(table)
+                  : props.headerActions,
+            })
+          : " ";
+      },
+      render: (row) => {
+        return props.rowActions !== undefined
+          ? h(Actions, {
+              items:
+                typeof props.rowActions === "function"
+                  ? props.rowActions(row)
+                  : props.rowActions,
+            })
+          : " ";
+      },
+      filterable: false,
+      index: Infinity,
+      searchable: false,
+      sortable: false,
+      toggleable: false,
+      relevant: false,
+    });
+  }
+});
 </script>
 <template>
   <div data-slot="data-table" :class="[styles(), props.class]">
     <!-- Toolbar -->
-    <div class="flex justify-between items-center gap-4 p-4">
+    <div class="flex justify-between items-center gap-4 py-4">
       <!-- search -->
       <slot name="search" v-if="props.showSearch">
         <DataTableSearch :table="table" />
@@ -102,21 +159,6 @@ const getSortIcon = (columnId: string) => {
       <UiTable>
         <UiTableHeader>
           <UiTableRow>
-            <!-- Selection column add it to table instance directly -->
-            <UiTableHead v-if="props.selectable" class="w-12">
-              <UiCheckbox
-                :model-value="
-                  table.select.isAllSelected()
-                    ? true
-                    : table.select.isIndeterminate()
-                      ? 'indeterminate'
-                      : false
-                "
-                @update:model-value="table.select.toggleAll()"
-              />
-            </UiTableHead>
-
-            <!-- Data columns -->
             <UiTableHead
               v-for="column in table.columns.visible"
               :key="column.id"
@@ -131,16 +173,14 @@ const getSortIcon = (columnId: string) => {
                   "
                   @click="table.sort(column)"
                 >
-                  <HeaderRender :column="column" :context="null" />
+                  <HeaderRender :column="column" :context="table" />
                   <UiIcon :name="getSortIcon(column.id)" class="ml-2 size-4" />
                 </UiButton>
               </template>
               <template v-else>
-                <HeaderRender :column="column" :context="null" />
+                <HeaderRender :column="column" :context="table" />
               </template>
             </UiTableHead>
-
-            <!-- Actions -->
           </UiTableRow>
         </UiTableHeader>
 
@@ -151,7 +191,7 @@ const getSortIcon = (columnId: string) => {
               :colspan="
                 table.columns.visible.length + (props.selectable ? 1 : 0)
               "
-              class="h-24 text-center text-muted"
+              class="h-24 text-center text-theme"
             >
               <slot name="empty-state"> No data to display. </slot>
             </UiTableCell>
@@ -164,14 +204,6 @@ const getSortIcon = (columnId: string) => {
             :key="table.getRowId(row)"
             :data-state="table.select.isSelected(row) ? 'selected' : undefined"
           >
-            <!-- Selection cell -->
-            <UiTableCell v-if="props.selectable" class="w-12">
-              <UiCheckbox
-                :model-value="table.select.isSelected(row)"
-                @update:model-value="table.select.toggle(row)"
-              />
-            </UiTableCell>
-
             <!-- Data cells -->
             <UiTableCell
               v-for="column in table.columns.visible"

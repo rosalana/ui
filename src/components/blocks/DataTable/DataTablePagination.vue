@@ -17,7 +17,7 @@ const props = defineProps<{
 <template>
   <div class="flex items-center justify-between gap-4 py-4">
     <!-- Info -->
-    <div class="flex-1 text-sm text-muted">
+    <div class="flex-1 text-sm text-theme">
       <template v-if="table.data.selected.length > 0">
         {{ table.data.selected.length }} of {{ table.data.final.length }} row(s)
         selected.
@@ -30,7 +30,7 @@ const props = defineProps<{
     <div class="flex items-center gap-6">
       <!-- Page size selector -->
       <div class="flex items-center gap-2">
-        <span class="text-sm text-muted whitespace-nowrap">Rows per page</span>
+        <span class="text-sm text-theme whitespace-nowrap">Rows per page</span>
         <UiSelect v-model="table.paginator.size" name="paginator">
           <UiSelectTrigger class="h-8 w-16">
             {{ table.paginator.size }}
@@ -48,7 +48,7 @@ const props = defineProps<{
       </div>
 
       <!-- Page info -->
-      <div class="text-sm text-muted whitespace-nowrap">
+      <div class="text-sm text-theme whitespace-nowrap">
         Page {{ table.paginator.current }} of {{ table.paginator.total || 1 }}
       </div>
 
