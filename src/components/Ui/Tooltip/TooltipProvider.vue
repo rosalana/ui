@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { TooltipProviderProps } from "reka-ui"
-import { TooltipProvider, useForwardProps } from "reka-ui"
+import type { TooltipProviderProps } from "reka-ui";
+import { TooltipProvider, useForwardProps } from "reka-ui";
 
 const props = withDefaults(defineProps<TooltipProviderProps>(), {
   delayDuration: 200,
-})
+});
 
-const forwarded = useForwardProps(props)
+const forwarded = useForwardProps(props);
 </script>
 
 <template>
