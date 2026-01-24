@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { SplitterPanelEmits, SplitterPanelProps } from "reka-ui"
-import { SplitterPanel, useForwardPropsEmits } from "reka-ui"
+import type { SplitterPanelEmits, SplitterPanelProps } from "reka-ui";
+import { SplitterPanel, useForwardPropsEmits } from "reka-ui";
 
-const props = defineProps<SplitterPanelProps>()
-const emit = defineEmits<SplitterPanelEmits>()
+const props = defineProps<SplitterPanelProps>();
+const emit = defineEmits<SplitterPanelEmits>();
 
-const forwarded = useForwardPropsEmits(props, emit)
+const forwarded = useForwardPropsEmits(props, emit);
 </script>
 
 <template>
