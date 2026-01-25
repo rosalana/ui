@@ -140,7 +140,7 @@
   --color-foreground: var(--color-foreground);
   --color-input: var(--color-input);
   --color-border: var(--color-border);
-  --color-ring: var(--color-ring);
+  --color-ring: var(--color-primary);
 }
 
 /*
