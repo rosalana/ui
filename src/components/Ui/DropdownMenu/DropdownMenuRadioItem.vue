@@ -9,7 +9,13 @@ import {
 import { tv } from "tailwind-variants";
 
 const dropdownMenuRadioItem = tv({
-  base: "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+  base: [
+    "relative flex cursor-default select-none items-center",
+    "rounded-lg py-2 pl-8 pr-2.5 text-sm outline-none",
+    "transition-colors duration-150",
+    "focus:bg-accent focus:text-accent-foreground",
+    "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+  ],
 });
 
 interface Props extends DropdownMenuRadioItemProps {

@@ -6,7 +6,13 @@ import { tv, type VariantProps } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const dropdownMenuSubTrigger = tv({
-  base: "flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  base: [
+    "flex cursor-default select-none items-center gap-2",
+    "rounded-lg px-2.5 py-2 text-sm outline-none",
+    "transition-colors duration-150",
+    "focus:bg-accent data-[state=open]:bg-accent",
+    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  ],
   variants: {
     inset: {
       true: "pl-8",
