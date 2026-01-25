@@ -30,7 +30,7 @@ const visible = computed(() => {
   return props.items.filter((item) => !item.hidden);
 });
 
-const open = useModel(props, "open");
+const open = useModel<"open", ActionsProps, "open">(props, "open");
 
 onMounted(() => {
   if (props.defaultOpen) {
