@@ -184,7 +184,7 @@ function pickContrast(c: string): string {
   if (oklchMatch) {
     const values = oklchMatch[1].split(/\s+/);
     const lightness = parseFloat(values[0]);
-    return lightness > 65
+    return lightness > 80
       ? (color("black") as string)
       : (color("white") as string);
   }
@@ -196,7 +196,7 @@ function pickContrast(c: string): string {
     const g = parseInt(rgbMatch[2]);
     const b = parseInt(rgbMatch[3]);
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 140
+    return brightness > 160
       ? (color("black") as string)
       : (color("white") as string);
   }
@@ -207,7 +207,7 @@ function pickContrast(c: string): string {
     const g = parseInt(c.slice(3, 5), 16);
     const b = parseInt(c.slice(5, 7), 16);
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 140
+    return brightness > 160
       ? (color("black") as string)
       : (color("white") as string);
   }
