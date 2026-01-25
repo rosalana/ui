@@ -75,7 +75,7 @@ shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-primary/40
 
 ### Animation with motion-v
 
-Use `motion-v` (Vue port of motion.dev) for micro-interactions:
+Use `motion-v` (Vue port of motion.dev) for every micro-interactions and animations. Prefer spring-based transitions for a natural feel.:
 
 ```vue
 <script setup>
@@ -255,6 +255,9 @@ colors: {
 ```
 
 Semantic colors: `primary`, `secondary`, `muted`, `destructive`, `info`, `success`, `warning`, `theme` (background/foreground).
+
+> [! Important]
+> For muted text color use `text-theme` instead of `text-muted` or `text-muted-foreground`. `text-theme` means the middle color of the gray scale, adapting to light/dark mode automatically.
 
 ## Tech Stack
 
