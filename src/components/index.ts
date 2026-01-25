@@ -172,6 +172,7 @@ export { default as UiPaginationLast } from "./Ui/Pagination/PaginationLast.vue"
 // PinInput
 export { default as UiPinInput } from "./Ui/PinInput/PinInput.vue";
 export { default as UiPinInputInput } from "./Ui/PinInput/PinInputInput.vue";
+export { default as UiPinInputSeparator } from "./Ui/PinInput/PinInputSeparator.vue";
 
 // Popover
 export { default as UiPopover } from "./Ui/Popover/Popover.vue";

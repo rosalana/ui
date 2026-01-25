@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends 'text' | 'number' = 'text'">
 import type { PinInputRootEmits, PinInputRootProps } from "reka-ui";
 import type { HTMLAttributes } from "vue";
 import { PinInputRoot, useForwardPropsEmits } from "reka-ui";
@@ -8,12 +8,13 @@ const pinInput = tv({
   base: "flex items-center gap-2",
 });
 
-interface Props extends PinInputRootProps {
-  class?: HTMLAttributes["class"];
-}
-
-const props = defineProps<Props>();
-const emit = defineEmits<PinInputRootEmits>();
+const props = withDefaults(
+  defineProps<PinInputRootProps<T> & { class?: HTMLAttributes["class"] }>(),
+  {
+    placeholder: "○",
+  },
+);
+const emit = defineEmits<PinInputRootEmits<T>>();
 
 const forwarded = useForwardPropsEmits(props, emit);
 </script>
