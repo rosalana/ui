@@ -62,7 +62,7 @@
   --color-muted-foreground: var(--color-muted-foreground);
 
   --color-accent: var(--color-muted);
-  --color-accent-foreground: var(--color-primary);
+  --color-accent-foreground: var(--color-muted-foreground);
 
   --color-destructive-50: var(--color-destructive-50);
   --color-destructive-100: var(--color-destructive-100);
