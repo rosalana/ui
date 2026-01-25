@@ -52,6 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: "text",
   variant: "default",
   showClear: false,
+  icon: " ",
 });
 
 const emit = defineEmits<{
