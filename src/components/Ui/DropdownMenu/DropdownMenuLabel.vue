@@ -5,7 +5,7 @@ import { DropdownMenuLabel, useForwardProps } from "reka-ui";
 import { tv, type VariantProps } from "tailwind-variants";
 
 const dropdownMenuLabel = tv({
-  base: "px-2.5 py-2 text-sm font-semibold text-theme",
+  base: "px-2.5 py-2 text-xs font-semibold text-theme",
   variants: {
     inset: {
       true: "pl-8",
