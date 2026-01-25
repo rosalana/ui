@@ -132,7 +132,7 @@ const activeState = computed(() => {
       @input="handleInput"
     />
 
-    <div class="absolute top-0 right-0 h-full flex items-center pr-2">
+    <div class="absolute bg-background top-1 bottom-1 right-1 flex items-center pr-1">
       <AnimatePresence mode="popLayout">
         <motion.div
           v-if="activeState"
@@ -145,7 +145,7 @@ const activeState = computed(() => {
           <UiButton
             variant="clear"
             size="icon-sm"
-            class="size-7 p-0"
+            class="size-7"
             :class="[
               activeState.color,
               !activeState.clickable && 'pointer-events-none cursor-default',
