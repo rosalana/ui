@@ -38,6 +38,80 @@ Colors are injected as CSS custom properties at runtime (`--color-primary-500`, 
 ### 4. Inertia Integration
 User and preferences data come from Inertia page props, not a separate state store. Composables like `useUser()` and `usePreferences()` read directly from `usePage().props`.
 
+## Design System
+
+Rosalana UI uses a **clean, modern, approachable** design language focused on creativity and warmth. The goal is to feel inviting and memorable without being flashy or corporate.
+
+### Design Principles
+
+1. **Soft & Rounded** - Use generous border-radius (`rounded-xl`, `rounded-2xl`) for a friendly, approachable feel
+2. **Diffuse Shadows** - Soft, spread shadows instead of harsh ones. Color-tinted shadows for depth
+3. **Clean & Minimal** - No heavy gradients or glassmorphism. Solid colors with subtle depth
+4. **Warm & Inviting** - Design should feel like home, spark creativity, not cold corporate UI
+5. **Subtle Animations** - Spring-based micro-interactions using `motion-v` for satisfying feedback
+
+### Visual Style Guide
+
+**Shadows:**
+```css
+/* Soft colored shadow pattern */
+shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-primary/40
+```
+
+**Border Radius:**
+- Default: `rounded-xl` (12px)
+- Large: `rounded-2xl` (16px)
+- Small: `rounded-lg` (8px)
+
+**Interactions:**
+- `active:scale-[0.97]` - Satisfying press feedback
+- `hover:brightness-105` - Subtle hover brightening
+- Spring animations via `motion-v` for enter/exit states
+
+**Colors:**
+- Use semantic color tokens (`primary`, `secondary`, `muted`, `destructive`)
+- Color-tinted shadows matching the element's color
+- Maintain good contrast for accessibility
+
+### Animation with motion-v
+
+Use `motion-v` (Vue port of motion.dev) for micro-interactions:
+
+```vue
+<script setup>
+import { AnimatePresence, motion } from "motion-v"
+</script>
+
+<template>
+  <!-- Enter/exit animations -->
+  <AnimatePresence>
+    <motion.div
+      v-if="visible"
+      :initial="{ opacity: 0, scale: 0.95 }"
+      :animate="{ opacity: 1, scale: 1 }"
+      :exit="{ opacity: 0, scale: 0.95 }"
+      :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+    />
+  </AnimatePresence>
+
+  <!-- Reactive animations -->
+  <motion.span
+    :animate="isActive ? { width: 'auto', opacity: 1 } : { width: 0, opacity: 0 }"
+    :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+  />
+</template>
+```
+
+**Tip:** When animating elements that need to collapse (like hover arrows), animate both `width` and `marginLeft` (negative margin to compensate for flex gap).
+
+### Reference Component: UiButton
+
+`UiButton` (`components/Ui/Button/Button.vue`) demonstrates all design principles:
+- Soft shadows with color tinting
+- Spring animations for loading spinner and hover arrow
+- `active:scale-[0.97]` press feedback
+- Clean variants without heavy effects
+
 ## Project Structure
 
 ```
@@ -188,6 +262,7 @@ Semantic colors: `primary`, `secondary`, `muted`, `destructive`, `info`, `succes
 - **Tailwind CSS v4** with `@theme` syntax
 - **reka-ui** for headless component primitives
 - **tailwind-variants** for component variants
+- **motion-v** for spring-based micro-animations
 - **Inertia.js** for page props (peer dependency)
 - **Axios** for HTTP requests
 
