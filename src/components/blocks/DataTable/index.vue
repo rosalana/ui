@@ -165,9 +165,9 @@ onMounted(() => {
             >
               <template v-if="column.sortable">
                 <UiButton
-                  variant="ghost"
+                  variant="clear"
                   size="sm"
-                  class="-ml-3 h-8 hover:bg-transparent dark:hover:bg-transparent data-[state=active]:text-primary"
+                  class="-ml-3 h-8 data-[state=active]:text-primary"
                   :data-state="
                     table.state.sort.id === column.id ? 'active' : undefined
                   "
