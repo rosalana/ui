@@ -6,7 +6,7 @@ import { tv, type VariantProps } from "tailwind-variants";
 
 const dropdownMenuItem = tv({
   base: [
-    "relative flex cursor-default select-none items-center gap-2",
+    "relative flex cursor-pointer select-none items-center gap-2",
     "rounded-lg px-2.5 py-2 text-sm outline-none",
     "transition-colors duration-150",
     "focus:bg-accent focus:text-accent-foreground",

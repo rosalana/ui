@@ -6,7 +6,14 @@ import { tv } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const selectTrigger = tv({
-  base: "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+  base: [
+    "cursor-pointer border border-border",
+    "shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-muted/40",
+    "hover:shadow-muted",
+    "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-xl bg-background text-foreground px-3 py-2 text-sm shadow-xs ring-offset-background placeholder:text-theme focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+    "active:scale-[0.97]",
+    "hover:bg-muted",
+  ],
 });
 
 interface Props extends SelectTriggerProps {

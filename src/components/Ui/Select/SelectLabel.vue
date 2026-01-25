@@ -5,7 +5,7 @@ import { SelectLabel, useForwardProps } from "reka-ui";
 import { tv } from "tailwind-variants";
 
 const selectLabel = tv({
-  base: "px-2 py-1.5 text-sm font-semibold",
+  base: "px-2.5 py-2 text-xs font-semibold text-theme",
 });
 
 interface Props extends SelectLabelProps {

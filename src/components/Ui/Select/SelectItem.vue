@@ -11,7 +11,14 @@ import { tv } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const selectItem = tv({
-  base: "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+  base: [
+    "relative flex cursor-pointer select-none items-center gap-2",
+    "rounded-lg px-2.5 py-2 text-sm outline-none",
+    "transition-colors duration-150",
+    "focus:bg-accent focus:text-accent-foreground",
+    "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+    "[&>svg]:size-4 [&>svg]:shrink-0",
+  ],
 });
 
 interface Props extends SelectItemProps {

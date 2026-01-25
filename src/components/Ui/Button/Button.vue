@@ -43,7 +43,7 @@ const button = tv({
         "bg-background text-foreground",
         "border border-border",
         "shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-muted/40",
-        "hover:bg-muted ",
+        "hover:bg-muted",
         "hover:shadow-muted",
       ],
       ghost: [

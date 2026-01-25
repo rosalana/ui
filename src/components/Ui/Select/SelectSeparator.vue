@@ -5,7 +5,7 @@ import { SelectSeparator, useForwardProps } from "reka-ui";
 import { tv } from "tailwind-variants";
 
 const selectSeparator = tv({
-  base: "-mx-1 my-1 h-px bg-muted",
+  base: "-mx-1.5 my-1.5 h-px bg-border",
 });
 
 interface Props extends SelectSeparatorProps {
