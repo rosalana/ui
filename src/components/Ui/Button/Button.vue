@@ -54,6 +54,9 @@ const button = tv({
         "text-primary",
         "relative no-underline! after:absolute after:bottom-2 after:h-px after:w-2/3 after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-in-out hover:after:origin-bottom-left hover:after:scale-x-100",
       ],
+      clear: [
+        "bg-transparent text-foreground",
+      ],
     },
     size: {
       default: "h-10 px-5 py-2 has-[>svg]:px-4",
