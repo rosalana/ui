@@ -5,7 +5,7 @@ import { Primitive } from "reka-ui";
 import { tv } from "tailwind-variants";
 
 const alertDescription = tv({
-  base: "text-sm [&_p]:leading-relaxed",
+  base: "text-sm [&_p]:leading-relaxed text-theme",
 });
 
 interface Props extends PrimitiveProps {

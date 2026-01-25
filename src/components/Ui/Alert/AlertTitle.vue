@@ -5,7 +5,7 @@ import { Primitive } from "reka-ui";
 import { tv } from "tailwind-variants";
 
 const alertTitle = tv({
-  base: "mb-1 font-medium leading-none tracking-tight",
+  base: "mb-1.5 font-medium leading-none tracking-tight",
 });
 
 interface Props extends PrimitiveProps {
