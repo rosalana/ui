@@ -289,7 +289,7 @@ const secondary = (): NonNullable<Required<ColorsConfig["secondary"]>> => ({
 
 const muted = (): NonNullable<Required<ColorsConfig["muted"]>> => ({
   color: theme().color, // shared color with Theme
-  default: "100 dark:700",
+  default: "100 dark:800",
 });
 
 const destructive = (): NonNullable<Required<ColorsConfig["destructive"]>> => ({
