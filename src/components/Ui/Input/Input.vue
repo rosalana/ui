@@ -9,7 +9,8 @@ const input = tv({
   base: [
     "flex h-9 w-full rounded-xl border border-border bg-background text-foreground px-3 py-1 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-theme focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
     "shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-muted/40",
-    "hover:shadow-muted",
+    "hover:shadow-muted dark:shadow-muted/20 dark:hover:shadow-muted/80",
+    "transition-shadow duration-200 ease-out",
   ],
   variants: {
     variant: {

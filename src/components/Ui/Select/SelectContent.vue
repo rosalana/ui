@@ -14,7 +14,7 @@ const selectContent = tv({
   base: [
     "relative z-50 max-h-96 min-w-[8rem] overflow-hidden",
     "rounded-xl border bg-background text-foreground p-0.5",
-    "shadow-[0_4px_16px_-4px,0_8px_32px_-8px] shadow-theme/15 dark:shadow-theme/30",
+    "shadow-[0_4px_16px_-4px,0_8px_32px_-8px] shadow-theme/15",
   ],
   variants: {
     position: {

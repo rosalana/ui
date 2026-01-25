@@ -13,7 +13,7 @@ const dropdownMenuSubContent = tv({
   base: [
     "z-50 min-w-[8rem] overflow-hidden",
     "rounded-xl border bg-background p-1.5 text-foreground",
-    "shadow-[0_4px_16px_-4px,0_8px_32px_-8px] shadow-black/15 dark:shadow-black/30",
+    "shadow-[0_4px_16px_-4px,0_8px_32px_-8px] shadow-theme/15",
     "data-[side=bottom]:origin-top data-[side=bottom]:[--y-from:-10px]",
     "data-[side=top]:origin-bottom data-[side=top]:[--y-from:10px]",
     "data-[side=left]:origin-right data-[side=left]:[--x-from:10px]",
