@@ -1,6 +1,7 @@
 import { useDebounceFn } from "@vueuse/core";
 import { computed, defineComponent, reactive, ref, watch } from "vue";
 import type { Column, ResolvedColumn, TableConfig, TableState } from "./types";
+export * from "./types";
 
 const debug = ref(true);
 export function useTable<T = any>(config: TableConfig<T>) {

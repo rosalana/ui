@@ -8,7 +8,7 @@ import {
 export type ActionItem = {
   label: string;
   class?: string;
-  onClick: () => void;
+  onClick?: () => void;
   icon?: string;
   disabled?: boolean;
   hidden?: boolean;
