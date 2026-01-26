@@ -5,3 +5,4 @@ export * from "./useComputedPage";
 export * from "./useTheme";
 export * from "./useFetch";
 export * from "./useDetectLightness";
+export * from "./useGradient";
