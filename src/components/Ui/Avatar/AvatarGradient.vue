@@ -3,6 +3,12 @@ import { ref, computed, watch, type HTMLAttributes } from "vue";
 import { tv } from "tailwind-variants";
 import { useGradient, generateGradient } from "../../../composables/useGradient";
 
+// open source gradient maker:
+
+// https://kevingrajeda.github.io/meshGradient/
+
+// https://github.com/KevinGrajeda/meshGradient/tree/main/src/components
+
 const avatarGradient = tv({
   base: "aspect-square size-full overflow-hidden",
 });
