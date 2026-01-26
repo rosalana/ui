@@ -30,60 +30,177 @@ function stringToSeed(str: string): number {
   return Math.abs(hash) || 1;
 }
 
+// Simplex noise implementation for cloud texture
+const GRAD3 = [
+  [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
+  [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
+  [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1],
+];
+
+function createNoise(seed: number) {
+  const random = createRandom(seed);
+  const perm = new Array(512);
+  const p = new Array(256);
+
+  for (let i = 0; i < 256; i++) {
+    p[i] = Math.floor(random() * 256);
+  }
+
+  for (let i = 0; i < 512; i++) {
+    perm[i] = p[i & 255];
+  }
+
+  function dot(g: number[], x: number, y: number): number {
+    return g[0] * x + g[1] * y;
+  }
+
+  return function noise2D(x: number, y: number): number {
+    const F2 = 0.5 * (Math.sqrt(3) - 1);
+    const G2 = (3 - Math.sqrt(3)) / 6;
+
+    const s = (x + y) * F2;
+    const i = Math.floor(x + s);
+    const j = Math.floor(y + s);
+
+    const t = (i + j) * G2;
+    const X0 = i - t;
+    const Y0 = j - t;
+    const x0 = x - X0;
+    const y0 = y - Y0;
+
+    let i1: number, j1: number;
+    if (x0 > y0) {
+      i1 = 1;
+      j1 = 0;
+    } else {
+      i1 = 0;
+      j1 = 1;
+    }
+
+    const x1 = x0 - i1 + G2;
+    const y1 = y0 - j1 + G2;
+    const x2 = x0 - 1 + 2 * G2;
+    const y2 = y0 - 1 + 2 * G2;
+
+    const ii = i & 255;
+    const jj = j & 255;
+
+    let n0 = 0, n1 = 0, n2 = 0;
+
+    let t0 = 0.5 - x0 * x0 - y0 * y0;
+    if (t0 >= 0) {
+      t0 *= t0;
+      const gi0 = perm[ii + perm[jj]] % 12;
+      n0 = t0 * t0 * dot(GRAD3[gi0], x0, y0);
+    }
+
+    let t1 = 0.5 - x1 * x1 - y1 * y1;
+    if (t1 >= 0) {
+      t1 *= t1;
+      const gi1 = perm[ii + i1 + perm[jj + j1]] % 12;
+      n1 = t1 * t1 * dot(GRAD3[gi1], x1, y1);
+    }
+
+    let t2 = 0.5 - x2 * x2 - y2 * y2;
+    if (t2 >= 0) {
+      t2 *= t2;
+      const gi2 = perm[ii + 1 + perm[jj + 1]] % 12;
+      n2 = t2 * t2 * dot(GRAD3[gi2], x2, y2);
+    }
+
+    // Return value in range [-1, 1]
+    return 70 * (n0 + n1 + n2);
+  };
+}
+
+// Fractal Brownian Motion for layered cloud noise
+function fbm(
+  noise: (x: number, y: number) => number,
+  x: number,
+  y: number,
+  octaves: number = 4,
+  lacunarity: number = 2,
+  gain: number = 0.5
+): number {
+  let value = 0;
+  let amplitude = 1;
+  let frequency = 1;
+  let maxValue = 0;
+
+  for (let i = 0; i < octaves; i++) {
+    value += amplitude * noise(x * frequency, y * frequency);
+    maxValue += amplitude;
+    amplitude *= gain;
+    frequency *= lacunarity;
+  }
+
+  return value / maxValue;
+}
+
 // Generate gradient configuration from seed
 function generateConfig(seed: string | number): GradientConfig {
   const seedValue = typeof seed === "string" ? stringToSeed(seed) : seed;
   const random = createRandom(seedValue);
 
-  // Decide harmony type - analogous (similar colors) or complementary (opposite)
-  const harmony: "analogous" | "complementary" =
-    random() > 0.5 ? "analogous" : "complementary";
+  // Always analogous for cloud-like feel
+  const harmony: "analogous" | "complementary" = "analogous";
 
   // Base hue
   const baseHue = random() * 360;
 
-  // Background - light, saturated base color (never dark/black)
+  // Background - medium saturated base color (will be the darker bottom)
   const background: GradientColor = {
     h: baseHue,
-    s: 50 + random() * 30,
-    l: 75 + random() * 15, // 75-90% lightness - always light
+    s: 60 + random() * 25,
+    l: 55 + random() * 15, // 55-70% - medium brightness for bottom
   };
 
-  // Generate 4-5 layered blobs
-  const numBlobs = 4 + Math.floor(random() * 2);
+  // Generate cloud layers with varying depths
   const blobs: GradientBlob[] = [];
 
-  for (let i = 0; i < numBlobs; i++) {
-    let hue: number;
+  // Layer 1: Deep/dark layer (bottom gradient effect)
+  blobs.push({
+    x: 0.5,
+    y: 1.2, // Below center for bottom-heavy effect
+    radius: 0.9 + random() * 0.3,
+    color: {
+      h: baseHue,
+      s: 70 + random() * 20,
+      l: 45 + random() * 10, // Darker shade
+    },
+    phase: random() * Math.PI * 2,
+    orbit: 0.01,
+  });
 
-    if (harmony === "analogous") {
-      // Analogous: colors within ±40° of base hue
-      hue = (baseHue + (random() - 0.5) * 80 + 360) % 360;
-    } else {
-      // Complementary: base hue or opposite (180°)
-      if (random() > 0.4) {
-        // 60% chance of complementary color
-        hue = (baseHue + 180 + (random() - 0.5) * 30 + 360) % 360;
-      } else {
-        // 40% chance of base color variation
-        hue = (baseHue + (random() - 0.5) * 30 + 360) % 360;
-      }
-    }
-
-    // Vary saturation and lightness for depth
-    const isHighlight = random() > 0.7;
-
+  // Layer 2-3: Mid-tone cloud wisps
+  for (let i = 0; i < 2; i++) {
     blobs.push({
-      x: 0.1 + random() * 0.8,
-      y: 0.1 + random() * 0.8,
-      radius: 0.35 + random() * 0.4,
+      x: 0.3 + random() * 0.4,
+      y: 0.4 + random() * 0.4,
+      radius: 0.4 + random() * 0.3,
       color: {
-        h: hue,
-        s: isHighlight ? 20 + random() * 30 : 60 + random() * 35,
-        l: isHighlight ? 90 + random() * 8 : 55 + random() * 25,
+        h: (baseHue + (random() - 0.5) * 20 + 360) % 360,
+        s: 40 + random() * 30,
+        l: 70 + random() * 15,
       },
       phase: random() * Math.PI * 2,
-      orbit: 0.02 + random() * 0.04,
+      orbit: 0.02 + random() * 0.02,
+    });
+  }
+
+  // Layer 4-5: Light cloud highlights (top/bright areas)
+  for (let i = 0; i < 2; i++) {
+    blobs.push({
+      x: 0.2 + random() * 0.6,
+      y: 0.1 + random() * 0.5,
+      radius: 0.3 + random() * 0.4,
+      color: {
+        h: (baseHue + (random() - 0.5) * 15 + 360) % 360,
+        s: 15 + random() * 25,
+        l: 88 + random() * 10, // Very light - cloud highlights
+      },
+      phase: random() * Math.PI * 2,
+      orbit: 0.015 + random() * 0.025,
     });
   }
 
