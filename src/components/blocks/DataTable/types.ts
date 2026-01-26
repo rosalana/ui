@@ -1,7 +1,6 @@
 import type { HTMLAttributes } from "vue";
-import type { Column } from "../../../composables/useTable/types";
+import type { Column, TableInstance } from "../../../composables";
 import { ActionItem } from "../Actions/types";
-import { useTable } from "../../../composables";
 
 export interface DataTableProps<T = any> {
   /** Data array to display in the table */
@@ -27,7 +26,7 @@ export interface DataTableProps<T = any> {
   /** Header actions */
   headerActions?:
     | ActionItem[]
-    | ((table: ReturnType<typeof useTable>) => ActionItem[]);
+    | ((table: TableInstance<T>) => ActionItem[]);
   /** Row actions */
   rowActions?: ActionItem[] | ((row: T) => ActionItem[]);
   /** Show pagination controls */

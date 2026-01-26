@@ -9,10 +9,10 @@ import {
   UiDropdownMenuTrigger,
   UiIcon,
 } from "../../index";
-import { HeaderRender, useTable } from "../../../composables";
+import { HeaderRender, TableInstance } from "../../../composables";
 
 const props = defineProps<{
-  table: ReturnType<typeof useTable<T>>;
+  table: TableInstance<T>;
 }>();
 </script>
 <template>

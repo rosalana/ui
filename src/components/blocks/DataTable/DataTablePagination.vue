@@ -7,10 +7,10 @@ import {
   UiSelectItem,
   UiSelectTrigger,
 } from "../../index";
-import { useTable } from "../../../composables";
+import { TableInstance } from "../../../composables";
 
 const props = defineProps<{
-  table: ReturnType<typeof useTable<T>>;
+  table: TableInstance<T>;
   pageSizeOptions: number[];
 }>();
 </script>

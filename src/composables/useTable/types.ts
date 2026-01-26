@@ -1,3 +1,5 @@
+import { useTable } from ".";
+
 export type TableConfig<T = any> = {
   /** Data to display */
   data: T[];
@@ -77,3 +79,5 @@ export type TableEvents<T = any> = {
   toggle: (column: Column<T>) => void;
   select: (row: any) => void;
 };
+
+export type TableInstance<T = any> = ReturnType<typeof useTable<T>>;
