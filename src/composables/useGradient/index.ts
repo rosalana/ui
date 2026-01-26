@@ -32,9 +32,18 @@ function stringToSeed(str: string): number {
 
 // Simplex noise implementation for cloud texture
 const GRAD3 = [
-  [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
-  [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
-  [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1],
+  [1, 1, 0],
+  [-1, 1, 0],
+  [1, -1, 0],
+  [-1, -1, 0],
+  [1, 0, 1],
+  [-1, 0, 1],
+  [1, 0, -1],
+  [-1, 0, -1],
+  [0, 1, 1],
+  [0, -1, 1],
+  [0, 1, -1],
+  [0, -1, -1],
 ];
 
 function createNoise(seed: number) {
@@ -85,7 +94,9 @@ function createNoise(seed: number) {
     const ii = i & 255;
     const jj = j & 255;
 
-    let n0 = 0, n1 = 0, n2 = 0;
+    let n0 = 0,
+      n1 = 0,
+      n2 = 0;
 
     let t0 = 0.5 - x0 * x0 - y0 * y0;
     if (t0 >= 0) {
@@ -120,7 +131,7 @@ function fbm(
   y: number,
   octaves: number = 4,
   lacunarity: number = 2,
-  gain: number = 0.5
+  gain: number = 0.5,
 ): number {
   let value = 0;
   let amplitude = 1;
@@ -142,101 +153,22 @@ function generateConfig(seed: string | number): GradientConfig {
   const seedValue = typeof seed === "string" ? stringToSeed(seed) : seed;
   const random = createRandom(seedValue);
 
-  // Always analogous for cloud-like feel
   const harmony: "analogous" | "complementary" = "analogous";
 
   // Base hue
   const baseHue = random() * 360;
 
-  // Background - medium saturated base color (will be the darker bottom)
+  // Background - LIGHT, low saturation (the canvas)
   const background: GradientColor = {
     h: baseHue,
-    s: 60 + random() * 25,
-    l: 55 + random() * 15, // 55-70% - medium brightness for bottom
+    s: 20 + random() * 15, // 20-35% saturation - subtle tint
+    l: 92 + random() * 6, // 92-98% lightness - almost white
   };
 
-  // Generate cloud layers with varying depths
+  // Blobs not used in new rendering, but kept for compatibility
   const blobs: GradientBlob[] = [];
 
-  // Layer 1: Deep/dark layer (bottom gradient effect)
-  blobs.push({
-    x: 0.5,
-    y: 1.2, // Below center for bottom-heavy effect
-    radius: 0.9 + random() * 0.3,
-    color: {
-      h: baseHue,
-      s: 70 + random() * 20,
-      l: 45 + random() * 10, // Darker shade
-    },
-    phase: random() * Math.PI * 2,
-    orbit: 0.01,
-  });
-
-  // Layer 2-3: Mid-tone cloud wisps
-  for (let i = 0; i < 2; i++) {
-    blobs.push({
-      x: 0.3 + random() * 0.4,
-      y: 0.4 + random() * 0.4,
-      radius: 0.4 + random() * 0.3,
-      color: {
-        h: (baseHue + (random() - 0.5) * 20 + 360) % 360,
-        s: 40 + random() * 30,
-        l: 70 + random() * 15,
-      },
-      phase: random() * Math.PI * 2,
-      orbit: 0.02 + random() * 0.02,
-    });
-  }
-
-  // Layer 4-5: Light cloud highlights (top/bright areas)
-  for (let i = 0; i < 2; i++) {
-    blobs.push({
-      x: 0.2 + random() * 0.6,
-      y: 0.1 + random() * 0.5,
-      radius: 0.3 + random() * 0.4,
-      color: {
-        h: (baseHue + (random() - 0.5) * 15 + 360) % 360,
-        s: 15 + random() * 25,
-        l: 88 + random() * 10, // Very light - cloud highlights
-      },
-      phase: random() * Math.PI * 2,
-      orbit: 0.015 + random() * 0.025,
-    });
-  }
-
   return { background, blobs, harmony };
-}
-
-// Calculate blob position with animation
-function getBlobPosition(
-  blob: GradientBlob,
-  position: number,
-  index: number
-): { x: number; y: number } {
-  const angle = (position / 100) * Math.PI * 2 + blob.phase;
-
-  // Elliptical orbit with variation per blob
-  const speed = 1 + (index % 3) * 0.25;
-  const xOffset = Math.cos(angle * speed) * blob.orbit;
-  const yOffset = Math.sin(angle * speed * 0.8) * blob.orbit * 1.3;
-
-  // Secondary subtle movement for organic feel
-  const angle2 = angle * 2.1 + index * 0.9;
-  const xOffset2 = Math.cos(angle2) * blob.orbit * 0.35;
-  const yOffset2 = Math.sin(angle2) * blob.orbit * 0.35;
-
-  return {
-    x: blob.x + xOffset + xOffset2,
-    y: blob.y + yOffset + yOffset2,
-  };
-}
-
-// HSL to CSS string
-function hsl(color: GradientColor, alpha?: number): string {
-  if (alpha !== undefined) {
-    return `hsla(${color.h}, ${color.s}%, ${color.l}%, ${alpha})`;
-  }
-  return `hsl(${color.h}, ${color.s}%, ${color.l}%)`;
 }
 
 // Render gradient to canvas
@@ -244,129 +176,193 @@ function renderGradient(
   ctx: CanvasRenderingContext2D,
   config: GradientConfig,
   size: number,
-  position: number = 0
+  position: number = 0,
 ) {
-  const { blobs, background } = config;
+  const { background } = config;
   const seed = stringToSeed(JSON.stringify(background));
   const noise = createNoise(seed);
+  const random = createRandom(seed);
   const animOffset = (position / 100) * Math.PI * 2;
 
-  // 1. Fill entire canvas with background - no empty/black areas
-  ctx.fillStyle = hsl(background);
-  ctx.fillRect(0, 0, size, size);
+  // Color palette based on saturation (not darkness)
+  // Base: light, low saturation
+  const baseColor = {
+    h: background.h,
+    s: background.s,
+    l: background.l,
+  };
+  // Mid: medium saturation for texture
+  const midColor = {
+    h: background.h,
+    s: 45 + random() * 15, // 45-60% saturation
+    l: 75 + random() * 10, // 75-85% lightness
+  };
+  // Saturated: rich color for accents (not dark, but vivid)
+  const saturatedColor = {
+    h: background.h,
+    s: 65 + random() * 20, // 65-85% saturation
+    l: 55 + random() * 15, // 55-70% lightness
+  };
 
-  // 2. Create temp canvas for blob layer
+  const [baseR, baseG, baseB] = hslToRgb(baseColor.h, baseColor.s, baseColor.l);
+  const [midR, midG, midB] = hslToRgb(midColor.h, midColor.s, midColor.l);
+  const [satR, satG, satB] = hslToRgb(saturatedColor.h, saturatedColor.s, saturatedColor.l);
+
+  // Generate ONE origin point on the edge - all layers come from here
+  const edgePos = random();
+  let originX: number, originY: number;
+
+  if (edgePos < 0.25) {
+    // Top edge
+    originX = edgePos / 0.25;
+    originY = 0;
+  } else if (edgePos < 0.5) {
+    // Right edge
+    originX = 1;
+    originY = (edgePos - 0.25) / 0.25;
+  } else if (edgePos < 0.75) {
+    // Bottom edge
+    originX = 1 - (edgePos - 0.5) / 0.25;
+    originY = 1;
+  } else {
+    // Left edge
+    originX = 0;
+    originY = 1 - (edgePos - 0.75) / 0.25;
+  }
+
+  // Angle pointing inward toward center
+  const originAngle = Math.atan2(0.5 - originY, 0.5 - originX);
+  // Spread - how wide the smudge fans out
+  const spread = 0.3 + random() * 0.3;
+
+  // Create image data
+  const imageData = ctx.createImageData(size, size);
+  const data = imageData.data;
+
+  for (let py = 0; py < size; py++) {
+    for (let px = 0; px < size; px++) {
+      const nx = px / size;
+      const ny = py / size;
+
+      // Cloud noise for texture
+      const cloudNoise = fbm(noise, nx * 4 + animOffset * 0.05, ny * 4, 4, 2.0, 0.5);
+      const detailNoise = fbm(noise, nx * 8 - animOffset * 0.03, ny * 8, 2, 2.0, 0.5);
+
+      // Calculate influence from the single origin point
+      const dx = nx - originX;
+      const dy = ny - originY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Angle from origin to this pixel
+      const pixelAngle = Math.atan2(dy, dx);
+      const angleDiff = Math.abs(pixelAngle - originAngle);
+      const normalizedAngleDiff = Math.min(angleDiff, Math.PI * 2 - angleDiff);
+
+      // Spread factor (how much the smudge fans out from main direction)
+      const spreadFactor = Math.max(0, 1 - normalizedAngleDiff / (Math.PI * spread));
+
+      // Distance falloff with noise distortion (creates cloud ripple)
+      const noiseDistort = cloudNoise * 0.12;
+      const distortedDist = dist + noiseDistort;
+
+      // Mid color reaches further (covers most of canvas from origin)
+      const midFalloff = Math.max(0, 1 - distortedDist / 0.85);
+      let midInfluence = midFalloff * midFalloff * spreadFactor;
+
+      // Saturated color stays closer to origin
+      const satFalloff = Math.max(0, 1 - distortedDist / 0.5);
+      let satInfluence = satFalloff * satFalloff * satFalloff * spreadFactor;
+
+      // Add noise variation to create ripple texture
+      const noiseVariation = (cloudNoise * 0.5 + detailNoise * 0.5 + 1) * 0.5; // 0-1 range
+      midInfluence *= 0.7 + noiseVariation * 0.5;
+      satInfluence *= 0.5 + noiseVariation * 0.7;
+
+      // Clamp influences
+      midInfluence = Math.min(1, Math.max(0, midInfluence));
+      satInfluence = Math.min(1, Math.max(0, satInfluence * 0.6)); // Keep saturated subtle
+
+      // Blend colors: base -> mid -> saturated
+      let r = baseR;
+      let g = baseG;
+      let b = baseB;
+
+      // Apply mid influence
+      r = r + (midR - r) * midInfluence;
+      g = g + (midG - g) * midInfluence;
+      b = b + (midB - b) * midInfluence;
+
+      // Apply saturated influence on top
+      r = r + (satR - r) * satInfluence;
+      g = g + (satG - g) * satInfluence;
+      b = b + (satB - b) * satInfluence;
+
+      const idx = (py * size + px) * 4;
+      data[idx] = Math.round(r);
+      data[idx + 1] = Math.round(g);
+      data[idx + 2] = Math.round(b);
+      data[idx + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+
+  // Apply subtle blur for smoothness
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = size;
   tempCanvas.height = size;
   const tempCtx = tempCanvas.getContext("2d")!;
+  tempCtx.drawImage(ctx.canvas, 0, 0);
 
-  // Fill temp with transparent
-  tempCtx.clearRect(0, 0, size, size);
+  ctx.filter = `blur(${size * 0.012}px)`;
+  ctx.drawImage(tempCanvas, 0, 0);
+  ctx.filter = "none";
+}
 
-  // 3. Draw blobs with soft edges
-  for (let i = 0; i < blobs.length; i++) {
-    const blob = blobs[i];
-    const pos = getBlobPosition(blob, position, i);
+// HSL to RGB conversion
+function hslToRgb(h: number, s: number, l: number): [number, number, number] {
+  s /= 100;
+  l /= 100;
 
-    const centerX = pos.x * size;
-    const centerY = pos.y * size;
-    const radius = blob.radius * size;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
 
-    // Radial gradient with soft falloff
-    const gradient = tempCtx.createRadialGradient(
-      centerX,
-      centerY,
-      0,
-      centerX,
-      centerY,
-      radius
-    );
+  let r = 0,
+    g = 0,
+    b = 0;
 
-    // Soft, layered falloff
-    gradient.addColorStop(0, hsl(blob.color, 0.9));
-    gradient.addColorStop(0.25, hsl(blob.color, 0.7));
-    gradient.addColorStop(0.5, hsl(blob.color, 0.4));
-    gradient.addColorStop(0.75, hsl(blob.color, 0.15));
-    gradient.addColorStop(1, hsl(blob.color, 0));
-
-    // Use lighter blend for soft layering
-    tempCtx.globalCompositeOperation = i === 0 ? "source-over" : "lighter";
-    tempCtx.fillStyle = gradient;
-    tempCtx.beginPath();
-    tempCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    tempCtx.fill();
+  if (h < 60) {
+    r = c;
+    g = x;
+    b = 0;
+  } else if (h < 120) {
+    r = x;
+    g = c;
+    b = 0;
+  } else if (h < 180) {
+    r = 0;
+    g = c;
+    b = x;
+  } else if (h < 240) {
+    r = 0;
+    g = x;
+    b = c;
+  } else if (h < 300) {
+    r = x;
+    g = 0;
+    b = c;
+  } else {
+    r = c;
+    g = 0;
+    b = x;
   }
 
-  // 4. Apply blur for smooth blending
-  ctx.filter = `blur(${size * 0.1}px)`;
-  ctx.globalCompositeOperation = "soft-light";
-  ctx.globalAlpha = 0.9;
-  ctx.drawImage(tempCanvas, 0, 0);
-
-  // 5. Second pass with less blur for definition
-  ctx.filter = `blur(${size * 0.035}px)`;
-  ctx.globalAlpha = 0.7;
-  ctx.drawImage(tempCanvas, 0, 0);
-
-  // 6. Third pass - minimal blur for crisp highlights
-  ctx.filter = `blur(${size * 0.015}px)`;
-  ctx.globalCompositeOperation = "overlay";
-  ctx.globalAlpha = 0.4;
-  ctx.drawImage(tempCanvas, 0, 0);
-
-  // 7. Reset context
-  ctx.filter = "none";
-  ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = 1;
-
-  // 8. Add noise ripple overlay for layered cloud effect
-  const noiseCanvas = document.createElement("canvas");
-  noiseCanvas.width = size;
-  noiseCanvas.height = size;
-  const noiseCtx = noiseCanvas.getContext("2d")!;
-  const noiseImageData = noiseCtx.createImageData(size, size);
-  const noiseData = noiseImageData.data;
-
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const nx = x / size;
-      const ny = y / size;
-
-      // Multi-scale noise for ripple texture
-      const n1 = fbm(noise, nx * 4 + animOffset * 0.1, ny * 4, 3, 2, 0.5);
-      const n2 = fbm(noise, nx * 8 - animOffset * 0.05, ny * 8, 2, 2, 0.5);
-      const combined = (n1 * 0.7 + n2 * 0.3);
-
-      // Map noise to grayscale for overlay
-      const brightness = Math.floor(128 + combined * 60);
-
-      const idx = (y * size + x) * 4;
-      noiseData[idx] = brightness;
-      noiseData[idx + 1] = brightness;
-      noiseData[idx + 2] = brightness;
-      noiseData[idx + 3] = 255;
-    }
-  }
-
-  noiseCtx.putImageData(noiseImageData, 0, 0);
-
-  // Apply noise with soft-light blend for subtle ripple
-  ctx.filter = `blur(${size * 0.02}px)`;
-  ctx.globalCompositeOperation = "soft-light";
-  ctx.globalAlpha = 0.35;
-  ctx.drawImage(noiseCanvas, 0, 0);
-
-  // Second noise pass with overlay for more depth
-  ctx.filter = `blur(${size * 0.01}px)`;
-  ctx.globalCompositeOperation = "overlay";
-  ctx.globalAlpha = 0.15;
-  ctx.drawImage(noiseCanvas, 0, 0);
-
-  // Reset context
-  ctx.filter = "none";
-  ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = 1;
+  return [
+    Math.round((r + m) * 255),
+    Math.round((g + m) * 255),
+    Math.round((b + m) * 255),
+  ];
 }
 
 /**
@@ -394,7 +390,7 @@ export function useGradient(options: UseGradientOptions): UseGradientReturn {
 
   const toDataURL = (
     format: "png" | "jpeg" | "webp" = "png",
-    quality = 0.92
+    quality = 0.92,
   ): string => {
     const cvs = canvas.value;
     if (!cvs) return "";
@@ -403,7 +399,7 @@ export function useGradient(options: UseGradientOptions): UseGradientReturn {
 
   const toBlob = (
     format: "png" | "jpeg" | "webp" = "png",
-    quality = 0.92
+    quality = 0.92,
   ): Promise<Blob | null> => {
     return new Promise((resolve) => {
       const cvs = canvas.value;
@@ -428,7 +424,7 @@ export function useGradient(options: UseGradientOptions): UseGradientReturn {
           render(pos);
         });
       },
-      { immediate: false }
+      { immediate: false },
     );
   }
 
@@ -456,7 +452,7 @@ export function useGradient(options: UseGradientOptions): UseGradientReturn {
 export function generateGradient(
   seed: string | number,
   size: number = 256,
-  format: "png" | "jpeg" | "webp" = "png"
+  format: "png" | "jpeg" | "webp" = "png",
 ): string {
   const config = generateConfig(seed);
   const canvas = document.createElement("canvas");
