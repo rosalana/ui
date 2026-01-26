@@ -247,6 +247,9 @@ function renderGradient(
   position: number = 0
 ) {
   const { blobs, background } = config;
+  const seed = stringToSeed(JSON.stringify(background));
+  const noise = createNoise(seed);
+  const animOffset = (position / 100) * Math.PI * 2;
 
   // 1. Fill entire canvas with background - no empty/black areas
   ctx.fillStyle = hsl(background);
@@ -313,6 +316,54 @@ function renderGradient(
   ctx.drawImage(tempCanvas, 0, 0);
 
   // 7. Reset context
+  ctx.filter = "none";
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = 1;
+
+  // 8. Add noise ripple overlay for layered cloud effect
+  const noiseCanvas = document.createElement("canvas");
+  noiseCanvas.width = size;
+  noiseCanvas.height = size;
+  const noiseCtx = noiseCanvas.getContext("2d")!;
+  const noiseImageData = noiseCtx.createImageData(size, size);
+  const noiseData = noiseImageData.data;
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const nx = x / size;
+      const ny = y / size;
+
+      // Multi-scale noise for ripple texture
+      const n1 = fbm(noise, nx * 4 + animOffset * 0.1, ny * 4, 3, 2, 0.5);
+      const n2 = fbm(noise, nx * 8 - animOffset * 0.05, ny * 8, 2, 2, 0.5);
+      const combined = (n1 * 0.7 + n2 * 0.3);
+
+      // Map noise to grayscale for overlay
+      const brightness = Math.floor(128 + combined * 60);
+
+      const idx = (y * size + x) * 4;
+      noiseData[idx] = brightness;
+      noiseData[idx + 1] = brightness;
+      noiseData[idx + 2] = brightness;
+      noiseData[idx + 3] = 255;
+    }
+  }
+
+  noiseCtx.putImageData(noiseImageData, 0, 0);
+
+  // Apply noise with soft-light blend for subtle ripple
+  ctx.filter = `blur(${size * 0.02}px)`;
+  ctx.globalCompositeOperation = "soft-light";
+  ctx.globalAlpha = 0.35;
+  ctx.drawImage(noiseCanvas, 0, 0);
+
+  // Second noise pass with overlay for more depth
+  ctx.filter = `blur(${size * 0.01}px)`;
+  ctx.globalCompositeOperation = "overlay";
+  ctx.globalAlpha = 0.15;
+  ctx.drawImage(noiseCanvas, 0, 0);
+
+  // Reset context
   ctx.filter = "none";
   ctx.globalCompositeOperation = "source-over";
   ctx.globalAlpha = 1;
