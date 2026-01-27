@@ -9,6 +9,12 @@ import { useGradient } from "../../../composables/useGradient";
 
 // https://github.com/KevinGrajeda/meshGradient/tree/main/src/components
 
+// Gradient by měl mít bacground vždy tu světlou svojí barvu
+// A potom další 2 barvy. (světlá tmavá)
+// Je potřeba zajistit, aby pointy byly dobře u sebe a nevytvářely moc velké prázdné plochy
+// Následuje uprava shaders, aby měly i ripple effekt
+
+
 const avatarGradient = tv({
   base: "aspect-square size-full overflow-hidden",
 });
