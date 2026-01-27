@@ -1,59 +1,252 @@
-import type { GradientColor, GradientOptions } from "./types";
+import type { Ref } from "vue";
 import p5 from "p5";
-export * from "./types";
 
+// ============================================================================
+// Types
+// ============================================================================
 
-import vertSource from "./shaders/shader.vert?raw";
-import fragSource from "./shaders/shader.frag?raw";
+export interface GradientColor {
+  h: number;
+  s: number;
+  l: number;
+}
 
-/** Warp size */
-const WARP_SIZE = 0.5;
-/** Warp radius */
-const WARP_RADIUS = 0.7;
-/** Noise ratio */
-const NOISE_RATIO = 0.04;
+export interface GradientOptions {
+  /** Seed for deterministic gradient generation */
+  seed: string | number;
+  /** Canvas element ref */
+  canvas?: Ref<HTMLCanvasElement | null>;
+  /** Progress of the gradient animation (0-100) default: 100 */
+  progress?: number;
+  /** Fires when the gradient is rendered */
+  onRender?: () => void;
+  /** Fires when an error occurs during gradient generation */
+  onError?: (error: Error) => void;
+}
 
-/** Predefined color options */
+export interface GradientConfig {
+  /** Background color - always filled, never empty */
+  background: GradientColor;
+  /** Array of gradient colors */
+  colors: GradientColor[];
+  /** Size of the warp effect */
+  warpSize: number;
+  /** Radius of the warp effect */
+  warpRadius: number;
+  /** Ratio of noise applied to the gradient */
+  noiseRatio: number;
+  /** Canvas dimensions */
+  width: number;
+  /** Canvas dimensions */
+  height: number;
+  /** Random seed used for generation */
+  random: number;
+}
+
+// ============================================================================
+// Shader Sources
+// ============================================================================
+
+const vertSource = `#ifdef GL_ES
+precision mediump float;
+#endif
+
+attribute vec3 aPosition;
+
+void main() {
+  vec4 positionVec4 = vec4(aPosition, 1.0);
+  positionVec4.xy = positionVec4.xy * 2.0 - 1.0; 
+  gl_Position = positionVec4;
+}`;
+
+const fragSource = `#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform vec3 u_bgColor;
+uniform vec3 u_colors[10];
+uniform vec2 u_positions[10];
+uniform int u_numberPoints;
+uniform float u_noiseRatio;
+uniform float u_warpRatio;
+uniform float u_warpSize;
+uniform vec2 u_mouse;
+
+float rand(vec2 n) { 
+  return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+}
+
+vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
+
+float snoise(vec3 v){ 
+  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+
+  vec3 i  = floor(v + dot(v, C.yyy) );
+  vec3 x0 =   v - i + dot(i, C.xxx) ;
+
+  vec3 g = step(x0.yzx, x0.xyz);
+  vec3 l = 1.0 - g;
+  vec3 i1 = min( g.xyz, l.zxy );
+  vec3 i2 = max( g.xyz, l.zxy );
+
+  vec3 x1 = x0 - i1 + 1.0 * C.xxx;
+  vec3 x2 = x0 - i2 + 2.0 * C.xxx;
+  vec3 x3 = x0 - 1. + 3.0 * C.xxx;
+
+  i = mod(i, 289.0 ); 
+  vec4 p = permute( permute( permute( 
+             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+           + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
+           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+
+  float n_ = 1.0/7.0;
+  vec3  ns = n_ * D.wyz - D.xzx;
+
+  vec4 j = p - 49.0 * floor(p * ns.z *ns.z);
+
+  vec4 x_ = floor(j * ns.z);
+  vec4 y_ = floor(j - 7.0 * x_ );
+
+  vec4 x = x_ *ns.x + ns.yyyy;
+  vec4 y = y_ *ns.x + ns.yyyy;
+  vec4 h = 1.0 - abs(x) - abs(y);
+
+  vec4 b0 = vec4( x.xy, y.xy );
+  vec4 b1 = vec4( x.zw, y.zw );
+
+  vec4 s0 = floor(b0)*2.0 + 1.0;
+  vec4 s1 = floor(b1)*2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+
+  vec3 p0 = vec3(a0.xy,h.x);
+  vec3 p1 = vec3(a0.zw,h.y);
+  vec3 p2 = vec3(a1.xy,h.z);
+  vec3 p3 = vec3(a1.zw,h.w);
+
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+  p0 *= norm.x;
+  p1 *= norm.y;
+  p2 *= norm.z;
+  p3 *= norm.w;
+
+  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+  m = m * m;
+  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
+                                dot(p2,x2), dot(p3,x3) ) );
+}
+
+void main() {
+  vec2 st = gl_FragCoord.xy/u_resolution.xy;
+  st.y=1.-st.y;
+  vec3 noise=vec3(rand(vec2(st.x*5.+u_time,st.y*5.-u_time)));
+  
+  float warp=snoise(vec3(st.xy*u_warpSize,u_time))*u_warpRatio;
+  st+=warp;
+  
+  float pointGradient=0.;
+  vec3 colorGradient=vec3(0.);
+  float totalLight=1.;
+
+  for(int i=0;i<10;i++){
+    if(i<u_numberPoints){
+      vec3 color=u_colors[i];
+      vec2 pointPos=u_positions[i];
+      float dist=1.-distance(st,pointPos)*1.1;
+      pointGradient+=clamp(dist,0.,1.);
+      colorGradient+=color*clamp(dist,0.,1.);
+      totalLight*=(1.-dist)*(1.-dist);
+    }
+  }
+  
+  totalLight=smoothstep(0.,1.,clamp(1.-totalLight,0.,1.));
+  colorGradient=(colorGradient/pointGradient)*totalLight;
+  vec3 bgGradient=(1.-totalLight)*u_bgColor;
+  vec3 total=mix(clamp(colorGradient,0.,1.)+bgGradient,noise,u_noiseRatio);
+  gl_FragColor = vec4(vec3(total),1.);
+}`;
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+const WARP_SIZE: GradientConfig["warpSize"] = 1;
+const WARP_RADIUS: GradientConfig["warpRadius"] = 0.8;
+const NOISE_RATIO: GradientConfig["noiseRatio"] = 0.05;
+const NUMBER_POINTS = 3;
+
+const BACKGROUND: GradientColor = hsl(0, 0, 100); // white
+
 const COLORS: GradientColor[] = [
-  { h: 210, s: 0.7, l: 0.5 },
-  { h: 330, s: 0.7, l: 0.5 },
-  { h: 90, s: 0.7, l: 0.5 },
-  { h: 30, s: 0.7, l: 0.5 },
-  { h: 180, s: 0.7, l: 0.5 },
+  hsl(216.26, 100, 58), // blue
+  hsl(24.65, 100, 50), // orange
+  hsl(356.95, 96, 58), // red
+  hsl(159.74, 100, 37), // emerald
+  hsl(240.98, 100, 69), // indigo
 ];
 
-/**
- * Deterministic random number from seed (mulberry-ish)
- */
-function random(seed: string | number): number {
-  if (typeof seed === "string") {
-    let hash = 0;
-    for (let i = 0; i < seed.length; i++) {
-      const char = seed.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash |= 0;
-    }
-    seed = Math.abs(hash) || 1;
+// ============================================================================
+// Seeded Random Generator
+// ============================================================================
+
+class SeededRandom {
+  private seed: number;
+
+  constructor(seed: string | number) {
+    this.seed = SeededRandom.hashSeed(seed);
   }
 
-  let t = (seed += 0x6d2b79f5);
-  t = Math.imul(t ^ (t >>> 15), t | 1);
-  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  private static hashSeed(seed: string | number): number {
+    if (typeof seed === "string") {
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) {
+        const char = seed.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0;
+      }
+      return Math.abs(hash) || 1;
+    }
+    return seed;
+  }
+
+  /** Returns a deterministic random number between 0 and 1 */
+  next(): number {
+    let t = (this.seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+
+  /** Returns the initial hash value (useful for shader time uniform) */
+  getInitialValue(): number {
+    return SeededRandom.hashSeed(this.seed) / 4294967296;
+  }
 }
 
-function clamp01(n: number) {
-  return Math.max(0, Math.min(1, n));
+// ============================================================================
+// Color Utilities
+// ============================================================================
+
+function hsl(h: number, s: number, l: number): GradientColor {
+  return clampHsl({ h, s: s / 100, l: l / 100 });
 }
 
-function clampHue(n: number) {
-    return ((n % 360) + 360) % 360;
+function clampHsl(color: GradientColor): GradientColor {
+  return {
+    h: ((color.h % 360) + 360) % 360,
+    s: Math.max(0, Math.min(1, color.s)),
+    l: Math.max(0, Math.min(1, color.l)),
+  };
 }
 
-function hslToRgb01(h: number, s: number, l: number): [number, number, number] {
-  h = ((h % 360) + 360) % 360;
-  s = clamp01(s);
-  l = clamp01(l);
+function hslToRgb(color: GradientColor): [number, number, number] {
+  const { h, s, l } = clampHsl(color);
 
   const c = (1 - Math.abs(2 * l - 1)) * s;
   const hh = h / 60;
@@ -74,231 +267,481 @@ function hslToRgb01(h: number, s: number, l: number): [number, number, number] {
   return [r1 + m, g1 + m, b1 + m];
 }
 
-/**
- * White + 2 shades (light/dark) of one chosen base color (by seed)
- */
-function palette(rand: number): GradientColor[] {
-  const baseIndex = Math.floor(rand * COLORS.length) % COLORS.length;
+// ============================================================================
+// Gradient Generation
+// ============================================================================
+
+function generateColors(rng: SeededRandom): GradientColor[] {
+  const baseIndex = Math.floor(rng.next() * COLORS.length) % COLORS.length;
   const base = COLORS[baseIndex];
 
-  const light: GradientColor = {
-    h: clampHue(base.h - 50),
-    s: clamp01(base.s * 0.95),
-    l: clamp01(Math.max(base.l, 0.55) + 0.2),
-  };
-
-  const dark: GradientColor = {
-    h: base.h,
-    s: clamp01(base.s * 1.05),
-    l: clamp01(Math.min(base.l, 0.55) - 0.4),
-  };
-
-  // vždy 3 barvy: white, light, dark
   return [
-    { h: base.h, s: base.s, l: 0.9 }, // white
-    light,
+    clampHsl({ h: base.h - 50, s: base.s * 0.9, l: base.l + 0.2 }),
+    clampHsl({ h: base.h, s: base.s * 1.05, l: base.l - 0.4 }),
     base,
-    dark,
   ];
 }
 
-function derivedSeed(seed: string | number, salt: string): string | number {
-  return typeof seed === "string"
-    ? `${seed}:${salt}`
-    : seed + salt.length * 999;
+function generatePositions(rng: SeededRandom, count: number): number[] {
+  const positions: number[] = [];
+  for (let i = 0; i < count; i++) {
+    positions.push(rng.next(), rng.next());
+  }
+  return positions;
 }
 
-function getCanvasPixelSize(el: HTMLCanvasElement) {
+// ============================================================================
+// Canvas Utilities
+// ============================================================================
+
+function getCanvasDimensions(canvas: HTMLCanvasElement) {
   const dpr = Math.min(2, window.devicePixelRatio || 1);
-  const cssW = el.clientWidth || el.width || 1;
-  const cssH = el.clientHeight || el.height || 1;
+  const cssW = canvas.clientWidth || canvas.width || 1;
+  const cssH = canvas.clientHeight || canvas.height || 1;
+
   const w = Math.max(1, Math.floor(cssW * dpr));
   const h = Math.max(1, Math.floor(cssH * dpr));
+
   return { w, h, dpr };
 }
 
-function ensure2DContext(canvas: HTMLCanvasElement) {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas 2D context is not available.");
-  return ctx;
-}
+// ============================================================================
+// Main Composable
+// ============================================================================
 
-export function useGradient(baseOptions: GradientOptions) {
-  // internal state
-  let options: GradientOptions = { ...baseOptions };
-  let host: HTMLDivElement | null = null;
+export function useGradient(options: GradientOptions) {
+  const { seed, canvas, progress = 100, onRender, onError } = options;
 
-  let p: p5 | null = null;
-  let ready: Promise<void> | null = null;
+  let p5Instance: p5 | null = null;
+  let offscreenCanvas: HTMLCanvasElement | null = null;
 
-  let gfx: any = null; // p5.Graphics (WEBGL)
-  let shader: any = null; // p5.Shader
+  /**
+   * Creates a p5 sketch that renders the gradient to a canvas
+   */
+  function createSketch(
+    targetCanvas: HTMLCanvasElement,
+    width: number,
+    height: number,
+    renderOnce: boolean = false
+  ): Promise<p5> {
+    return new Promise((resolve, reject) => {
+      const rng = new SeededRandom(seed);
+      const timeValue = rng.next() * 100;
+      const gradientColors = generateColors(rng);
+      const positions = generatePositions(rng, NUMBER_POINTS);
 
-  let lastSeed: string | number | null = null;
-  let lastPalette: GradientColor[] | null = null;
-  let targetPositions: number[] | null = null; // normalized [x1,y1,x2,y2,x3,y3]
+      const sketch = (p: p5) => {
+        let theShader: p5.Shader;
 
-  function ensureP5(): Promise<void> {
-    if (ready) return ready;
+        p.setup = function () {
+          p.pixelDensity(1);
+          
+          // Create canvas with WEBGL mode
+          const cnv = p.createCanvas(width, height, p.WEBGL);
+          
+          // Disable depth test for 2D rendering
+          const gl = (p as any).canvas.getContext("webgl");
+          if (gl) {
+            gl.disable(gl.DEPTH_TEST);
+          }
 
-    ready = new Promise<void>((resolve) => {
-      host = document.createElement("div");
-      host.style.position = "fixed";
-      host.style.left = "-99999px";
-      host.style.top = "-99999px";
-      host.style.width = "1px";
-      host.style.height = "1px";
-      host.style.overflow = "hidden";
-      document.body.appendChild(host);
+          // Create shader
+          theShader = p.createShader(vertSource, fragSource);
 
-      p = new p5((pp: p5) => {
-        pp.setup = () => {
-          pp.pixelDensity(1);
+          p.noStroke();
 
-          // malý hidden canvas jen aby p5 mělo WEBGL renderer (bez toho občas shader API zlobí)
-          const cnv = pp.createCanvas(1, 1, (pp as any).WEBGL) as any;
-          if (cnv?.elt) cnv.elt.style.display = "none";
-
-          gfx = pp.createGraphics(2, 2, (pp as any).WEBGL);
-          gfx.pixelDensity(1);
-          gfx.noStroke();
-
-          // shader jako stringy (bez loadShader/preload)
-          shader = (gfx as any).createShader(vertSource, fragSource);
-
-          resolve();
+          if (renderOnce) {
+            // Single render mode - draw once and resolve
+            renderFrame();
+            resolve(p);
+          } else {
+            resolve(p);
+          }
         };
-      }, host);
+
+        p.draw = function () {
+          if (!renderOnce) {
+            renderFrame();
+          }
+        };
+
+        function renderFrame() {
+          p.background(0);
+
+          // Set shader uniforms
+          theShader.setUniform("u_resolution", [p.width, p.height]);
+          theShader.setUniform("u_time", timeValue + (progress / 100) * 10);
+          theShader.setUniform("u_bgColor", hslToRgb(BACKGROUND));
+
+          // Flatten colors array
+          const colorsUniform: number[] = [];
+          for (let i = 0; i < NUMBER_POINTS; i++) {
+            colorsUniform.push(...hslToRgb(gradientColors[i]));
+          }
+          theShader.setUniform("u_colors", colorsUniform);
+
+          theShader.setUniform("u_positions", positions);
+          theShader.setUniform("u_numberPoints", NUMBER_POINTS);
+          theShader.setUniform("u_noiseRatio", NOISE_RATIO);
+          theShader.setUniform("u_warpRatio", WARP_RADIUS);
+          theShader.setUniform("u_warpSize", WARP_SIZE);
+          theShader.setUniform("u_mouse", [0, 0]);
+
+          // Apply shader and draw
+          p.shader(theShader);
+          p.rect(0, 0, p.width, p.height);
+        }
+      };
+
+      try {
+        // Create a container div for p5
+        const container = document.createElement("div");
+        container.style.position = "absolute";
+        container.style.left = "-9999px";
+        container.style.top = "-9999px";
+        document.body.appendChild(container);
+
+        const instance = new p5(sketch, container);
+
+        // Clean up container after setup
+        setTimeout(() => {
+          if (container.parentNode) {
+            // Move the canvas to the target if needed
+            const p5Canvas = container.querySelector("canvas");
+            if (p5Canvas && targetCanvas !== p5Canvas) {
+              const ctx = targetCanvas.getContext("2d");
+              if (ctx) {
+                targetCanvas.width = width;
+                targetCanvas.height = height;
+                ctx.drawImage(p5Canvas, 0, 0);
+              }
+            }
+            container.remove();
+          }
+        }, 100);
+      } catch (err) {
+        reject(err);
+      }
     });
-
-    return ready;
   }
 
-  function recomputeDeterministicState(seed: string | number) {
-    // palette
-    const rand = random(seed);
-    lastPalette = palette(rand);
-
-    // 3 target positions (normalized 0..1), deterministically derived from seed
-    // rozumný rozsah aby body nebyly moc u okraje
-    const r1 = random(derivedSeed(seed, "p1x"));
-    const r2 = random(derivedSeed(seed, "p1y"));
-    const r3 = random(derivedSeed(seed, "p2x"));
-    const r4 = random(derivedSeed(seed, "p2y"));
-    const r5 = random(derivedSeed(seed, "p3x"));
-    const r6 = random(derivedSeed(seed, "p3y"));
-
-    const map = (r: number) => 0.18 + r * 0.64;
-
-    targetPositions = [map(r1), map(r2), map(r3), map(r4), map(r5), map(r6)];
-  }
-
-  function currentPositions(progress: number): number[] {
-    const t = clamp01(progress / 100);
-    const base = targetPositions ?? [0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
-
-    // vystavění: start v centru, končí v cílové pozici
-    const cx = 0.5;
-    const cy = 0.5;
-
-    return [
-      cx + (base[0] - cx) * t,
-      cy + (base[1] - cy) * t,
-      cx + (base[2] - cx) * t,
-      cy + (base[3] - cy) * t,
-      cx + (base[4] - cx) * t,
-      cy + (base[5] - cy) * t,
-    ];
-  }
-
-  async function generate(override?: Partial<GradientOptions>) {
-    options = { ...options, ...(override ?? {}) };
-
-    const canvasEl = options.canvas.value;
-    if (!canvasEl) throw new Error("options.canvas.value is null");
-
-    await ensureP5();
-
-    const seed = options.seed;
-    const progress = options.progress ?? 100;
-
-    // (re)compute deterministic state if seed changed
-    if (lastSeed !== seed) {
-      lastSeed = seed;
-      recomputeDeterministicState(seed);
-    }
-
-    const { w, h } = getCanvasPixelSize(canvasEl);
-
-    // resize output canvas (pixels)
-    if (canvasEl.width !== w) canvasEl.width = w;
-    if (canvasEl.height !== h) canvasEl.height = h;
-
-    // resize webgl graphics
-    if (gfx.width !== w || gfx.height !== h) {
-      gfx.resizeCanvas(w, h);
-    }
-
-    // uniforms
-    const pal = lastPalette ?? palette(random(seed));
-    const whiteRgb = hslToRgb01(pal[0].h, pal[0].s, pal[0].l);
-    const c1 = hslToRgb01(pal[1].h, pal[1].s, pal[1].l);
-    const c2 = hslToRgb01(pal[2].h, pal[2].s, pal[2].l);
-
-    const colorsUniform = [...whiteRgb, ...c1, ...c2]; // 3 colors => 9 floats
-    const positionsUniform = currentPositions(progress); // 3 points => 6 floats
-
-    // u_time – deterministické + reaguje na progress (jemná animace)
-    const timeBase = random(derivedSeed(seed, "time")) * 1000;
-    const time = timeBase + (progress / 100) * 10;
-
-    gfx.shader(shader);
-
-    shader.setUniform("u_resolution", [w, h]);
-    shader.setUniform("u_time", time);
-
-    // bgColor: držíme bílé pozadí (můžeš změnit na jinou konstantu)
-    shader.setUniform("u_bgColor", [1, 1, 1]);
-
-    shader.setUniform("u_colors", colorsUniform);
-    shader.setUniform("u_positions", positionsUniform);
-    shader.setUniform("u_numberPoints", 3);
-
-    shader.setUniform("u_noiseRatio", NOISE_RATIO);
-    shader.setUniform("u_warpRatio", WARP_RADIUS);
-    shader.setUniform("u_warpSize", WARP_SIZE);
-
-    // myš není relevantní, ale shader může uniform očekávat
-    shader.setUniform("u_mouse", [w / 2, h / 2]);
-
-    // render full-rect
-    gfx.rect(0, 0, w, h);
-
-    // copy to provided canvas
-    const ctx = ensure2DContext(canvasEl);
-    ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(gfx.elt as HTMLCanvasElement, 0, 0, w, h);
-  }
-
-  function toImg(): string {
-    const canvasEl = options.canvas.value;
-    if (!canvasEl) throw new Error("options.canvas.value is null");
-    return canvasEl.toDataURL("image/png");
-  }
-
-  function destroy() {
+  /**
+   * Renders the gradient to the provided canvas ref
+   */
+  async function render(): Promise<void> {
     try {
-      p?.remove();
-    } finally {
-      p = null;
-      ready = null;
-      gfx = null;
-      shader = null;
+      const canvasEl = canvas?.value;
+      if (!canvasEl) {
+        throw new Error("Canvas element not available");
+      }
 
-      if (host?.parentNode) host.parentNode.removeChild(host);
-      host = null;
+      const { w, h } = getCanvasDimensions(canvasEl);
+
+      // Clean up previous instance
+      if (p5Instance) {
+        p5Instance.remove();
+        p5Instance = null;
+      }
+
+      // Create offscreen rendering
+      await renderToCanvas(canvasEl, w, h);
+
+      onRender?.();
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      onError?.(error);
     }
   }
 
-  return { generate, toImg, destroy };
+  /**
+   * Internal: Renders gradient to a canvas element
+   */
+  async function renderToCanvas(
+    targetCanvas: HTMLCanvasElement,
+    width: number,
+    height: number
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const rng = new SeededRandom(seed);
+      const timeValue = rng.next() * 100;
+      const gradientColors = generateColors(rng);
+      const positions = generatePositions(rng, NUMBER_POINTS);
+
+      // Create temporary container
+      const container = document.createElement("div");
+      container.style.cssText =
+        "position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;";
+      document.body.appendChild(container);
+
+      const sketch = (p: p5) => {
+        let theShader: p5.Shader;
+
+        p.setup = function () {
+          p.pixelDensity(1);
+          p.createCanvas(width, height, p.WEBGL);
+
+          const gl = (p as any).canvas.getContext("webgl");
+          if (gl) {
+            gl.disable(gl.DEPTH_TEST);
+          }
+
+          theShader = p.createShader(vertSource, fragSource);
+          p.noStroke();
+          p.noLoop(); // Single frame mode
+        };
+
+        p.draw = function () {
+          p.background(0);
+
+          theShader.setUniform("u_resolution", [p.width, p.height]);
+          theShader.setUniform("u_time", timeValue + (progress / 100) * 10);
+          theShader.setUniform("u_bgColor", hslToRgb(BACKGROUND));
+
+          const colorsUniform: number[] = [];
+          for (let i = 0; i < NUMBER_POINTS; i++) {
+            colorsUniform.push(...hslToRgb(gradientColors[i]));
+          }
+          theShader.setUniform("u_colors", colorsUniform);
+          theShader.setUniform("u_positions", positions);
+          theShader.setUniform("u_numberPoints", NUMBER_POINTS);
+          theShader.setUniform("u_noiseRatio", NOISE_RATIO);
+          theShader.setUniform("u_warpRatio", WARP_RADIUS);
+          theShader.setUniform("u_warpSize", WARP_SIZE);
+          theShader.setUniform("u_mouse", [0, 0]);
+
+          p.shader(theShader);
+          p.rect(0, 0, p.width, p.height);
+
+          // Copy to target canvas
+          setTimeout(() => {
+            try {
+              const p5Canvas = container.querySelector("canvas");
+              if (p5Canvas) {
+                const ctx = targetCanvas.getContext("2d");
+                if (ctx) {
+                  targetCanvas.width = width;
+                  targetCanvas.height = height;
+                  ctx.drawImage(p5Canvas, 0, 0);
+                }
+              }
+              p.remove();
+              container.remove();
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          }, 50);
+        };
+      };
+
+      try {
+        new p5(sketch, container);
+      } catch (err) {
+        container.remove();
+        reject(err);
+      }
+    });
+  }
+
+  /**
+   * Renders to an offscreen canvas and returns as data URL
+   */
+  async function toImg(
+    w: number = 500,
+    h: number = 500,
+    format: "png" | "jpeg" | "webp" = "png"
+  ): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const rng = new SeededRandom(seed);
+      const timeValue = rng.next() * 100;
+      const gradientColors = generateColors(rng);
+      const positions = generatePositions(rng, NUMBER_POINTS);
+
+      const container = document.createElement("div");
+      container.style.cssText =
+        "position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;";
+      document.body.appendChild(container);
+
+      const sketch = (p: p5) => {
+        let theShader: p5.Shader;
+
+        p.setup = function () {
+          p.pixelDensity(1);
+          p.createCanvas(w, h, p.WEBGL);
+
+          const gl = (p as any).canvas.getContext("webgl");
+          if (gl) {
+            gl.disable(gl.DEPTH_TEST);
+          }
+
+          theShader = p.createShader(vertSource, fragSource);
+          p.noStroke();
+          p.noLoop();
+        };
+
+        p.draw = function () {
+          p.background(0);
+
+          theShader.setUniform("u_resolution", [p.width, p.height]);
+          theShader.setUniform("u_time", timeValue + (progress / 100) * 10);
+          theShader.setUniform("u_bgColor", hslToRgb(BACKGROUND));
+
+          const colorsUniform: number[] = [];
+          for (let i = 0; i < NUMBER_POINTS; i++) {
+            colorsUniform.push(...hslToRgb(gradientColors[i]));
+          }
+          theShader.setUniform("u_colors", colorsUniform);
+          theShader.setUniform("u_positions", positions);
+          theShader.setUniform("u_numberPoints", NUMBER_POINTS);
+          theShader.setUniform("u_noiseRatio", NOISE_RATIO);
+          theShader.setUniform("u_warpRatio", WARP_RADIUS);
+          theShader.setUniform("u_warpSize", WARP_SIZE);
+          theShader.setUniform("u_mouse", [0, 0]);
+
+          p.shader(theShader);
+          p.rect(0, 0, p.width, p.height);
+
+          setTimeout(() => {
+            try {
+              const p5Canvas = container.querySelector("canvas") as HTMLCanvasElement;
+              if (p5Canvas) {
+                const mimeType = `image/${format}`;
+                const dataUrl = p5Canvas.toDataURL(mimeType);
+                p.remove();
+                container.remove();
+                resolve(dataUrl);
+              } else {
+                throw new Error("Canvas not found");
+              }
+            } catch (err) {
+              p.remove();
+              container.remove();
+              reject(err);
+            }
+          }, 50);
+        };
+      };
+
+      try {
+        new p5(sketch, container);
+      } catch (err) {
+        container.remove();
+        reject(err);
+      }
+    });
+  }
+
+  /**
+   * Renders to an offscreen canvas and returns as Blob
+   */
+  async function toBlob(
+    w: number = 500,
+    h: number = 500,
+    format: "png" | "jpeg" | "webp" = "png",
+    quality?: number
+  ): Promise<Blob | null> {
+    return new Promise((resolve, reject) => {
+      const rng = new SeededRandom(seed);
+      const timeValue = rng.next() * 100;
+      const gradientColors = generateColors(rng);
+      const positions = generatePositions(rng, NUMBER_POINTS);
+
+      const container = document.createElement("div");
+      container.style.cssText =
+        "position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;";
+      document.body.appendChild(container);
+
+      const sketch = (p: p5) => {
+        let theShader: p5.Shader;
+
+        p.setup = function () {
+          p.pixelDensity(1);
+          p.createCanvas(w, h, p.WEBGL);
+
+          const gl = (p as any).canvas.getContext("webgl");
+          if (gl) {
+            gl.disable(gl.DEPTH_TEST);
+          }
+
+          theShader = p.createShader(vertSource, fragSource);
+          p.noStroke();
+          p.noLoop();
+        };
+
+        p.draw = function () {
+          p.background(0);
+
+          theShader.setUniform("u_resolution", [p.width, p.height]);
+          theShader.setUniform("u_time", timeValue + (progress / 100) * 10);
+          theShader.setUniform("u_bgColor", hslToRgb(BACKGROUND));
+
+          const colorsUniform: number[] = [];
+          for (let i = 0; i < NUMBER_POINTS; i++) {
+            colorsUniform.push(...hslToRgb(gradientColors[i]));
+          }
+          theShader.setUniform("u_colors", colorsUniform);
+          theShader.setUniform("u_positions", positions);
+          theShader.setUniform("u_numberPoints", NUMBER_POINTS);
+          theShader.setUniform("u_noiseRatio", NOISE_RATIO);
+          theShader.setUniform("u_warpRatio", WARP_RADIUS);
+          theShader.setUniform("u_warpSize", WARP_SIZE);
+          theShader.setUniform("u_mouse", [0, 0]);
+
+          p.shader(theShader);
+          p.rect(0, 0, p.width, p.height);
+
+          setTimeout(() => {
+            try {
+              const p5Canvas = container.querySelector("canvas") as HTMLCanvasElement;
+              if (p5Canvas) {
+                const mimeType = `image/${format}`;
+                p5Canvas.toBlob(
+                  (blob) => {
+                    p.remove();
+                    container.remove();
+                    resolve(blob);
+                  },
+                  mimeType,
+                  quality
+                );
+              } else {
+                throw new Error("Canvas not found");
+              }
+            } catch (err) {
+              p.remove();
+              container.remove();
+              reject(err);
+            }
+          }, 50);
+        };
+      };
+
+      try {
+        new p5(sketch, container);
+      } catch (err) {
+        container.remove();
+        reject(err);
+      }
+    });
+  }
+
+  /**
+   * Cleanup function - call when component unmounts
+   */
+  function destroy(): void {
+    if (p5Instance) {
+      p5Instance.remove();
+      p5Instance = null;
+    }
+    if (offscreenCanvas) {
+      offscreenCanvas = null;
+    }
+  }
+
+  return {
+    render,
+    toImg,
+    toBlob,
+    destroy,
+  };
 }

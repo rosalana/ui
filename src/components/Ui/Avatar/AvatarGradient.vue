@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, type HTMLAttributes, onMounted } from "vue";
+import { ref, computed, watch, type HTMLAttributes, onMounted, onUnmounted } from "vue";
 import { tv } from "tailwind-variants";
 import { useGradient } from "../../../composables/useGradient";
 
@@ -18,13 +18,13 @@ interface Props {
   /** Seed for deterministic gradient generation */
   seed?: string | number;
   /** Render mode - canvas for animations, image for static display */
-  mode?: "canvas" | "image";
+//   mode?: "canvas" | "image";
   /** Progress for animation (0-100) */
   progress?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  mode: "canvas",
+//   mode: "canvas",
   progress: 100,
 });
 
@@ -37,43 +37,18 @@ const stableSeed = computed(() => {
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
 // Use composable for canvas mode
-const gradient =
-  props.mode === "canvas"
-    ? useGradient({
-        seed: stableSeed.value,
-        canvas: canvasRef,
-        progress: props.progress,
-      })
-    : null;
-
-// Static image for image mode
-const imageSrc = computed(() => {
-  if (props.mode === "image") {
-    return gradient?.toImg();
-  }
-  return "";
+const gradient = useGradient({
+  seed: stableSeed.value,
+  canvas: canvasRef,
+  progress: props.progress,
 });
-
-// Re-render on seed change
-watch(
-  () => stableSeed.value,
-  () => {
-    if (gradient) {
-      gradient.generate();
-    }
-  },
-);
 
 onMounted(() => {
-  if (gradient) {
-    gradient.generate();
-  }
+    gradient.render();
 });
 
-defineExpose({
-  toDataURL: () => gradient?.toImg() ?? imageSrc.value,
-//   toBlob: () => gradient?.toBlob() ?? null,
-//   config: gradient,
+onUnmounted(() => {
+    gradient.destroy();
 });
 </script>
 
@@ -82,7 +57,6 @@ defineExpose({
     data-slot="avatar-gradient"
     :class="[avatarGradient({ class: props.class })]"
   >
-    <canvas v-if="mode === 'canvas'" ref="canvasRef" class="size-full" />
-    <img v-else :src="imageSrc" alt="" class="size-full object-cover" />
+    <canvas ref="canvasRef" class="size-full" />
   </div>
 </template>
