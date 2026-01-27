@@ -24,7 +24,8 @@ class Seed {
 
   constructor(seed?: string | number) {
     this.seed = Seed.hash(seed);
-    this.baseColorIndex = Math.floor(this.next() * COLORS.length) % COLORS.length;
+    this.baseColorIndex =
+      Math.floor(this.next() * COLORS.length) % COLORS.length;
   }
 
   private static hash(seed?: string | number): number {
@@ -56,10 +57,7 @@ class Seed {
   public colors(): GradientColor[] {
     const base = this.baseColor();
 
-    return [
-      hsl(base.h - 10, base.s * 90, base.l * 100 + 20),
-      base,
-    ];
+    return [hsl(base.h - 10, base.s * 90, base.l * 100 + 20), base];
   }
 
   public background(): GradientColor {
@@ -257,9 +255,9 @@ export function useGradient(options: GradientOptions) {
   }
 
   return {
-    render: _call(render, onError),
-    toImage: _call(toImage, onError),
-    toBlob: _call(toBlob, onError),
-    destroy: _call(destroy, onError),
+    render: _call(render, onError) as typeof render,
+    toImage: _call(toImage, onError) as typeof toImage,
+    toBlob: _call(toBlob, onError) as typeof toBlob,
+    destroy: _call(destroy, onError) as typeof destroy,
   };
 }

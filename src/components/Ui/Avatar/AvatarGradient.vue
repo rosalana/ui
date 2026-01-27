@@ -1,19 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, watch, type HTMLAttributes, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, type HTMLAttributes, onMounted, onUnmounted, watchEffect } from "vue";
 import { tv } from "tailwind-variants";
 import { useGradient } from "../../../composables/useGradient";
 
-// open source gradient maker:
-
-// https://kevingrajeda.github.io/meshGradient/
-
-// https://github.com/KevinGrajeda/meshGradient/tree/main/src/components
-
-// Gradient by měl mít bacground vždy tu světlou svojí barvu
-// A potom další 2 barvy. (světlá tmavá)
-// Je potřeba zajistit, aby pointy byly dobře u sebe a nevytvářely moc velké prázdné plochy
-// Následuje uprava shaders, aby měly i ripple effekt
-
+/**
+ * https://kevingrajeda.github.io/meshGradient/
+ * https://github.com/KevinGrajeda/meshGradient/tree/main/src/components
+ */
 
 const avatarGradient = tv({
   base: "aspect-square size-full overflow-hidden",
@@ -24,13 +17,13 @@ interface Props {
   /** Seed for deterministic gradient generation */
   seed?: string | number;
   /** Render mode - canvas for animations, image for static display */
-//   mode?: "canvas" | "image";
+  mode?: "canvas" | "image";
   /** Progress for animation (0-100) */
   progress?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-//   mode: "canvas",
+  mode: "canvas",
   progress: 100,
 });
 
@@ -41,6 +34,7 @@ const stableSeed = computed(() => {
 });
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
+const imageUrl = ref<string>("");
 
 // Use composable for canvas mode
 const gradient = useGradient({
@@ -50,7 +44,13 @@ const gradient = useGradient({
 });
 
 onMounted(() => {
-    gradient.render();
+    if (props.mode === "canvas") {
+      gradient.render();
+    } else {
+      gradient.toImage(500, 500).then((url) => {
+        imageUrl.value = url;
+      });
+    }
 });
 
 onUnmounted(() => {
@@ -63,6 +63,12 @@ onUnmounted(() => {
     data-slot="avatar-gradient"
     :class="[avatarGradient({ class: props.class })]"
   >
-    <canvas ref="canvasRef" class="size-full" />
+    <canvas v-if="mode === 'canvas'" ref="canvasRef" class="size-full" />
+    <img
+      v-else
+      :src="imageUrl"
+      alt="Avatar Gradient"
+      class="size-full object-cover"
+    />
   </div>
 </template>
