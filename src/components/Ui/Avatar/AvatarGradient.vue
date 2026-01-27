@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch, type HTMLAttributes } from "vue";
+import { ref, computed, watch, type HTMLAttributes, onMounted } from "vue";
 import { tv } from "tailwind-variants";
-import { useGradient, generateGradient } from "../../../composables/useGradient";
+import { useGradient } from "../../../composables/useGradient";
 
 // open source gradient maker:
 
@@ -19,16 +19,13 @@ interface Props {
   seed?: string | number;
   /** Render mode - canvas for animations, image for static display */
   mode?: "canvas" | "image";
-  /** Size in pixels (for canvas resolution) */
-  size?: number;
-  /** Position for animation (0-100) */
-  position?: number;
+  /** Progress for animation (0-100) */
+  progress?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   mode: "canvas",
-  size: 256,
-  position: 0,
+  progress: 100,
 });
 
 // Stable seed - random if not provided
@@ -38,7 +35,6 @@ const stableSeed = computed(() => {
 });
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
-const positionRef = computed(() => props.position);
 
 // Use composable for canvas mode
 const gradient =
@@ -46,15 +42,14 @@ const gradient =
     ? useGradient({
         seed: stableSeed.value,
         canvas: canvasRef,
-        size: props.size,
-        position: positionRef,
+        progress: props.progress,
       })
     : null;
 
 // Static image for image mode
 const imageSrc = computed(() => {
   if (props.mode === "image") {
-    return generateGradient(stableSeed.value, props.size);
+    return gradient?.toImg();
   }
   return "";
 });
@@ -64,15 +59,21 @@ watch(
   () => stableSeed.value,
   () => {
     if (gradient) {
-      gradient.render(props.position);
+      gradient.generate();
     }
-  }
+  },
 );
 
+onMounted(() => {
+  if (gradient) {
+    gradient.generate();
+  }
+});
+
 defineExpose({
-  toDataURL: () => gradient?.toDataURL() ?? imageSrc.value,
-  toBlob: () => gradient?.toBlob() ?? null,
-  config: gradient?.config,
+  toDataURL: () => gradient?.toImg() ?? imageSrc.value,
+//   toBlob: () => gradient?.toBlob() ?? null,
+//   config: gradient,
 });
 </script>
 

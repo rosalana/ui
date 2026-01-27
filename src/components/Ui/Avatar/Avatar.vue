@@ -11,7 +11,7 @@ const avatar = tv({
       default: "size-10",
       sm: "size-8",
       lg: "size-12",
-      xl: "size-16",
+      xl: "size-42",
     },
   },
   defaultVariants: {
