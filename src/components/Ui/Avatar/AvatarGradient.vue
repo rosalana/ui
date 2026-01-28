@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, computed, watch, type HTMLAttributes, onMounted, onUnmounted, watchEffect } from "vue";
+import { ref, computed, type HTMLAttributes, onMounted, onUnmounted } from "vue";
 import { tv } from "tailwind-variants";
 import { useGradient } from "../../../composables/useGradient";
-
+import { Canvas } from "../../../utils";
 /**
  * https://kevingrajeda.github.io/meshGradient/
  * https://github.com/KevinGrajeda/meshGradient/tree/main/src/components
+ * 
+ * Progress se měří podle warp size to je nejlepší. Nejlepší by bylo ale kdyby se nám podařilo pohnout těma bodama spíš aby vylezli ven z obrazovky žejo.
  */
 
 const avatarGradient = tv({
@@ -36,7 +38,7 @@ const stableSeed = computed(() => {
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const imageUrl = ref<string>("");
 
-// Use composable for canvas mode
+// // Use composable for canvas mode
 const gradient = useGradient({
   seed: stableSeed.value,
   canvas: canvasRef,

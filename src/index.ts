@@ -1,6 +1,4 @@
-export * from "./plugin/index";
-export * from "./plugin/types";
-
-export * from "./composables/index";
-
-export * from "./components/index";
+export * from "./plugin";
+export * from "./composables";
+export * from "./components";
+export * from "./utils";
