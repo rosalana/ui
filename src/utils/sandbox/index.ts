@@ -1,4 +1,10 @@
-import { ResolvedSandboxOptions, SandboxOptions } from "./types";
+import type {
+  AnyUniformValue,
+  ResolvedSandboxOptions,
+  SandboxOptions,
+  WebGLVersion,
+} from "./types";
+import type { SandboxError } from "./errors";
 
 import defaultVert from "./shaders/shader.vert?raw";
 import defaultFrag from "./shaders/shader.frag?raw";
@@ -7,15 +13,34 @@ import Listener from "./tools/listener";
 import WebGL from "./tools/web_gl";
 
 export * from "./types";
+export * from "./errors";
 
+/**
+ * Sandbox - A lightweight WebGL wrapper for shader effects.
+ *
+ * @example
+ * // Static rendering
+ * const sandbox = new Sandbox(canvas, {
+ *   fragment: myShader,
+ *   autoplay: false,
+ * });
+ * sandbox.setUniforms({ u_time: 1.5 }).render();
+ *
+ * @example
+ * // Animation loop
+ * const sandbox = new Sandbox(canvas, {
+ *   fragment: myShader,
+ *   autoplay: true,
+ * });
+ */
 export default class Sandbox {
-  /** list of active event listeners */
+  /** Active event listeners */
   private listeners: (() => void)[] = [];
-  /** HTML canvas element for rendering */
+  /** HTML canvas element */
   private canvas: HTMLCanvasElement;
-  /** Resolved sandbox options */
+  /** Resolved options */
   private options: ResolvedSandboxOptions;
-  /** WebGL rendering engine */
+  /** WebGL engine */
   private engine: WebGL;
 
   constructor(canvas: HTMLCanvasElement, options?: SandboxOptions) {
@@ -32,39 +57,46 @@ export default class Sandbox {
     if (this.options.autoplay) {
       this.play();
     }
-
-    return this;
   }
+
+  // ===========================================================================
+  // Options
+  // ===========================================================================
 
   private resolveOptions(options?: SandboxOptions): ResolvedSandboxOptions {
-    const defaults = {
-      vertex: defaultVert,
-      fragment: defaultFrag,
-      autoplay: true,
-      pauseWhenHidden: true,
-      dpr: "auto" as const,
-      preserveDrawingBuffer: false,
-      antialias: true,
-      onError: (error: Error) => console.error(error),
-      onLoad: () => {},
+    return {
+      vertex: options?.vertex ?? defaultVert,
+      fragment: options?.fragment ?? defaultFrag,
+      autoplay: options?.autoplay ?? true,
+      pauseWhenHidden: options?.pauseWhenHidden ?? true,
+      dpr: options?.dpr ?? "auto",
+      preserveDrawingBuffer: options?.preserveDrawingBuffer ?? false,
+      antialias: options?.antialias ?? true,
+      onError: options?.onError ?? ((error: SandboxError) => console.error(error)),
+      onLoad: options?.onLoad ?? (() => {}),
+      onBeforeRender: options?.onBeforeRender ?? null,
+      onAfterRender: options?.onAfterRender ?? null,
+      uniforms: options?.uniforms ?? {},
     };
-
-    return { ...defaults, ...options };
   }
 
-  private setupListeners() {
+  // ===========================================================================
+  // Event Listeners
+  // ===========================================================================
+
+  private setupListeners(): void {
     this.listeners.push(
-      // Window resize listener
+      // Window resize
       Listener.on(window, "resize", () => {
         this.setViewport();
       }),
 
-      // Canvas resize listener
+      // Canvas resize
       Listener.on(this.canvas, "resize", () => {
         this.setViewport();
       }),
 
-      // Document scroll listener to check if canvas is in viewport
+      // Visibility check on scroll
       Listener.on(document, "scroll", () => {
         if (!this.options.pauseWhenHidden) return;
 
@@ -75,20 +107,24 @@ export default class Sandbox {
         }
       }),
 
-      // Mouse move listener
+      // Mouse tracking
       Listener.on(document, "mousemove", (e) => {
-        this.setMouse(e.clientX || e.pageX, e.clientY || e.pageY);
+        this.updateMouse(e.clientX || e.pageX, e.clientY || e.pageY);
       }),
     );
   }
 
-  private destroyListeners() {
+  private destroyListeners(): void {
     this.listeners.forEach((off) => off());
     this.listeners = [];
   }
 
   private setViewport(): void {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr =
+      this.options.dpr === "auto"
+        ? Math.min(2, window.devicePixelRatio || 1)
+        : this.options.dpr;
+
     const cssW = this.canvas.clientWidth || this.canvas.width || 1;
     const cssH = this.canvas.clientHeight || this.canvas.height || 1;
 
@@ -112,113 +148,165 @@ export default class Sandbox {
     );
   }
 
-  private setMouse(x: number, y: number) {
+  private updateMouse(x: number, y: number): void {
     const rect = this.canvas.getBoundingClientRect();
     const inCanvas =
       x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 
     if (inCanvas) {
-      this.engine.mouse(x - rect.left, y - rect.top);
+      this.engine.setMouse(x - rect.left, y - rect.top);
     }
   }
 
+  // ===========================================================================
+  // Uniform API
+  // ===========================================================================
+
   /**
-   * Sets a uniform variable in the shader program.
-   * @param name - The name of the uniform variable.
-   * @param value - The value to set for the uniform variable.
+   * Set a single uniform value.
    * @example
-   * sandbox.setUniform("u_var", 1.0);
-   * sandbox.setUniform("u_var2", [800, 600]);
-   *
-   * @returns void
+   * sandbox.setUniform("u_time", 1.5);
+   * sandbox.setUniform("u_color", [1, 0, 0]);
    */
-  setUniform(name: string, value: any): void {
+  setUniform(name: string, value: AnyUniformValue): this {
     this.engine.uniform(name, value);
+    return this;
   }
 
   /**
-   * Sets multiple uniform variables in the shader program.
-   * @param uniforms - An object containing uniform variable names and their corresponding values.
+   * Set multiple uniforms at once.
    * @example
    * sandbox.setUniforms({
-   *   u_var: 1.0,
-   *   u_var2: [800, 600],
+   *   u_time: 1.5,
+   *   u_resolution: [800, 600],
+   *   u_colors: [[1, 0, 0], [0, 1, 0]],
    * });
-   *
-   * @returns void
    */
-  setUniforms(uniforms: Record<string, any>): void {
-    for (const name in uniforms) {
-      this.setUniform(name, uniforms[name]);
-    }
+  setUniforms(uniforms: Record<string, AnyUniformValue>): this {
+    this.engine.setUniforms(uniforms);
+    return this;
   }
 
   /**
-   * Sets the shader program using provided vertex and fragment shader source code.
-   * @param vertex - The source code for the vertex shader.
-   * @param fragment - The source code for the fragment shader.
+   * Get current uniform value.
+   */
+  getUniform(name: string): AnyUniformValue | undefined {
+    return this.engine.getUniform(name);
+  }
+
+  // ===========================================================================
+  // Shader API
+  // ===========================================================================
+
+  /**
+   * Update shaders.
    * @example
    * sandbox.setShader(vertexSource, fragmentSource);
-   *
-   * @returns void
    */
-  setShader(vertex: string, fragment: string): void {
+  setShader(vertex: string, fragment: string): this {
     this.engine.shader(vertex, fragment);
+    return this;
   }
 
   /**
-   * Plays the sandbox rendering loop. If the sandbox is already playing, this has no effect.
+   * Update only fragment shader (uses default vertex).
    * @example
-   * handleButtonClick() {
-   *   sandbox.play();
-   * }
-   *
-   * @returns void
+   * sandbox.setFragmentShader(fragmentSource);
    */
-  play(): void {
+  setFragmentShader(fragment: string): this {
+    this.engine.shader(defaultVert, fragment);
+    return this;
+  }
+
+  // ===========================================================================
+  // Playback API
+  // ===========================================================================
+
+  /**
+   * Start animation loop.
+   */
+  play(): this {
     this.engine.play();
+    return this;
   }
 
   /**
-   * Pauses the sandbox rendering loop.
-   * @example
-   * handleButtonClick() {
-   *   sandbox.pause();
-   * };
-   *
-   * @returns void
+   * Stop animation loop.
    */
-  pause(): void {
+  pause(): this {
     this.engine.pause();
+    return this;
   }
 
   /**
-   * Toggles the play/pause state of the sandbox rendering loop.
-   * @example
-   * handleButtonClick() {
-   *   sandbox.togglePlay();
-   * };
-   *
-   * @returns void
+   * Toggle play/pause state.
    */
-  togglePlay(): void {
+  togglePlay(): this {
     if (this.engine.playing) {
       this.pause();
     } else {
       this.play();
     }
+    return this;
   }
 
   /**
-   * Destroys the sandbox instance, releasing all resources and event listeners.
+   * Render a single frame (for static rendering).
+   * @example
+   * sandbox.setUniforms({ u_time: 1.5 }).render();
+   */
+  render(): this {
+    this.engine.render();
+    return this;
+  }
+
+  /**
+   * Render at specific time (for deterministic output).
+   * @example
+   * sandbox.renderAt(2.5); // Render as if 2.5 seconds elapsed
+   */
+  renderAt(time: number): this {
+    this.engine.renderAt(time);
+    return this;
+  }
+
+  // ===========================================================================
+  // State API
+  // ===========================================================================
+
+  /**
+   * Check if currently playing.
+   */
+  get isPlaying(): boolean {
+    return this.engine.playing;
+  }
+
+  /**
+   * Get WebGL version (1 or 2).
+   */
+  get webglVersion(): WebGLVersion {
+    return this.engine.getVersion();
+  }
+
+  /**
+   * Get canvas element.
+   */
+  get canvasElement(): HTMLCanvasElement {
+    return this.canvas;
+  }
+
+  // ===========================================================================
+  // Lifecycle
+  // ===========================================================================
+
+  /**
+   * Destroy sandbox and release all resources.
    * @example
    * onUnmounted(() => {
    *   sandbox.destroy();
    * });
-   *
-   * @returns void
    */
-  destroy() {
+  destroy(): void {
     this.destroyListeners();
     this.engine.destroy();
   }

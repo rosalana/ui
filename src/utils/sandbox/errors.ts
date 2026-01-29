@@ -1,0 +1,93 @@
+/** Error codes for Sandbox errors */
+export type SandboxErrorCode =
+  | "WEBGL_NOT_SUPPORTED"
+  | "CONTEXT_CREATION_FAILED"
+  | "SHADER_COMPILATION_FAILED"
+  | "PROGRAM_LINK_FAILED";
+
+/** Base error class for all Sandbox errors */
+export class SandboxError extends Error {
+  constructor(
+    message: string,
+    public readonly code: SandboxErrorCode,
+  ) {
+    super(message);
+    this.name = "SandboxError";
+  }
+}
+
+/** WebGL context creation failure */
+export class ContextError extends SandboxError {
+  constructor(reason: "not_supported" | "creation_failed") {
+    const message =
+      reason === "not_supported"
+        ? "WebGL is not supported in this browser."
+        : "Failed to create WebGL context. The GPU may be unavailable.";
+
+    super(
+      message,
+      reason === "not_supported"
+        ? "WEBGL_NOT_SUPPORTED"
+        : "CONTEXT_CREATION_FAILED",
+    );
+    this.name = "ContextError";
+  }
+}
+
+/** Shader compilation failure with line info extraction */
+export class ShaderCompilationError extends SandboxError {
+  /** Line numbers where errors occurred */
+  public readonly lines: number[];
+
+  constructor(
+    public readonly shaderType: "vertex" | "fragment",
+    public readonly source: string,
+    public readonly infoLog: string,
+  ) {
+    const lines = ShaderCompilationError.parseErrorLines(infoLog);
+    const lineInfo = lines.length > 0 ? ` at line(s): ${lines.join(", ")}` : "";
+
+    super(
+      `${shaderType} shader compilation failed${lineInfo}\n\n${infoLog}`,
+      "SHADER_COMPILATION_FAILED",
+    );
+
+    this.name = "ShaderCompilationError";
+    this.lines = lines;
+  }
+
+  /** Parse error log to extract line numbers */
+  private static parseErrorLines(infoLog: string): number[] {
+    // Common patterns:
+    // "ERROR: 0:15: ..." (Chrome/ANGLE)
+    // "ERROR: :15: ..." (Firefox)
+    // "0:15(0): error: ..." (Mesa)
+    const patterns = [
+      /ERROR:\s*\d*:(\d+)/g, // Chrome/ANGLE: ERROR: 0:15
+      /(\d+):(\d+)\(\d+\):/g, // Mesa: 0:15(0):
+      /^(\d+):/gm, // Simple: 15:
+    ];
+
+    const lines: Set<number> = new Set();
+
+    for (const pattern of patterns) {
+      let match: RegExpExecArray | null;
+      while ((match = pattern.exec(infoLog)) !== null) {
+        const lineNum = parseInt(match[1], 10);
+        if (lineNum > 0) {
+          lines.add(lineNum);
+        }
+      }
+    }
+
+    return [...lines].sort((a, b) => a - b);
+  }
+}
+
+/** Shader program linking failure */
+export class ProgramLinkError extends SandboxError {
+  constructor(public readonly infoLog: string) {
+    super(`Shader program linking failed\n\n${infoLog}`, "PROGRAM_LINK_FAILED");
+    this.name = "ProgramLinkError";
+  }
+}

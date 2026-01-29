@@ -1,23 +1,164 @@
+import type {
+  AnyUniformValue,
+  ClockState,
+  Vec2,
+  WebGLContext,
+} from "../types";
+import Uniform from "./uniform";
+
+/**
+ * Manages a collection of uniforms with fluent API.
+ * Handles built-in uniforms (u_resolution, u_time, etc.) automatically.
+ */
 export default class Uniforms {
-  private uniforms: Map<string, any> = new Map<string, any>();
+  private gl: WebGLContext;
+  private program: WebGLProgram | null = null;
+  private uniforms: Map<string, Uniform> = new Map();
 
-  set(name: string, value: any): void {
-    this.uniforms.set(name, value);
+  /** Built-in uniform names that are handled automatically */
+  private static readonly BUILT_INS = new Set([
+    "u_resolution",
+    "u_time",
+    "u_delta",
+    "u_mouse",
+    "u_frame",
+  ]);
+
+  constructor(gl: WebGLContext) {
+    this.gl = gl;
   }
 
-  get(name: string): any | undefined {
-    return this.uniforms.get(name);
+  /**
+   * Attach to a WebGL program.
+   * Invalidates all cached locations since they're program-specific.
+   */
+  attachProgram(program: WebGLProgram): this {
+    this.program = program;
+
+    // Invalidate all cached locations
+    for (const uniform of this.uniforms.values()) {
+      uniform.invalidateLocation();
+    }
+
+    return this;
   }
 
+  /**
+   * Set a uniform value.
+   * Creates the uniform if it doesn't exist, updates if it does.
+   */
+  set(name: string, value: AnyUniformValue): this {
+    const existing = this.uniforms.get(name);
+
+    if (existing) {
+      existing.setValue(value);
+    } else {
+      this.uniforms.set(name, new Uniform(name, value));
+    }
+
+    return this;
+  }
+
+  /**
+   * Set multiple uniforms at once.
+   */
+  setMany(values: Record<string, AnyUniformValue>): this {
+    for (const [name, value] of Object.entries(values)) {
+      this.set(name, value);
+    }
+    return this;
+  }
+
+  /**
+   * Get current uniform value.
+   */
+  get(name: string): AnyUniformValue | undefined {
+    return this.uniforms.get(name)?.getValue();
+  }
+
+  /**
+   * Check if uniform exists.
+   */
   has(name: string): boolean {
     return this.uniforms.has(name);
   }
 
+  /**
+   * Remove a uniform.
+   */
   delete(name: string): boolean {
     return this.uniforms.delete(name);
   }
 
+  /**
+   * Upload all uniforms to GPU.
+   * Requires a program to be attached.
+   */
+  uploadAll(): this {
+    if (!this.program) {
+      return this;
+    }
+
+    for (const uniform of this.uniforms.values()) {
+      uniform.upload(this.gl, this.program);
+    }
+
+    return this;
+  }
+
+  /**
+   * Upload only built-in uniforms (u_resolution, u_time, u_delta, u_mouse, u_frame).
+   * Call this every frame with current values.
+   */
+  uploadBuiltIns(clock: ClockState, resolution: Vec2, mouse: Vec2): this {
+    // Set built-in values (creates uniforms if they don't exist)
+    this.set("u_resolution", resolution);
+    this.set("u_time", clock.time);
+    this.set("u_delta", clock.delta);
+    this.set("u_mouse", mouse);
+    this.set("u_frame", clock.frame);
+
+    // Upload only built-ins
+    if (!this.program) {
+      return this;
+    }
+
+    for (const name of Uniforms.BUILT_INS) {
+      const uniform = this.uniforms.get(name);
+      if (uniform) {
+        uniform.upload(this.gl, this.program);
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * Clear all uniforms.
+   */
+  clear(): void {
+    this.uniforms.clear();
+  }
+
+  /**
+   * Cleanup.
+   */
   destroy(): void {
     this.uniforms.clear();
+    this.program = null;
+  }
+
+  /**
+   * Get all uniform names.
+   */
+  keys(): IterableIterator<string> {
+    return this.uniforms.keys();
+  }
+
+  /**
+   * Get uniform count.
+   */
+  get size(): number {
+    return this.uniforms.size;
   }
 }

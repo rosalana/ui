@@ -177,6 +177,7 @@ reka-ui (headless, accessible)
 - **Plugin init:** `src/plugin/create.ts` - the `createRosalanaApp` function
 - **Color system:** `src/plugin/colors.ts` - CSS variable generation
 - **Theme composable:** `src/composables/useTheme.ts` - dark mode with localStorage
+- **Sandbox (WebGL):** `src/utils/sandbox/` - see [SANDBOX.md](src/utils/sandbox/SANDBOX.md) and [API.md](src/utils/sandbox/API.md)
 
 ## Component Conventions
 
