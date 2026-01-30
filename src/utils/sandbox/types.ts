@@ -25,7 +25,7 @@ export interface SandboxOptions {
   /** Callback called each frame after render */
   onAfterRender?: HookCallback | null;
   /** Initial uniforms to set */
-  uniforms?: Record<string, AnyUniformValue>;
+  uniforms?: UniformSchema;
 }
 
 /** Resolved sandbox options with all defaults applied */
