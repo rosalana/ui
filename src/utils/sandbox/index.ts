@@ -1,7 +1,9 @@
 import type {
   AnyUniformValue,
+  ClockState,
   ResolvedSandboxOptions,
   SandboxOptions,
+  UniformSchema,
   WebGLVersion,
 } from "./types";
 import type { SandboxError } from "./errors";
@@ -59,30 +61,48 @@ export default class Sandbox {
     }
   }
 
-  // ===========================================================================
-  // Options
-  // ===========================================================================
-
-  private resolveOptions(options?: SandboxOptions): ResolvedSandboxOptions {
-    return {
-      vertex: options?.vertex ?? defaultVert,
-      fragment: options?.fragment ?? defaultFrag,
-      autoplay: options?.autoplay ?? true,
-      pauseWhenHidden: options?.pauseWhenHidden ?? true,
-      dpr: options?.dpr ?? "auto",
-      preserveDrawingBuffer: options?.preserveDrawingBuffer ?? false,
-      antialias: options?.antialias ?? true,
-      onError: options?.onError ?? ((error: SandboxError) => console.error(error)),
-      onLoad: options?.onLoad ?? (() => {}),
-      onBeforeRender: options?.onBeforeRender ?? null,
-      onAfterRender: options?.onAfterRender ?? null,
-      uniforms: options?.uniforms ?? {},
-    };
+  /**
+   * Sandbox - A lightweight WebGL wrapper for shader effects.
+   *
+   * @example
+   * // Static rendering
+   * const sandbox = Sandbox.create(canvas, {
+   *   fragment: myShader,
+   *   autoplay: false,
+   * });
+   * sandbox.setUniforms({ u_time: 1.5 }).render();
+   *
+   * @example
+   * // Animation loop
+   * const sandbox = Sandbox.create(canvas, {
+   *   fragment: myShader,
+   *   autoplay: true,
+   * });
+   */
+  static create(canvas: HTMLCanvasElement, options?: SandboxOptions): Sandbox {
+    return new Sandbox(canvas, options);
   }
 
-  // ===========================================================================
-  // Event Listeners
-  // ===========================================================================
+  private resolveOptions(options?: SandboxOptions): ResolvedSandboxOptions {
+    const defaults = {
+      vertex: defaultVert,
+      fragment: defaultFrag,
+      autoplay: true,
+      pauseWhenHidden: true,
+      dpr: "auto" as "auto",
+      preserveDrawingBuffer: false,
+      antialias: true,
+      onError: (error: SandboxError) => {
+        console.error(error);
+      },
+      onLoad: () => {},
+      onBeforeRender: null,
+      onAfterRender: null,
+      uniforms: {},
+    };
+
+    return { ...defaults, ...options };
+  }
 
   private setupListeners(): void {
     this.listeners.push(
@@ -109,13 +129,20 @@ export default class Sandbox {
 
       // Mouse tracking
       Listener.on(document, "mousemove", (e) => {
-        this.updateMouse(e.clientX || e.pageX, e.clientY || e.pageY);
+        this.setMouse(e.clientX || e.pageX, e.clientY || e.pageY);
+      }),
+
+      // Touch tracking
+      Listener.on(document, "touchmove", (e) => {
+        if (e.touches.length > 0) {
+          this.setMouse(e.touches[0].clientX, e.touches[0].clientY);
+        }
       }),
     );
   }
 
   private destroyListeners(): void {
-    this.listeners.forEach((off) => off());
+    this.listeners.forEach((destroy) => destroy());
     this.listeners = [];
   }
 
@@ -148,55 +175,53 @@ export default class Sandbox {
     );
   }
 
-  private updateMouse(x: number, y: number): void {
+  private setMouse(x: number, y: number): void {
     const rect = this.canvas.getBoundingClientRect();
     const inCanvas =
       x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 
     if (inCanvas) {
-      this.engine.setMouse(x - rect.left, y - rect.top);
+      this.engine.mouse(x - rect.left, y - rect.top);
     }
   }
 
-  // ===========================================================================
-  // Uniform API
-  // ===========================================================================
-
   /**
-   * Set a single uniform value.
+   * Set a single uniform value with type checking.
    * @example
-   * sandbox.setUniform("u_time", 1.5);
-   * sandbox.setUniform("u_color", [1, 0, 0]);
+   * sandbox.setUniform<Vec3>("u_color", [1, 0, 0]);
+   * sandbox.setUniform<number>("u_time", 1.5);
+   * sandbox.setUniform<Vec3[]>("u_colors", [[1, 0, 0], [0, 1, 0]]);
    */
-  setUniform(name: string, value: AnyUniformValue): this {
-    this.engine.uniform(name, value);
+  setUniform<T extends AnyUniformValue>(name: string, value: T): this {
+    this.engine.uniform<T>(name, value);
     return this;
   }
 
   /**
-   * Set multiple uniforms at once.
+   * Set multiple uniforms at once with type checking.
    * @example
-   * sandbox.setUniforms({
+   * interface MyUniforms extends UniformSchema {
+   *   u_time: number;
+   *   u_resolution: Vec2;
+   *   u_colors: Vec3[];
+   * }
+   * sandbox.setUniforms<MyUniforms>({
    *   u_time: 1.5,
    *   u_resolution: [800, 600],
    *   u_colors: [[1, 0, 0], [0, 1, 0]],
    * });
    */
-  setUniforms(uniforms: Record<string, AnyUniformValue>): this {
-    this.engine.setUniforms(uniforms);
+  setUniforms<T extends UniformSchema>(uniforms: T): this {
+    this.engine.uniforms<T>(uniforms);
     return this;
   }
 
   /**
    * Get current uniform value.
    */
-  getUniform(name: string): AnyUniformValue | undefined {
-    return this.engine.getUniform(name);
+  getUniform<T extends AnyUniformValue>(name: string): T | undefined {
+    return this.engine.getUniform<T>(name);
   }
-
-  // ===========================================================================
-  // Shader API
-  // ===========================================================================
 
   /**
    * Update shaders.
@@ -218,10 +243,6 @@ export default class Sandbox {
     return this;
   }
 
-  // ===========================================================================
-  // Playback API
-  // ===========================================================================
-
   /**
    * Start animation loop.
    */
@@ -241,7 +262,7 @@ export default class Sandbox {
   /**
    * Toggle play/pause state.
    */
-  togglePlay(): this {
+  toggle(): this {
     if (this.engine.playing) {
       this.pause();
     } else {
@@ -251,9 +272,17 @@ export default class Sandbox {
   }
 
   /**
+   * Set current time (in seconds).
+   */
+  time(time: number): this {
+    this.engine.clock(time);
+    return this;
+  }
+
+  /**
    * Render a single frame (for static rendering).
    * @example
-   * sandbox.setUniforms({ u_time: 1.5 }).render();
+   * sandbox.time(1.4).render();
    */
   render(): this {
     this.engine.render();
@@ -266,13 +295,23 @@ export default class Sandbox {
    * sandbox.renderAt(2.5); // Render as if 2.5 seconds elapsed
    */
   renderAt(time: number): this {
-    this.engine.renderAt(time);
+    this.engine.clock(time);
+    this.engine.render();
     return this;
   }
 
-  // ===========================================================================
-  // State API
-  // ===========================================================================
+  /**
+   * Pause playback when specific time is reached.
+   * @example
+   * await sandbox.pauseAt(5.0); // Pause at 5 seconds
+   */
+  async pauseAt(time: number): Promise<this> {
+    await this.engine.when(function (state: ClockState): boolean {
+      return state.time >= time;
+    });
+    this.engine.pause();
+    return this;
+  }
 
   /**
    * Check if currently playing.
@@ -282,7 +321,7 @@ export default class Sandbox {
   }
 
   /**
-   * Get WebGL version (1 or 2).
+   * Get WebGL version using (1 or 2).
    */
   get webglVersion(): WebGLVersion {
     return this.engine.getVersion();
@@ -294,10 +333,6 @@ export default class Sandbox {
   get canvasElement(): HTMLCanvasElement {
     return this.canvas;
   }
-
-  // ===========================================================================
-  // Lifecycle
-  // ===========================================================================
 
   /**
    * Destroy sandbox and release all resources.

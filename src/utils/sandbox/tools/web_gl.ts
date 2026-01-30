@@ -2,6 +2,7 @@ import type {
   AnyUniformValue,
   ClockState,
   ResolvedSandboxOptions,
+  UniformSchema,
   Vec2,
   WebGLContext,
   WebGLVersion,
@@ -19,15 +20,16 @@ import Uniforms from "./uniforms";
 export default class WebGL {
   private canvas: HTMLCanvasElement;
   private gl: WebGLContext;
-  private program: Program;
-  private geometry: Geometry;
-  private uniforms: Uniforms;
-  private clock: Clock;
   private options: ResolvedSandboxOptions;
 
-  private resolution: Vec2 = [1, 1];
-  private mouse: Vec2 = [0, 0];
-  private version: WebGLVersion = 1;
+  private _program: Program;
+  private _geometry: Geometry;
+  private _uniforms: Uniforms;
+  private _clock: Clock;
+
+  private _resolution: Vec2 = [1, 1];
+  private _mouse: Vec2 = [0, 0];
+  private _version: WebGLVersion = 1;
 
   playing = false;
 
@@ -45,10 +47,10 @@ export default class WebGL {
     this.enableExtensions();
 
     // Initialize subsystems
-    this.program = new Program(this.gl);
-    this.geometry = Geometry.fullscreenQuad(this.gl);
-    this.uniforms = new Uniforms(this.gl);
-    this.clock = new Clock();
+    this._program = new Program(this.gl);
+    this._geometry = Geometry.fullscreenQuad(this.gl);
+    this._uniforms = new Uniforms(this.gl);
+    this._clock = new Clock();
 
     // Bind render method
     this.onRender = this.onRender.bind(this);
@@ -70,7 +72,7 @@ export default class WebGL {
 
     // Set initial uniforms
     if (options.uniforms) {
-      webgl.uniforms.setMany(options.uniforms);
+      webgl._uniforms.setMany(options.uniforms);
     }
 
     return webgl;
@@ -92,14 +94,14 @@ export default class WebGL {
     // Try WebGL2 first
     const gl2 = this.canvas.getContext("webgl2", attrs);
     if (gl2) {
-      this.version = 2;
+      this._version = 2;
       return gl2;
     }
 
     // Fallback to WebGL1
     const gl1 = this.canvas.getContext("webgl", attrs);
     if (gl1) {
-      this.version = 1;
+      this._version = 1;
       return gl1;
     }
 
@@ -119,7 +121,7 @@ export default class WebGL {
     this.gl.getExtension("OES_texture_float_linear");
 
     // VAO extension for WebGL1
-    if (this.version === 1) {
+    if (this._version === 1) {
       this.gl.getExtension("OES_vertex_array_object");
     }
   }
@@ -131,39 +133,47 @@ export default class WebGL {
     this.canvas.width = width;
     this.canvas.height = height;
     this.gl.viewport(x, y, width, height);
-    this.resolution = [width, height];
+    this._resolution = [width, height];
+    return this;
+  }
+
+  /**
+   * Set the clock time
+   */
+  clock(time: number): this {
+    this._clock.setTime(time);
     return this;
   }
 
   /**
    * Update mouse position.
    */
-  setMouse(x: number, y: number): this {
-    this.mouse = [x, y];
+  mouse(x: number, y: number): this {
+    this._mouse = [x, y];
     return this;
   }
 
   /**
    * Set a uniform value.
    */
-  uniform(name: string, value: AnyUniformValue): this {
-    this.uniforms.set(name, value);
+  uniform<T extends AnyUniformValue>(name: string, value: T): this {
+    this._uniforms.set(name, value);
     return this;
   }
 
   /**
    * Set multiple uniforms.
    */
-  setUniforms(values: Record<string, AnyUniformValue>): this {
-    this.uniforms.setMany(values);
+  uniforms<T extends UniformSchema>(values: T): this {
+    this._uniforms.setMany(values);
     return this;
   }
 
   /**
    * Get current uniform value.
    */
-  getUniform(name: string): AnyUniformValue | undefined {
-    return this.uniforms.get(name);
+  getUniform<T extends AnyUniformValue>(name: string): T | undefined {
+    return this._uniforms.get(name) as T | undefined;
   }
 
   /**
@@ -171,18 +181,18 @@ export default class WebGL {
    */
   shader(vertex: string, fragment: string): this {
     // Compile program
-    this.program.compile(vertex, fragment);
+    this._program.compile(vertex, fragment);
 
     // Update version based on shaders
-    this.version = this.program.getVersion();
+    this._version = this._program.getVersion();
 
     // Link attributes to geometry
-    this.geometry.linkAttributes(this.program);
+    this._geometry.linkAttributes(this._program);
 
     // Attach program to uniforms for location caching
-    const webglProgram = this.program.getProgram();
+    const webglProgram = this._program.getProgram();
     if (webglProgram) {
-      this.uniforms.attachProgram(webglProgram);
+      this._uniforms.attachProgram(webglProgram);
     }
 
     return this;
@@ -195,7 +205,7 @@ export default class WebGL {
     if (this.playing) return this;
 
     this.playing = true;
-    this.clock.start(this.onRender);
+    this._clock.start(this.onRender);
 
     return this;
   }
@@ -207,7 +217,7 @@ export default class WebGL {
     if (!this.playing) return this;
 
     this.playing = false;
-    this.clock.stop();
+    this._clock.stop();
 
     return this;
   }
@@ -216,17 +226,15 @@ export default class WebGL {
    * Render a single frame.
    */
   render(): this {
-    // Use current clock state for single-shot render
-    this.onRender(this.clock.getState());
+    this.onRender(this._clock.getState());
     return this;
   }
 
   /**
-   * Render at specific time (for deterministic output).
+   * Wait until a condition is met in the clock state.
    */
-  renderAt(time: number): this {
-    this.clock.setTime(time);
-    this.onRender(this.clock.getState());
+  async when(predicate: (state: ClockState) => boolean): Promise<this> {
+    await this._clock.when(predicate);
     return this;
   }
 
@@ -241,7 +249,7 @@ export default class WebGL {
    * Get detected WebGL version.
    */
   getVersion(): WebGLVersion {
-    return this.version;
+    return this._version;
   }
 
   /**
@@ -249,10 +257,10 @@ export default class WebGL {
    */
   destroy(): void {
     this.pause();
-    this.clock.destroy();
-    this.geometry.destroy();
-    this.program.destroy();
-    this.uniforms.destroy();
+    this._clock.destroy();
+    this._geometry.destroy();
+    this._program.destroy();
+    this._uniforms.destroy();
   }
 
   /**
@@ -271,17 +279,17 @@ export default class WebGL {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // Use program
-    this.program.use();
+    this._program.use();
 
     // Upload built-in uniforms
-    this.uniforms.uploadBuiltIns(state, this.resolution, this.mouse);
+    this._uniforms.uploadBuiltIns(state, this._resolution, this._mouse);
 
     // Upload all other uniforms
-    this.uniforms.uploadAll();
+    this._uniforms.uploadAll();
 
     // Draw geometry
-    this.geometry.bind();
-    this.geometry.draw();
+    this._geometry.bind();
+    this._geometry.draw();
 
     // Call after render callback
     if (this.options.onAfterRender) {

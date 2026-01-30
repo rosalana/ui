@@ -1,6 +1,7 @@
 import type {
   AnyUniformValue,
   ClockState,
+  UniformSchema,
   Vec2,
   WebGLContext,
 } from "../types";
@@ -47,7 +48,7 @@ export default class Uniforms {
    * Set a uniform value.
    * Creates the uniform if it doesn't exist, updates if it does.
    */
-  set(name: string, value: AnyUniformValue): this {
+  set<T extends AnyUniformValue>(name: string, value: T): this {
     const existing = this.uniforms.get(name);
 
     if (existing) {
@@ -62,7 +63,7 @@ export default class Uniforms {
   /**
    * Set multiple uniforms at once.
    */
-  setMany(values: Record<string, AnyUniformValue>): this {
+  setMany<T extends UniformSchema>(values: T): this {
     for (const [name, value] of Object.entries(values)) {
       this.set(name, value);
     }
@@ -72,8 +73,8 @@ export default class Uniforms {
   /**
    * Get current uniform value.
    */
-  get(name: string): AnyUniformValue | undefined {
-    return this.uniforms.get(name)?.getValue();
+  get<T extends AnyUniformValue>(name: string): T | undefined {
+    return this.uniforms.get(name)?.getValue() as T | undefined;
   }
 
   /**
