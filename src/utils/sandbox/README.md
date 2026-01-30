@@ -1,17 +1,36 @@
 # Sandbox
 
-Sandbox is a lightweight WebGL wrapper for **simple, beautiful shader effects**. It focuses on a clean API, type safety, and fast setup so you can go from idea → shader in minutes.
+Sandbox is a lightweight WebGL wrapper for **simple, beautiful shader effects**. It focuses on a clean API, type safety, and fast setup so you can go from idea to a shader in minutes.
 
-It’s **DX‑friendly**, small, and intentionally minimal — perfect for gradients, ambient backgrounds, and animated GLSL experiments. If you are not building a full 3D engine, Sandbox is a great alternative to larger libraries like three.js or p5.js.
+It's **DX‑friendly**, small, and intentionally minimal — perfect for gradients, ambient backgrounds, and animated GLSL experiments. If you're not building a full 3D engine, Sandbox is a delightful alternative to larger libraries like three.js or p5.js.
 
 It works in both **WebGL1 and WebGL2** contexts, with automatic fallback and detection.
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick setup](#quick-setup)
+- [Playback control](#playback-control)
+  - [Time control](#time-control)
+  - [Static rendering](#static-rendering)
+- [Shaders](#shaders)
+  - [WebGL version detection](#webgl-version-detection)
+- [Uniforms](#uniforms)
+- [Built‑in uniforms](#built-in-uniforms)
+- [Hooks](#hooks)
+  - [Self-removing hooks](#self-removing-hooks)
+- [Chaining](#chaining)
+- [Error handling](#error-handling)
+- [Vue integration](#vue-integration)
+- [Cleanup](#cleanup)
+- [Options](#options)
+- [Limitations (by design)](#limitations-by-design)
+- [License](#license)
+
 ## Installation
 
-If you wish to give Sandbox a try, you can install it via npm:
-
 ```bash
-npm install @rosalana/sandbox-js
+npm install @rosalana/sandbox
 ```
 
 ## Quick setup
@@ -19,22 +38,50 @@ npm install @rosalana/sandbox-js
 Sandbox is designed to get you up and running with minimal effort. It ships with sensible defaults, so in most cases it only takes a few lines of code to get started.
 
 ```ts
-import { Sandbox } from "@rosalana/sandbox-js";
+import { Sandbox } from "@rosalana/sandbox";
 
 const sandbox = Sandbox.create(canvas, {
   fragment: fragSource,
 });
 ```
 
-That’s it. You get a running render loop and a fullscreen quad.
+That's it. You get a running render loop and a fullscreen quad. No WebGL ceremony, no boilerplate — just your shader doing its thing.
 
-## Usage
+## Playback control
 
-Sandbox works as a magic box that somehow processes your shaders and displays them on a canvas. All the WebGL boilerplate is handled for you.
+Autoplay is enabled by default, so your shader starts rendering immediately. But you're in full control — pause, play, scrub through time, whatever you need.
 
-All of this are done without limiting your creativity. Sandbox comes with default shaders and uniforms, but you can override everything as needed.
+```ts
+sandbox.play();
+sandbox.pause();
+sandbox.toggle();
+```
 
-Autoplay is enabled by default, so your shader starts rendering immediately. You can pause, play, or render a single frame whenever you want.
+Want to know if it's running?
+
+```ts
+sandbox.isPlaying();
+```
+
+### Time control
+
+This is where it gets fun. You can jump to any point in time, which is perfect for debugging or creating deterministic renders.
+
+Start playing from a specific moment:
+
+```ts
+sandbox.playAt(2.5);
+```
+
+Or set up an auto-pause — great for intro animations that should stop after a few seconds:
+
+```ts
+sandbox.pauseAt(10);
+```
+
+### Static rendering
+
+Sometimes you don't need animation at all. Maybe you're generating a gradient thumbnail or rendering a single frame for export.
 
 ```ts
 const sandbox = Sandbox.create(canvas, {
@@ -42,33 +89,47 @@ const sandbox = Sandbox.create(canvas, {
   autoplay: false,
 });
 
-sandbox.play(); // play the animation
-sandbox.pause(); // pause the animation
-sandbox.toggle(); // toggle play/pause
-sandbox.render(); // render a single frame
+sandbox.render();
 ```
 
-### Shaders (what you actually write)
+Or render at a specific time — perfect for deterministic, reproducible output:
 
-Shaders are the only thing you need to provide to Sandbox. Rendering program requires vertex and fragment shaders.
+```ts
+sandbox.renderAt(1.5);
+```
 
-Sandbox comes with a default fullscreen vertex shader, so you usually don’t need to write one yourself. Default vertex shader gets automatically switch to WebGL1 or WebGL2 version depending on the context and provided fragment.
+## Shaders
 
-Most of the time you only need a fragment shader. Sandbox provides a default fullscreen vertex shader for you.
+Shaders are the only thing you need to provide. Sandbox comes with a default fullscreen vertex shader, so you usually don't need to write one yourself — and it automatically switches between WebGL1 and WebGL2 versions depending on your fragment shader.
+
+Update your fragment shader on the fly:
 
 ```ts
 sandbox.setFragment(fragmentSource);
 ```
 
-When you need a custom vertex shader (rare, but useful for special geometry):
+When you need full control over both vertex and fragment:
 
 ```ts
 sandbox.setShader(vertexSource, fragmentSource);
 ```
 
-### Uniforms (how you control the shader)
+### WebGL version detection
 
-Uniforms are the main way to feed data into your shader. Sandbox makes them **type‑safe** and **chainable**.
+Sandbox figures out which WebGL version you're using by looking at your shader code:
+
+- `#version 300 es` → WebGL2
+- no version directive → WebGL1
+
+If WebGL2 isn't available, Sandbox falls back to WebGL1 automatically. You can always check what you're running:
+
+```ts
+sandbox.webglVersion();
+```
+
+## Uniforms
+
+Uniforms are how you feed data into your shader. Sandbox makes them **type‑safe** and **chainable** — no more guessing what went wrong.
 
 Set a single uniform:
 
@@ -76,94 +137,97 @@ Set a single uniform:
 sandbox.setUniform<number>("u_intensity", 0.8);
 ```
 
-Set multiple uniforms with explicit types:
+Set multiple uniforms at once:
 
 ```ts
-interface MyUniforms extends UniformSchema {
+sandbox.setUniforms<{
   u_intensity: number;
-  u_colors: Vec3[];
-}
-
-sandbox.setUniforms<MyUniforms>({
+  u_color: Vec3;
+}>({
   u_intensity: 0.75,
-  u_colors: [
-    [1, 0.2, 0.3],
-    [0.2, 0.6, 1],
-  ],
+  u_color: [1, 0.2, 0.3],
 });
 ```
 
-Get a uniform value:
+Read back a uniform value:
 
 ```ts
 const intensity = sandbox.getUniform<number>("u_intensity");
 ```
 
-> All numeric values are treated as floats. This keeps the API simple and predictable.
+All numeric values are treated as floats. This keeps the API simple and predictable.
 
-### Hooks
+## Built‑in uniforms
 
-Hooks are perfect for logic for your uniforms that run every frame or to synchonize Sandbox state with reactive frameworks.
-
-Hooks are called either before or after each render. So keep that in mind. Sometimes it matters!
-
-```ts
-const remove = sandbox.hook(({ time }) => {
-  const intensity = (Math.sin(time) + 1) / 2;
-  sandbox.setUniform("u_intensity", intensity);
-}, "before");
-
-// To remove the hook later:
-remove();
-```
-
-When you need to run logic only once. You can set the hook to auto-remove itself when returning false:
-
-```ts
-sandbox.hook(({ time }) => {
-  console.log(time);
-  if (time > 5) return false; // remove hook after 5 seconds
-}, "after");
-```
-
-You can also use hooks to sync Sandbox state with external systems:
-
-```ts
-const playing = ref(false);
-
-sandbox.hook(() => {
-  playing.value = sandbox.value?.isPlaying() || false;
-}, "after");
-```
-
-### Cleanup
-
-Always cleanup when you’re done:
-
-```ts
-sandbox.destroy();
-
-// or in frameworks like Vue:
-onUnmounted(() => {
-  sandbox.destroy();
-});
-```
-
-## Built‑in uniforms (automatic)
-
-If your shader declares any of these, Sandbox fills them for you on every frame — no manual setup needed:
+These uniforms are filled automatically every frame — no setup needed. Just declare them in your shader and they work:
 
 | Uniform        | Type  | Description                 |
 | -------------- | ----- | --------------------------- |
 | `u_resolution` | vec2  | Canvas size in pixels       |
 | `u_time`       | float | Elapsed time (seconds)      |
 | `u_delta`      | float | Delta time since last frame |
-| `u_mouse`      | vec2  | Mouse position in canvas    |
+| `u_mouse`      | vec2  | Mouse position on canvas    |
 | `u_frame`      | int   | Frame counter               |
+
+## Hooks
+
+Hooks are one of the most powerful features in Sandbox. They let you run logic every frame — before or after render — which opens up a world of possibilities.
+
+**Pre-compute values on the CPU** before they hit the shader:
+
+```ts
+sandbox.hook(({ time }) => {
+  const intensity = (Math.sin(time) + 1) / 2;
+  sandbox.setUniform("u_intensity", intensity);
+}, "before");
+```
+
+**Sync state with reactive frameworks** like Vue or React:
+
+```ts
+const playing = ref(false);
+
+sandbox.hook(() => {
+  playing.value = sandbox.isPlaying();
+}, "after");
+```
+
+The hook returns a removal function, so you can clean up whenever you want:
+
+```ts
+const remove = sandbox.hook(({ time }) => {
+  console.log(time);
+}, "after");
+
+remove();
+```
+
+### Self-removing hooks
+
+Sometimes you need a hook that runs only until a condition is met. Just return `false` and the hook removes itself:
+
+```ts
+sandbox.hook(({ time }) => {
+  if (time > 5) return false;
+}, "after");
+```
+
+This is how `pauseAt()` works internally — it's hooks all the way down.
+
+## Chaining
+
+Every method returns `this`, so you can chain calls for clean, expressive code:
+
+```ts
+sandbox
+  .setUniforms({ u_color: [1, 0, 0] })
+  .time(2.5)
+  .render();
+```
 
 ## Error handling
 
-Sandbox handles errors internally and reports them via a single, friendly callback. This means you don’t need `try/catch` for normal use — just provide a fallback if you want one.
+Shader errors happen — typos, syntax mistakes, driver quirks. Sandbox handles them gracefully and reports them via a single callback. No try/catch needed.
 
 ```ts
 Sandbox.create(canvas, {
@@ -174,48 +238,114 @@ Sandbox.create(canvas, {
 });
 ```
 
+The error object includes useful details:
+
+- `error.code` — error type (`SHADER_COMPILATION_FAILED`, `PROGRAM_LINK_FAILED`, etc.)
+- `error.lines` — line numbers where errors occurred (for compilation errors)
+- `error.shaderType` — which shader failed (`vertex` or `fragment`)
+
+Error codes: `WEBGL_NOT_SUPPORTED`, `SHADER_COMPILATION_FAILED`, `PROGRAM_LINK_FAILED`, `SHADER_VERSION_MISMATCH`
+
+## Vue integration
+
+Here's a complete example showing how to use Sandbox with Vue's reactivity system:
+
+```vue
+<script setup lang="ts">
+import { shallowRef, ref, onMounted, onUnmounted } from "vue";
+import { Sandbox } from "@rosalana/sandbox";
+
+const canvasRef = ref<HTMLCanvasElement>();
+const sandbox = shallowRef<Sandbox | null>(null);
+const isPlaying = ref(false);
+
+onMounted(() => {
+  sandbox.value = Sandbox.create(canvasRef.value!, {
+    onAfterRender: () => {
+      isPlaying.value = sandbox.value?.isPlaying() ?? false;
+    },
+  });
+});
+
+onUnmounted(() => {
+  sandbox.value?.destroy();
+});
+</script>
+
+<template>
+  {{ isPlaying ? "Playing" : "Paused" }}
+  <canvas ref="canvasRef" />
+</template>
+```
+
+Use `shallowRef` for the Sandbox instance — you don't want Vue making the WebGL context reactive.
+
+## Cleanup
+
+Always destroy when you're done. This releases all WebGL resources and removes event listeners:
+
+```ts
+sandbox.destroy();
+```
+
+In frameworks like Vue:
+
+```ts
+onUnmounted(() => {
+  sandbox.destroy();
+});
+```
+
 ## Options
 
-```typescript
+```ts
 interface SandboxOptions {
-  /** Vertex shader source code (save version fragment) */
   vertex?: string;
-  /** Fragment shader source code (save version vertex) */
   fragment?: string;
-  /** Auto-play the sandbox on creation (default: true) */
   autoplay?: boolean;
-  /** Pause rendering when canvas not visible (default: true) */
   pauseWhenHidden?: boolean;
-  /** Device pixel ratio - "auto" uses window.devicePixelRatio (default: "auto") */
   dpr?: number | "auto";
-  /** Preserve drawing buffer for screenshots (default: false) */
   preserveDrawingBuffer?: boolean;
-  /** Enable antialiasing (default: true) */
   antialias?: boolean;
-  /** Error callback for shader compilation or runtime errors */
   onError?: (error: SandboxError) => void;
-  /** Callback when sandbox is ready */
   onLoad?: () => void;
-  /** Callback called each frame before render */
   onBeforeRender?: HookCallback | null;
-  /** Callback called each frame after render */
   onAfterRender?: HookCallback | null;
-  /** Initial uniforms to set */
   uniforms?: UniformSchema;
 }
 ```
 
-## WebGL version detection
-
-- `#version 300 es` → WebGL2
-- no version directive → WebGL1
-
-If WebGL2 is not available, Sandbox falls back to WebGL1 automatically.
+| Option                  | Default       | Description                     |
+| ----------------------- | ------------- | ------------------------------- |
+| `vertex`                | built-in      | Custom vertex shader            |
+| `fragment`              | built-in      | Fragment shader                 |
+| `autoplay`              | `true`        | Start rendering immediately     |
+| `pauseWhenHidden`       | `true`        | Pause when scrolled out of view |
+| `dpr`                   | `"auto"`      | Device pixel ratio              |
+| `preserveDrawingBuffer` | `false`       | Keep buffer for screenshots     |
+| `antialias`             | `true`        | Enable antialiasing             |
+| `onError`               | `console.error` | Error callback                  |
+| `onLoad`                | —             | Called when ready               |
+| `onBeforeRender`        | —             | Hook before each frame          |
+| `onAfterRender`         | —             | Hook after each frame           |
+| `uniforms`              | —             | Initial uniform values          |
 
 ## Limitations (by design)
 
-- No textures (planned, not included)
+- No textures (planned for future)
 - No multi‑pass rendering
 - No 3D scene graph
 
 If you need a full engine, reach for three.js. For clean shader‑only effects, Sandbox is a joy to use.
+
+## License
+
+Rosalana Sandbox is open-source under the [MIT license](/LICENCE), allowing you to freely use, modify, and distribute it with minimal restrictions.
+
+You may not be able to use our systems but you can use our code to build your own.
+
+For details on how to contribute or how the Rosalana ecosystem is maintained, please refer to each repository's individual guidelines.
+
+**Questions or feedback?**
+
+Feel free to open an issue or contribute with a pull request. Happy coding with Rosalana!
