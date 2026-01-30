@@ -237,9 +237,9 @@ export class Sandbox {
   /**
    * Update only fragment shader (uses default vertex).
    * @example
-   * sandbox.setFragmentShader(fragmentSource);
+   * sandbox.setFragment(fragmentSource);
    */
-  setFragmentShader(fragment: string): this {
+  setFragment(fragment: string): this {
     this.engine.shader(defaultVert, fragment);
     return this;
   }
