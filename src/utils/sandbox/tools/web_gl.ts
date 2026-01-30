@@ -7,7 +7,7 @@ import type {
   WebGLContext,
   WebGLVersion,
 } from "../types";
-import { ContextError } from "../errors";
+import { SandboxContextError, SandboxError } from "../errors";
 import Clock from "./clock";
 import Geometry from "./geometry";
 import Program from "./program";
@@ -93,6 +93,7 @@ export default class WebGL {
   /**
    * Initialize WebGL context.
    * Tries WebGL2 first, falls back to WebGL1.
+   * Context errors are fatal but still reported via onError.
    */
   private initContext(): WebGLContext {
     const attrs: WebGLContextAttributes = {
@@ -117,8 +118,10 @@ export default class WebGL {
       return gl1;
     }
 
-    // WebGL not supported
-    throw new ContextError("not_supported");
+    // WebGL not supported - fatal error
+    const error = new SandboxContextError("not_supported");
+    this.options.onError(error);
+    throw error;
   }
 
   /**
@@ -190,21 +193,28 @@ export default class WebGL {
 
   /**
    * Compile and link shaders.
+   * Errors are handled via onError callback, never thrown.
    */
   shader(vertex: string, fragment: string): this {
-    // Compile program
-    this._program.compile(vertex, fragment);
+    try {
+      // Compile program
+      this._program.compile(vertex, fragment);
 
-    // Update version based on shaders
-    this._version = this._program.getVersion();
+      // Update version based on shaders
+      this._version = this._program.getVersion();
 
-    // Link attributes to geometry
-    this._geometry.linkAttributes(this._program);
+      // Link attributes to geometry
+      this._geometry.linkAttributes(this._program);
 
-    // Attach program to uniforms for location caching
-    const webglProgram = this._program.getProgram();
-    if (webglProgram) {
-      this._uniforms.attachProgram(webglProgram);
+      // Attach program to uniforms for location caching
+      const webglProgram = this._program.getProgram();
+      if (webglProgram) {
+        this._uniforms.attachProgram(webglProgram);
+      }
+    } catch (error) {
+      if (error instanceof SandboxError) {
+        this.options.onError(error);
+      }
     }
 
     return this;

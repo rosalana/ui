@@ -94,7 +94,7 @@ export class Sandbox {
       preserveDrawingBuffer: false,
       antialias: true,
       onError: (error: SandboxError) => {
-        console.error(error);
+        console.error('Oops!', error, '\nYou can handle errors programmatically by providing an onError callback to suppress this log and implement custom fallback behavior.');
       },
       onLoad: () => {},
       onBeforeRender: null,

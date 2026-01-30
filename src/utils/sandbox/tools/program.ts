@@ -1,7 +1,7 @@
 import type { WebGLContext, WebGLVersion } from "../types";
 import {
-  ProgramLinkError,
-  ShaderCompilationError,
+  SandboxProgramError,
+  SandboxShaderError,
 } from "../errors";
 
 /**
@@ -135,7 +135,7 @@ export default class Program {
 
     const shader = gl.createShader(glType);
     if (!shader) {
-      throw new ShaderCompilationError(
+      throw new SandboxShaderError(
         type,
         source,
         "Failed to create shader object",
@@ -150,7 +150,7 @@ export default class Program {
     if (!compiled) {
       const infoLog = gl.getShaderInfoLog(shader) || "Unknown error";
       gl.deleteShader(shader);
-      throw new ShaderCompilationError(type, source, infoLog);
+      throw new SandboxShaderError(type, source, infoLog);
     }
 
     return shader;
@@ -164,12 +164,12 @@ export default class Program {
     const gl = this.gl;
 
     if (!this.vertexShader || !this.fragmentShader) {
-      throw new ProgramLinkError("Shaders not compiled");
+      throw new SandboxProgramError("Shaders not compiled");
     }
 
     const program = gl.createProgram();
     if (!program) {
-      throw new ProgramLinkError("Failed to create program object");
+      throw new SandboxProgramError("Failed to create program object");
     }
 
     gl.attachShader(program, this.vertexShader);
@@ -181,7 +181,7 @@ export default class Program {
     if (!linked) {
       const infoLog = gl.getProgramInfoLog(program) || "Unknown error";
       gl.deleteProgram(program);
-      throw new ProgramLinkError(infoLog);
+      throw new SandboxProgramError(infoLog);
     }
 
     this.program = program;

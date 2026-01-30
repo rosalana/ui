@@ -17,7 +17,7 @@ export class SandboxError extends Error {
 }
 
 /** WebGL context creation failure */
-export class ContextError extends SandboxError {
+export class SandboxContextError extends SandboxError {
   constructor(reason: "not_supported" | "creation_failed") {
     const message =
       reason === "not_supported"
@@ -30,12 +30,12 @@ export class ContextError extends SandboxError {
         ? "WEBGL_NOT_SUPPORTED"
         : "CONTEXT_CREATION_FAILED",
     );
-    this.name = "ContextError";
+    this.name = "SandboxContextError";
   }
 }
 
 /** Shader compilation failure with line info extraction */
-export class ShaderCompilationError extends SandboxError {
+export class SandboxShaderError extends SandboxError {
   /** Line numbers where errors occurred */
   public readonly lines: number[];
 
@@ -44,7 +44,7 @@ export class ShaderCompilationError extends SandboxError {
     public readonly source: string,
     public readonly infoLog: string,
   ) {
-    const lines = ShaderCompilationError.parseErrorLines(infoLog);
+    const lines = SandboxShaderError.parseErrorLines(infoLog);
     const lineInfo = lines.length > 0 ? ` at line(s): ${lines.join(", ")}` : "";
 
     super(
@@ -52,7 +52,7 @@ export class ShaderCompilationError extends SandboxError {
       "SHADER_COMPILATION_FAILED",
     );
 
-    this.name = "ShaderCompilationError";
+    this.name = "SandboxShaderError";
     this.lines = lines;
   }
 
@@ -85,9 +85,9 @@ export class ShaderCompilationError extends SandboxError {
 }
 
 /** Shader program linking failure */
-export class ProgramLinkError extends SandboxError {
+export class SandboxProgramError extends SandboxError {
   constructor(public readonly infoLog: string) {
     super(`Shader program linking failed\n\n${infoLog}`, "PROGRAM_LINK_FAILED");
-    this.name = "ProgramLinkError";
+    this.name = "SandboxProgramError";
   }
 }
