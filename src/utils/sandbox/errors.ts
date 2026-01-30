@@ -3,7 +3,9 @@ export type SandboxErrorCode =
   | "WEBGL_NOT_SUPPORTED"
   | "CONTEXT_CREATION_FAILED"
   | "SHADER_COMPILATION_FAILED"
-  | "PROGRAM_LINK_FAILED";
+  | "PROGRAM_LINK_FAILED"
+  | "SHADER_VERSION_MISMATCH"
+  | "UNKNOWN_ERROR";
 
 /** Base error class for all Sandbox errors */
 export class SandboxError extends Error {
@@ -34,8 +36,21 @@ export class SandboxContextError extends SandboxError {
   }
 }
 
+export class SandboxShaderVersionMismatchError extends SandboxError {
+  constructor(
+    public readonly vertexVersion: number,
+    public readonly fragmentVersion: number,
+  ) {
+    super(
+      `Vertex and fragment shader WebGL versions do not match (${vertexVersion} vs ${fragmentVersion})`,
+      "SHADER_VERSION_MISMATCH",
+    );
+    this.name = "SandboxShaderVersionMismatchError";
+  }
+}
+
 /** Shader compilation failure with line info extraction */
-export class SandboxShaderError extends SandboxError {
+export class SandboxShaderCompilationError extends SandboxError {
   /** Line numbers where errors occurred */
   public readonly lines: number[];
 
@@ -44,7 +59,7 @@ export class SandboxShaderError extends SandboxError {
     public readonly source: string,
     public readonly infoLog: string,
   ) {
-    const lines = SandboxShaderError.parseErrorLines(infoLog);
+    const lines = SandboxShaderCompilationError.parseErrorLines(infoLog);
     const lineInfo = lines.length > 0 ? ` at line(s): ${lines.join(", ")}` : "";
 
     super(
@@ -52,7 +67,7 @@ export class SandboxShaderError extends SandboxError {
       "SHADER_COMPILATION_FAILED",
     );
 
-    this.name = "SandboxShaderError";
+    this.name = "SandboxShaderCompilationError";
     this.lines = lines;
   }
 

@@ -1,22 +1,24 @@
 import type {
   AnyUniformValue,
-  ClockState,
   HookCallback,
   ResolvedSandboxOptions,
   SandboxOptions,
   UniformSchema,
   WebGLVersion,
 } from "./types";
-import type { SandboxError } from "./errors";
-
-import defaultVert from "./shaders/shader.vert?raw";
-import defaultFrag from "./shaders/shader.frag?raw";
+import { SandboxError } from "./errors";
 
 import Listener from "./tools/listener";
 import WebGL from "./tools/web_gl";
 
 export * from "./types";
 export * from "./errors";
+
+import WebGL1_Vert from "./shaders/webgl1_shader.vert?raw";
+import WebGL1_Frag from "./shaders/webgl1_shader.frag?raw";
+import WebGL2_Vert from "./shaders/webgl2_shader.vert?raw";
+import WebGL2_Frag from "./shaders/webgl2_shader.frag?raw";
+import Program from "./tools/program";
 
 /**
  * Sandbox - A lightweight WebGL wrapper for shader effects.
@@ -86,21 +88,39 @@ export class Sandbox {
 
   private resolveOptions(options?: SandboxOptions): ResolvedSandboxOptions {
     const defaults = {
-      vertex: defaultVert,
-      fragment: defaultFrag,
+      vertex: WebGL1_Vert,
+      fragment: WebGL1_Frag,
       autoplay: true,
       pauseWhenHidden: true,
       dpr: "auto" as "auto",
       preserveDrawingBuffer: false,
       antialias: true,
       onError: (error: SandboxError) => {
-        console.error('Oops!', error, '\nYou can handle errors programmatically by providing an onError callback to suppress this log and implement custom fallback behavior.');
+        console.error(
+          "Oops!",
+          error,
+          "\nYou can handle errors programmatically by providing an onError callback to suppress this log and implement custom fallback behavior.",
+        );
       },
       onLoad: () => {},
       onBeforeRender: null,
       onAfterRender: null,
       uniforms: {},
     };
+
+    // If only vertex is provided, set matching fragment
+    if (options?.vertex && !options?.fragment) {
+      const version = Program.detectVersion(options.vertex);
+      defaults.vertex = options.vertex;
+      defaults.fragment = version === 2 ? WebGL2_Frag : WebGL1_Frag;
+    }
+
+    // If only fragment is provided, set matching vertex
+    if (options?.fragment && !options?.vertex) {
+      const version = Program.detectVersion(options.fragment);
+      defaults.fragment = options.fragment;
+      defaults.vertex = version === 2 ? WebGL2_Vert : WebGL1_Vert;
+    }
 
     return { ...defaults, ...options };
   }
@@ -240,7 +260,10 @@ export class Sandbox {
    * sandbox.setFragment(fragmentSource);
    */
   setFragment(fragment: string): this {
-    this.engine.shader(defaultVert, fragment);
+    const version = this.webglVersion();
+    const vertex = version === 1 ? WebGL1_Vert : WebGL2_Vert;
+
+    this.engine.shader(vertex, fragment);
     return this;
   }
 

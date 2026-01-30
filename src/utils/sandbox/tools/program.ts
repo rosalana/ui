@@ -1,7 +1,8 @@
 import type { WebGLContext, WebGLVersion } from "../types";
 import {
   SandboxProgramError,
-  SandboxShaderError,
+  SandboxShaderCompilationError,
+  SandboxShaderVersionMismatchError,
 } from "../errors";
 
 /**
@@ -40,6 +41,11 @@ export default class Program {
     // Detect version from shaders
     const vertVersion = Program.detectVersion(vertexSource);
     const fragVersion = Program.detectVersion(fragmentSource);
+
+    if (vertVersion != fragVersion) {
+      throw new SandboxShaderVersionMismatchError(vertVersion, fragVersion);
+    }
+
     this.version = Math.max(vertVersion, fragVersion) as WebGLVersion;
 
     // Compile shaders
@@ -130,12 +136,11 @@ export default class Program {
     source: string,
   ): WebGLShader {
     const gl = this.gl;
-    const glType =
-      type === "vertex" ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
+    const glType = type === "vertex" ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
 
     const shader = gl.createShader(glType);
     if (!shader) {
-      throw new SandboxShaderError(
+      throw new SandboxShaderCompilationError(
         type,
         source,
         "Failed to create shader object",
@@ -150,7 +155,7 @@ export default class Program {
     if (!compiled) {
       const infoLog = gl.getShaderInfoLog(shader) || "Unknown error";
       gl.deleteShader(shader);
-      throw new SandboxShaderError(type, source, infoLog);
+      throw new SandboxShaderCompilationError(type, source, infoLog);
     }
 
     return shader;
