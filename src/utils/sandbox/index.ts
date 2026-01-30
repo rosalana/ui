@@ -10,6 +10,7 @@ import { SandboxError } from "./errors";
 
 import Listener from "./tools/listener";
 import WebGL from "./tools/web_gl";
+import Program from "./tools/program";
 
 export * from "./types";
 export * from "./errors";
@@ -18,7 +19,6 @@ import WebGL1_Vert from "./shaders/webgl1_shader.vert?raw";
 import WebGL1_Frag from "./shaders/webgl1_shader.frag?raw";
 import WebGL2_Vert from "./shaders/webgl2_shader.vert?raw";
 import WebGL2_Frag from "./shaders/webgl2_shader.frag?raw";
-import Program from "./tools/program";
 
 /**
  * Sandbox - A lightweight WebGL wrapper for shader effects.
