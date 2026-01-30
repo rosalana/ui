@@ -2,7 +2,6 @@
 import { ref, computed, type HTMLAttributes, onMounted, onUnmounted } from "vue";
 import { tv } from "tailwind-variants";
 import { useGradient } from "../../../composables/useGradient";
-import { Canvas } from "../../../utils";
 /**
  * https://kevingrajeda.github.io/meshGradient/
  * https://github.com/KevinGrajeda/meshGradient/tree/main/src/components
