@@ -231,14 +231,6 @@ export default class WebGL {
   }
 
   /**
-   * Wait until a condition is met in the clock state.
-   */
-  async when(predicate: (state: ClockState) => boolean): Promise<this> {
-    await this._clock.when(predicate);
-    return this;
-  }
-
-  /**
    * Get WebGL context.
    */
   getContext(): WebGLContext {

@@ -35,7 +35,7 @@ export * from "./errors";
  *   autoplay: true,
  * });
  */
-export default class Sandbox {
+export class Sandbox {
   /** Active event listeners */
   private listeners: (() => void)[] = [];
   /** HTML canvas element */
@@ -297,19 +297,6 @@ export default class Sandbox {
   renderAt(time: number): this {
     this.engine.clock(time);
     this.engine.render();
-    return this;
-  }
-
-  /**
-   * Pause playback when specific time is reached.
-   * @example
-   * await sandbox.pauseAt(5.0); // Pause at 5 seconds
-   */
-  async pauseAt(time: number): Promise<this> {
-    await this.engine.when(function (state: ClockState): boolean {
-      return state.time >= time;
-    });
-    this.engine.pause();
     return this;
   }
 

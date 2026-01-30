@@ -100,30 +100,6 @@ export default class Clock {
   }
 
   /**
-   * Wait until a condition is met in the clock state.
-   * Resolves the promise when the predicate returns true.
-   */
-  when(predicate: (state: ClockState) => boolean): Promise<this> {
-    return new Promise((resolve) => {
-      const check = (state: ClockState) => {
-        if (predicate(state)) {
-          this.callback = null;
-          resolve(this);
-        }
-      };
-      const originalCallback = this.callback;
-      this.callback = (state: ClockState) => {
-        if (originalCallback) {
-          originalCallback(state);
-        }
-        check(state);
-      };
-      // Initial check in case the condition is already met
-      check(this.getState());
-    });
-  }
-
-  /**
    * Set time directly (for deterministic rendering).
    */
   setTime(time: number): this {
