@@ -21,9 +21,9 @@ export interface SandboxOptions {
   /** Callback when sandbox is ready */
   onLoad?: () => void;
   /** Callback called each frame before render */
-  onBeforeRender?: RenderCallback | null;
+  onBeforeRender?: HookCallback | null;
   /** Callback called each frame after render */
-  onAfterRender?: RenderCallback | null;
+  onAfterRender?: HookCallback | null;
   /** Initial uniforms to set */
   uniforms?: Record<string, AnyUniformValue>;
 }
@@ -140,4 +140,4 @@ export interface UniformEntry {
 export type DrawMode = "TRIANGLES" | "TRIANGLE_STRIP" | "TRIANGLE_FAN";
 
 /** Render callback signature */
-export type RenderCallback = (clock: ClockState) => void;
+export type HookCallback = (clock: ClockState) => void;
