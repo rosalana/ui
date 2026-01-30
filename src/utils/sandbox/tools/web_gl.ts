@@ -12,6 +12,7 @@ import Clock from "./clock";
 import Geometry from "./geometry";
 import Program from "./program";
 import Uniforms from "./uniforms";
+import Hooks from "../hooks";
 
 /**
  * Main WebGL orchestrator.
@@ -21,6 +22,9 @@ export default class WebGL {
   private canvas: HTMLCanvasElement;
   private gl: WebGLContext;
   private options: ResolvedSandboxOptions;
+
+  onBeforeHooks: Hooks = new Hooks();
+  onAfterHooks: Hooks = new Hooks();
 
   private _program: Program;
   private _geometry: Geometry;
@@ -51,6 +55,14 @@ export default class WebGL {
     this._geometry = Geometry.fullscreenQuad(this.gl);
     this._uniforms = new Uniforms(this.gl);
     this._clock = new Clock();
+
+    if (this.options.onBeforeRender) {
+      this.onBeforeHooks.add(this.options.onBeforeRender);
+    }
+
+    if (this.options.onAfterRender) {
+      this.onAfterHooks.add(this.options.onAfterRender);
+    }
 
     // Bind render method
     this.onRender = this.onRender.bind(this);
@@ -216,8 +228,14 @@ export default class WebGL {
   pause(): this {
     if (!this.playing) return this;
 
+    const state = this._clock.getState();
+
+    this.onBeforeHooks.run(state);
+    
     this.playing = false;
     this._clock.stop();
+
+    this.onAfterHooks.run(state);
 
     return this;
   }
@@ -262,9 +280,7 @@ export default class WebGL {
     const gl = this.gl;
 
     // Call before render callback
-    if (this.options.onBeforeRender) {
-      this.options.onBeforeRender(state);
-    }
+    this.onBeforeHooks.run(state);
 
     // Clear canvas
     gl.clearColor(0, 0, 0, 0);
@@ -284,8 +300,6 @@ export default class WebGL {
     this._geometry.draw();
 
     // Call after render callback
-    if (this.options.onAfterRender) {
-      this.options.onAfterRender(state);
-    }
+    this.onAfterHooks.run(state);
   }
 }

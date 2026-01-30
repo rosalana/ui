@@ -1,6 +1,7 @@
 import type {
   AnyUniformValue,
   ClockState,
+  HookCallback,
   ResolvedSandboxOptions,
   SandboxOptions,
   UniformSchema,
@@ -244,9 +245,29 @@ export class Sandbox {
   }
 
   /**
+   * Add a runtime render hook.
+   */
+  hook(callback: HookCallback, when: "before" | "after" = "before") {
+    if (when === "before") {
+      return this.engine.onBeforeHooks.add(callback);
+    } else {
+      return this.engine.onAfterHooks.add(callback);
+    }
+  }
+
+  /**
    * Start animation loop.
    */
   play(): this {
+    this.engine.play();
+    return this;
+  }
+
+  /**
+   * Start animation loop at specific time (in seconds).
+   */
+  playAt(time: number): this {
+    this.engine.clock(time);
     this.engine.play();
     return this;
   }
@@ -256,6 +277,19 @@ export class Sandbox {
    */
   pause(): this {
     this.engine.pause();
+    return this;
+  }
+
+  /**
+   * Pause animation loop at specific time (in seconds).
+   */
+  pauseAt(time: number): this {
+    this.hook((state) => {
+      if (state.time >= time) {
+        this.pause();
+      }
+    }, "after");
+
     return this;
   }
 
@@ -303,21 +337,21 @@ export class Sandbox {
   /**
    * Check if currently playing.
    */
-  get isPlaying(): boolean {
+  isPlaying(): boolean {
     return this.engine.playing;
   }
 
   /**
    * Get WebGL version using (1 or 2).
    */
-  get webglVersion(): WebGLVersion {
+  webglVersion(): WebGLVersion {
     return this.engine.getVersion();
   }
 
   /**
    * Get canvas element.
    */
-  get canvasElement(): HTMLCanvasElement {
+  canvasElement(): HTMLCanvasElement {
     return this.canvas;
   }
 

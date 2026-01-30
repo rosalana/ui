@@ -1,4 +1,4 @@
-import type { ClockState, RenderCallback } from "../types";
+import type { ClockState, HookCallback } from "../types";
 
 /**
  * High-precision animation timing using requestAnimationFrame.
@@ -17,7 +17,7 @@ export default class Clock {
   private startTime = 0;
   private lastTime = 0;
   private rafId: number | null = null;
-  private callback: RenderCallback | null = null;
+  private callback: HookCallback | null = null;
 
   constructor() {
     // Bind loop method to preserve 'this' context
@@ -27,7 +27,7 @@ export default class Clock {
   /**
    * Start the animation loop with a render callback.
    */
-  start(callback: RenderCallback): this {
+  start(callback: HookCallback): this {
     if (this.running) return this;
 
     this.callback = callback;
