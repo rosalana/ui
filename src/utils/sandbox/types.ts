@@ -140,4 +140,4 @@ export interface UniformEntry {
 export type DrawMode = "TRIANGLES" | "TRIANGLE_STRIP" | "TRIANGLE_FAN";
 
 /** Render callback signature */
-export type HookCallback = (clock: ClockState) => void;
+export type HookCallback = (clock: ClockState) => void | false;

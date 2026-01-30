@@ -12,7 +12,7 @@ import Clock from "./clock";
 import Geometry from "./geometry";
 import Program from "./program";
 import Uniforms from "./uniforms";
-import Hooks from "../hooks";
+import Hooks from "./hooks";
 
 /**
  * Main WebGL orchestrator.
@@ -231,7 +231,7 @@ export default class WebGL {
     const state = this._clock.getState();
 
     this.onBeforeHooks.run(state);
-    
+
     this.playing = false;
     this._clock.stop();
 
@@ -271,6 +271,8 @@ export default class WebGL {
     this._geometry.destroy();
     this._program.destroy();
     this._uniforms.destroy();
+    this.onAfterHooks.destroy();
+    this.onBeforeHooks.destroy();
   }
 
   /**

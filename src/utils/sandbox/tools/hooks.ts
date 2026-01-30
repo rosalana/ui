@@ -1,4 +1,4 @@
-import { ClockState, HookCallback } from "./types";
+import { ClockState, HookCallback } from "../types";
 
 export default class Hooks {
   private hooks: Map<string, HookCallback> = new Map();
@@ -8,7 +8,7 @@ export default class Hooks {
   }
 
   /** Add a new hook, returns a removal function */
-  public add(hook: HookCallback): typeof this.remove {
+  public add(hook: HookCallback): () => void {
     const id = this.id();
     this.hooks.set(id, hook);
     return () => this.remove(id);
@@ -21,9 +21,11 @@ export default class Hooks {
 
   /** Run all hooks with the given state */
   public run(state: ClockState): void {
-    this.hooks.forEach((hook) => {
-      hook(state);
-    });
+    for (const [id, hook] of this.hooks) {
+      if (hook(state) === false) {
+        this.remove(id);
+      }
+    }
   }
 
   public destroy(): void {

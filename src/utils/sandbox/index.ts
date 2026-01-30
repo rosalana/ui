@@ -284,8 +284,9 @@ export class Sandbox {
    * Pause animation loop at specific time (in seconds).
    */
   pauseAt(time: number): this {
-    this.hook((state) => {
+    const remove = this.hook((state) => {
       if (state.time >= time) {
+        remove();
         this.pause();
       }
     }, "after");
