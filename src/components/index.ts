@@ -273,3 +273,7 @@ export type { DataTableProps } from "./blocks/DataTable/types";
 // Actions
 export { default as Actions } from "./blocks/Actions/index.vue";
 export type { ActionsProps, ActionsEmits, ActionItem } from "./blocks/Actions/types";
+
+// WebNav
+export { default as WebNav } from "./blocks/WebNav/index.vue";
+export type { WebNavItem, WebNavProps } from "./blocks/WebNav/types";
