@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from "vue";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const alertDialogHeader = tv({
   base: "flex flex-col space-y-2 text-center sm:text-left",
 });
 
 interface Props {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

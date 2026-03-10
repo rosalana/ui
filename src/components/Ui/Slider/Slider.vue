@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { SliderRootEmits, SliderRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   SliderRange,
   SliderRoot,
@@ -9,7 +8,7 @@ import {
   useForwardPropsEmits,
 } from "reka-ui";
 import { computed } from "vue";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const sliderRoot = tv({
   base: "relative flex w-full touch-none select-none items-center",
@@ -28,7 +27,7 @@ const sliderThumb = tv({
 });
 
 interface Props extends SliderRootProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

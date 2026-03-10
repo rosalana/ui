@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { PaginationRootEmits, PaginationRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { PaginationRoot, useForwardPropsEmits } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const pagination = tv({
   base: "mx-auto flex w-full justify-center",
 });
 
 interface Props extends PaginationRootProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

@@ -3,13 +3,12 @@ import type {
   DropdownMenuCheckboxItemEmits,
   DropdownMenuCheckboxItemProps,
 } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   DropdownMenuCheckboxItem,
   DropdownMenuItemIndicator,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const dropdownMenuCheckboxItem = tv({
@@ -23,7 +22,7 @@ const dropdownMenuCheckboxItem = tv({
 });
 
 interface Props extends DropdownMenuCheckboxItemProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

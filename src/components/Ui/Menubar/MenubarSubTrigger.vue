@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { MenubarSubTriggerProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { MenubarSubTrigger, useForwardProps } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const menubarSubTrigger = tv({
@@ -17,7 +16,7 @@ const menubarSubTrigger = tv({
 type MenubarSubTriggerVariants = VariantProps<typeof menubarSubTrigger>;
 
 interface Props extends MenubarSubTriggerProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   inset?: MenubarSubTriggerVariants["inset"];
 }
 

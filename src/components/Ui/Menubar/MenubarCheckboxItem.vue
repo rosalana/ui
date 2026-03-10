@@ -3,13 +3,12 @@ import type {
   MenubarCheckboxItemEmits,
   MenubarCheckboxItemProps,
 } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   MenubarCheckboxItem,
   MenubarItemIndicator,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const menubarCheckboxItem = tv({
@@ -17,7 +16,7 @@ const menubarCheckboxItem = tv({
 });
 
 interface Props extends MenubarCheckboxItemProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

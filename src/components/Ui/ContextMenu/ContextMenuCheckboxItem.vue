@@ -3,13 +3,12 @@ import type {
   ContextMenuCheckboxItemEmits,
   ContextMenuCheckboxItemProps,
 } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   ContextMenuCheckboxItem,
   ContextMenuItemIndicator,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const contextMenuCheckboxItem = tv({
@@ -17,7 +16,7 @@ const contextMenuCheckboxItem = tv({
 });
 
 interface Props extends ContextMenuCheckboxItemProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

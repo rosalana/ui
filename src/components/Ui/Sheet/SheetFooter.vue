@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from "vue";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
+// implemented
 const sheetFooter = tv({
-  base: "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+  base: "flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end",
 });
 
 interface Props {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

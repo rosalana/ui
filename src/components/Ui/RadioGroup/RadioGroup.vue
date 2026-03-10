@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { RadioGroupRootEmits, RadioGroupRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { RadioGroupRoot, useForwardPropsEmits } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const radioGroup = tv({
   base: "grid gap-2",
 });
 
 interface Props extends RadioGroupRootProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

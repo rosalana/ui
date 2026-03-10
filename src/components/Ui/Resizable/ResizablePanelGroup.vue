@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { SplitterGroupEmits, SplitterGroupProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { SplitterGroup, useForwardPropsEmits } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const resizablePanelGroup = tv({
   base: "flex size-full data-[panel-group-direction=vertical]:flex-col",
 });
 
 interface Props extends SplitterGroupProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { NavigationMenuIndicatorProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { NavigationMenuIndicator, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const navigationMenuIndicator = tv({
   base: "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in",
 });
 
 interface Props extends NavigationMenuIndicatorProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

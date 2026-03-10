@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { TabsContentProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { TabsContent, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const tabsContent = tv({
   base: "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 });
 
 interface Props extends TabsContentProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

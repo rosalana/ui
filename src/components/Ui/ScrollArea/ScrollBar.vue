@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ScrollAreaScrollbarProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ScrollAreaScrollbar, ScrollAreaThumb, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const scrollbar = tv({
   base: "flex touch-none select-none transition-colors",
@@ -19,7 +18,7 @@ const thumb = tv({
 });
 
 interface Props extends ScrollAreaScrollbarProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = withDefaults(defineProps<Props>(), {

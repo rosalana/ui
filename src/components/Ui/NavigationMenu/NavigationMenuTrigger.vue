@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { NavigationMenuTriggerProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { NavigationMenuTrigger, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const navigationMenuTrigger = tv({
@@ -10,7 +9,7 @@ const navigationMenuTrigger = tv({
 });
 
 interface Props extends NavigationMenuTriggerProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

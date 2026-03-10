@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ToggleGroupItemProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ToggleGroupItem, useForwardProps } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 import { inject } from "vue";
 
 const toggleGroupItem = tv({
@@ -30,7 +29,7 @@ type ToggleGroupItemVariants = VariantProps<typeof toggleGroupItem>;
 interface Props extends ToggleGroupItemProps {
   variant?: ToggleGroupItemVariants["variant"];
   size?: ToggleGroupItemVariants["size"];
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

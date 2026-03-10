@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { DropdownMenuRadioItemProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   DropdownMenuItemIndicator,
   DropdownMenuRadioItem,
   useForwardProps,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const dropdownMenuRadioItem = tv({
   base: [
@@ -19,7 +18,7 @@ const dropdownMenuRadioItem = tv({
 });
 
 interface Props extends DropdownMenuRadioItemProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

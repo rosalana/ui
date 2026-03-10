@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { AccordionRootEmits, AccordionRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
+import type { ClassValue } from "tailwind-variants";
 import { AccordionRoot, useForwardPropsEmits } from "reka-ui";
 
 interface Props extends AccordionRootProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

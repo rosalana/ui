@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { SelectScrollUpButtonProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { SelectScrollUpButton, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const selectScrollUpButton = tv({
@@ -10,7 +9,7 @@ const selectScrollUpButton = tv({
 });
 
 interface Props extends SelectScrollUpButtonProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ProgressRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ProgressIndicator, ProgressRoot, useForwardProps } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 import { computed } from "vue";
 
 const progressRoot = tv({
@@ -29,7 +28,7 @@ type ProgressVariants = VariantProps<typeof progressIndicator>;
 
 interface Props extends ProgressRootProps {
   variant?: ProgressVariants["variant"];
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = withDefaults(defineProps<Props>(), {

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { NavigationMenuRootEmits, NavigationMenuRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   NavigationMenuRoot,
   NavigationMenuViewport,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const navigationMenu = tv({
   base: "relative z-10 flex max-w-max flex-1 items-center justify-center",
@@ -17,7 +16,7 @@ const navigationMenuViewport = tv({
 });
 
 interface Props extends NavigationMenuRootProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

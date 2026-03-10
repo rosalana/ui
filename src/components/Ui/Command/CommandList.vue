@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { ComboboxContentProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ComboboxContent, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const commandList = tv({
   base: "max-h-[300px] overflow-y-auto overflow-x-hidden",
 });
 
 interface Props extends ComboboxContentProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

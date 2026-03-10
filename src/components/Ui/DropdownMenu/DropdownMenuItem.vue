@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { DropdownMenuItemProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { DropdownMenuItem, useForwardProps } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 
 const dropdownMenuItem = tv({
   base: [
@@ -23,7 +22,7 @@ const dropdownMenuItem = tv({
 type DropdownMenuItemVariants = VariantProps<typeof dropdownMenuItem>;
 
 interface Props extends DropdownMenuItemProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   inset?: DropdownMenuItemVariants["inset"];
 }
 

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { SplitterResizeHandleProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { SplitterResizeHandle, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const resizableHandle = tv({
@@ -15,7 +14,7 @@ const resizableHandle = tv({
 });
 
 interface Props extends SplitterResizeHandleProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   withHandle?: boolean;
 }
 

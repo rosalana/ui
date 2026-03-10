@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { AlertDialogTitleProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { AlertDialogTitle, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const alertDialogTitle = tv({
   base: "text-lg font-semibold",
 });
 
 interface Props extends AlertDialogTitleProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

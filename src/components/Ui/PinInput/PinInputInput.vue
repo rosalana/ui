@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { PinInputInputProps } from "reka-ui";
-import { onMounted, ref, type HTMLAttributes } from "vue";
+import { onMounted, ref } from "vue";
 import { PinInputInput, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import { ComponentPublicInstance } from "vue";
 
 const pinInputInput = tv({
@@ -23,7 +23,7 @@ const pinInputInput = tv({
 });
 
 interface Props extends PinInputInputProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

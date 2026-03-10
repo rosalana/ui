@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ContextMenuSubTriggerProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ContextMenuSubTrigger, useForwardProps } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const contextMenuSubTrigger = tv({
@@ -17,7 +16,7 @@ const contextMenuSubTrigger = tv({
 type ContextMenuSubTriggerVariants = VariantProps<typeof contextMenuSubTrigger>;
 
 interface Props extends ContextMenuSubTriggerProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   inset?: ContextMenuSubTriggerVariants["inset"];
 }
 

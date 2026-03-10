@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from "vue";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const tableRow = tv({
   base: "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
 });
 
 interface Props {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

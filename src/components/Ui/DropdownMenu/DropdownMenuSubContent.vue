@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { DropdownMenuSubContentProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   DropdownMenuPortal,
   DropdownMenuSubContent,
   useForwardProps,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import { AnimatePresence, motion } from "motion-v";
 
 const dropdownMenuSubContent = tv({
@@ -22,7 +21,7 @@ const dropdownMenuSubContent = tv({
 });
 
 interface Props extends DropdownMenuSubContentProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

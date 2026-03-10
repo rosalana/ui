@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ContextMenuItemProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ContextMenuItem, useForwardProps } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 
 const contextMenuItem = tv({
   base: "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
@@ -16,7 +15,7 @@ const contextMenuItem = tv({
 type ContextMenuItemVariants = VariantProps<typeof contextMenuItem>;
 
 interface Props extends ContextMenuItemProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   inset?: ContextMenuItemVariants["inset"];
 }
 

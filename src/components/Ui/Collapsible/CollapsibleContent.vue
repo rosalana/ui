@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { CollapsibleContentProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { CollapsibleContent, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
+// implemented
 const collapsibleContent = tv({
-  base: "overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down",
+  base: "overflow-hidden text-sm text-foreground/80 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down",
 });
 
 interface Props extends CollapsibleContentProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

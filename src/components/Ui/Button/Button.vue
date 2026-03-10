@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { PrimitiveProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { computed, ref } from "vue";
 import { Primitive } from "reka-ui";
 import { AnimatePresence, motion } from "motion-v";
-import { VariantProps, tv } from "tailwind-variants";
+import { VariantProps, tv , type ClassValue } from "tailwind-variants";
 import { UiIcon } from "../../index";
 
 const button = tv({
@@ -77,7 +76,7 @@ type ButtonVariants = VariantProps<typeof button>;
 interface Props extends PrimitiveProps {
   variant?: ButtonVariants["variant"];
   size?: ButtonVariants["size"];
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   disabled?: boolean;
   loading?: boolean;
   arrow?: boolean;

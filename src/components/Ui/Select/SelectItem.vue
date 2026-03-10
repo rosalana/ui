@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { SelectItemProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   SelectItem,
   SelectItemIndicator,
   SelectItemText,
   useForwardProps,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const selectItem = tv({
@@ -22,7 +21,7 @@ const selectItem = tv({
 });
 
 interface Props extends SelectItemProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { SelectContentProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   SelectContent,
   SelectPortal,
   SelectViewport,
   useForwardProps,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import { AnimatePresence, motion } from "motion-v";
 
 const selectContent = tv({
@@ -49,7 +48,7 @@ const selectViewport = tv({
 });
 
 interface Props extends SelectContentProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = withDefaults(defineProps<Props>(), {

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { TabsRootEmits, TabsRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
+import type { ClassValue } from "tailwind-variants";
 import { TabsRoot, useForwardPropsEmits } from "reka-ui";
 
 interface Props extends TabsRootProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

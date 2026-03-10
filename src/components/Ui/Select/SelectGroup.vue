@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { SelectGroupProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
+import type { ClassValue } from "tailwind-variants";
 import { SelectGroup, useForwardProps } from "reka-ui";
 
 interface Props extends SelectGroupProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

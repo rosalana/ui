@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from "vue";
 import { useForwardExpose } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 
 const textarea = tv({
   base: "flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none",
@@ -33,7 +32,7 @@ interface Props {
   minlength?: number;
   wrap?: "hard" | "soft" | "off";
   variant?: TextareaVariants["variant"];
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = withDefaults(defineProps<Props>(), {

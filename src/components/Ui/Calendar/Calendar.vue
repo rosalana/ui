@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { CalendarRootEmits, CalendarRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   CalendarCell,
   CalendarCellTrigger,
@@ -16,7 +15,7 @@ import {
   CalendarRoot,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const calendarRoot = tv({
@@ -52,7 +51,7 @@ const calendarCellTrigger = tv({
 });
 
 interface Props extends CalendarRootProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

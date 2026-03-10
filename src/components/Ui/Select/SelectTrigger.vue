@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { SelectTriggerProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { SelectIcon, SelectTrigger, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const selectTrigger = tv({
@@ -17,7 +16,7 @@ const selectTrigger = tv({
 });
 
 interface Props extends SelectTriggerProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

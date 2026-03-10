@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, type HTMLAttributes } from "vue";
+import { computed, ref } from "vue";
 import { useForwardExpose } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 import { UiButton, UiIcon } from "../../index";
 import { AnimatePresence, motion } from "motion-v";
 
@@ -42,7 +42,7 @@ interface Props {
   step?: string | number;
   pattern?: string;
   variant?: InputVariants["variant"];
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   showClear?: boolean;
   passwordToggle?: boolean;
   icon?: string;

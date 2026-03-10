@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { NavigationMenuListProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { NavigationMenuList, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const navigationMenuList = tv({
   base: "group flex flex-1 list-none items-center justify-center gap-1",
 });
 
 interface Props extends NavigationMenuListProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

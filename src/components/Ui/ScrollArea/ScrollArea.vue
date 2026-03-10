@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ScrollAreaRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   ScrollAreaCorner,
   ScrollAreaRoot,
@@ -9,7 +8,7 @@ import {
   ScrollAreaViewport,
   useForwardProps,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const scrollArea = tv({
   base: "relative overflow-hidden",
@@ -30,8 +29,8 @@ const thumb = tv({
 });
 
 interface Props extends ScrollAreaRootProps {
-  class?: HTMLAttributes["class"];
-  viewportClass?: HTMLAttributes["class"];
+  class?: ClassValue;
+  viewportClass?: ClassValue;
 }
 
 const props = defineProps<Props>();

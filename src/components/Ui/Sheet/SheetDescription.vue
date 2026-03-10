@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { DialogDescriptionProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { DialogDescription, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
+// implemented
 const sheetDescription = tv({
-  base: "text-sm text-muted-foreground",
+  base: "text-sm text-theme",
 });
 
 interface Props extends DialogDescriptionProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

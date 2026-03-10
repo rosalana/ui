@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from "vue";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const menubarShortcut = tv({
   base: "ml-auto text-xs tracking-widest text-muted-foreground",
 });
 
 interface Props {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ContextMenuLabelProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ContextMenuLabel, useForwardProps } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 
 const contextMenuLabel = tv({
   base: "px-2 py-1.5 text-sm font-semibold text-foreground",
@@ -16,7 +15,7 @@ const contextMenuLabel = tv({
 type ContextMenuLabelVariants = VariantProps<typeof contextMenuLabel>;
 
 interface Props extends ContextMenuLabelProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   inset?: ContextMenuLabelVariants["inset"];
 }
 

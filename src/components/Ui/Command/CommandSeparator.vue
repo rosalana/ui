@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { ComboboxSeparatorProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ComboboxSeparator, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const commandSeparator = tv({
   base: "-mx-1 h-px bg-border",
 });
 
 interface Props extends ComboboxSeparatorProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

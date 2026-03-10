@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { SwitchRootEmits, SwitchRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { SwitchRoot, SwitchThumb, useForwardPropsEmits } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import { motion } from "motion-v";
 
 const switchRoot = tv({
@@ -30,7 +29,7 @@ const switchThumb = tv({
 });
 
 interface Props extends SwitchRootProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

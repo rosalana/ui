@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { AvatarImageProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { AvatarImage, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const avatarImage = tv({
   base: "aspect-square size-full",
 });
 
 interface Props extends AvatarImageProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

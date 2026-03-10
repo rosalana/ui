@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, type HTMLAttributes, onMounted, onUnmounted } from "vue";
-import { tv } from "tailwind-variants";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { tv , type ClassValue } from "tailwind-variants";
 import { useGradient } from "../../../composables/useGradient";
 /**
  * https://kevingrajeda.github.io/meshGradient/
@@ -14,7 +14,7 @@ const avatarGradient = tv({
 });
 
 interface Props {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   /** Seed for deterministic gradient generation */
   seed?: string | number;
   /** Render mode - canvas for animations, image for static display */

@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { AvatarFallbackProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { AvatarFallback, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const avatarFallback = tv({
   base: "flex size-full items-center justify-center rounded-full bg-muted",
 });
 
 interface Props extends AvatarFallbackProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

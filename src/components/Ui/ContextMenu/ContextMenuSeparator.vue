@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { ContextMenuSeparatorProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ContextMenuSeparator, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const contextMenuSeparator = tv({
   base: "-mx-1 my-1 h-px bg-border",
 });
 
 interface Props extends ContextMenuSeparatorProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

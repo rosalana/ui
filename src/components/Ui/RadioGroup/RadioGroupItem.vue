@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { RadioGroupItemProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { RadioGroupIndicator, RadioGroupItem, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const radioGroupItem = tv({
   base: "aspect-square size-4 rounded-full border border-primary text-primary shadow-xs focus:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
 });
 
 interface Props extends RadioGroupItemProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

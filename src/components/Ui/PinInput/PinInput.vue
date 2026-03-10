@@ -1,15 +1,14 @@
 <script setup lang="ts" generic="T extends 'text' | 'number' = 'text'">
 import type { PinInputRootEmits, PinInputRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { PinInputRoot, useForwardPropsEmits } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const pinInput = tv({
   base: "flex items-center gap-2",
 });
 
 const props = withDefaults(
-  defineProps<PinInputRootProps<T> & { class?: HTMLAttributes["class"] }>(),
+  defineProps<PinInputRootProps<T> & { class?: ClassValue }>(),
   {
     placeholder: "○",
   },

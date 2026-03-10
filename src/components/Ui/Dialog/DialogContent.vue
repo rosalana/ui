@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { DialogContentEmits, DialogContentProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   DialogClose,
   DialogContent,
@@ -8,7 +7,7 @@ import {
   DialogOverlay,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const dialogOverlay = tv({
@@ -20,7 +19,7 @@ const dialogContent = tv({
 });
 
 interface Props extends DialogContentProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   hideCloseButton?: boolean;
 }
 

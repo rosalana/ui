@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { PrimitiveProps } from "reka-ui";
-import { computed, type HTMLAttributes } from "vue";
+import { computed } from "vue";
 import { Primitive } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 import { UiIcon } from "../../index";
 
 const alert = tv({
@@ -31,7 +31,7 @@ type AlertVariants = VariantProps<typeof alert>;
 
 interface Props extends PrimitiveProps {
   variant?: AlertVariants["variant"];
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   icon?: string;
 }
 

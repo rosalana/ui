@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { AccordionContentProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { AccordionContent, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
+// implemented
 const accordionContent = tv({
-  base: "overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+  base: "overflow-hidden text-sm text-foreground/80 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
 });
 
 interface Props extends AccordionContentProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

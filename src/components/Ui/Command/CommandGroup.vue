@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { ComboboxGroupProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ComboboxGroup, ComboboxLabel, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const commandGroup = tv({
   base: "overflow-hidden p-1 text-foreground [&_[data-slot=command-group-heading]]:px-2 [&_[data-slot=command-group-heading]]:py-1.5 [&_[data-slot=command-group-heading]]:text-xs [&_[data-slot=command-group-heading]]:font-medium [&_[data-slot=command-group-heading]]:text-muted-foreground",
 });
 
 interface Props extends ComboboxGroupProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   heading?: string;
 }
 

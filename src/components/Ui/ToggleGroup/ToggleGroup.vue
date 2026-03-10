@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ToggleGroupRootEmits, ToggleGroupRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ToggleGroupRoot, useForwardPropsEmits } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 import { provide } from "vue";
 
 const toggleGroup = tv({
@@ -14,7 +13,7 @@ type ToggleVariants = VariantProps<typeof toggleGroup>;
 interface Props extends ToggleGroupRootProps {
   variant?: "default" | "outline";
   size?: "default" | "sm" | "lg";
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = withDefaults(defineProps<Props>(), {

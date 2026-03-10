@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { PaginationListProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { PaginationList, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const paginationList = tv({
   base: "flex flex-row items-center gap-1",
 });
 
 interface Props extends PaginationListProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

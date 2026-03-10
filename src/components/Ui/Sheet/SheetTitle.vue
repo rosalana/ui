@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { DialogTitleProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { DialogTitle, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
+// implemented
 const sheetTitle = tv({
-  base: "text-lg font-semibold text-foreground",
+  base: "text-lg font-semibold tracking-tight text-foreground",
 });
 
 interface Props extends DialogTitleProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ComboboxInputProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ComboboxInput, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const commandInput = tv({
@@ -10,7 +9,7 @@ const commandInput = tv({
 });
 
 interface Props extends ComboboxInputProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { AlertDialogContentEmits, AlertDialogContentProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import {
   AlertDialogContent,
   AlertDialogPortal,
   AlertDialogOverlay,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const alertDialogOverlay = tv({
   base: "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -18,7 +17,7 @@ const alertDialogContent = tv({
 });
 
 interface Props extends AlertDialogContentProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

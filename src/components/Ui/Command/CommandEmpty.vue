@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { ComboboxEmptyProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { ComboboxEmpty, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const commandEmpty = tv({
   base: "py-6 text-center text-sm",
 });
 
 interface Props extends ComboboxEmptyProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

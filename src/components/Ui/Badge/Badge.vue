@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { PrimitiveProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { Primitive } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 import { UiIcon } from "../../index";
 
 const badge = tv({
@@ -49,7 +48,7 @@ type BadgeVariants = VariantProps<typeof badge>;
 
 interface Props extends PrimitiveProps {
   variant?: BadgeVariants["variant"];
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   icon?: string;
 }
 

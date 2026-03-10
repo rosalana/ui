@@ -1,15 +1,15 @@
 <script setup lang="ts">
+// implemented
 import type { AccordionItemProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { AccordionItem, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const accordionItem = tv({
-  base: "border-b",
+  base: "border-b border-border",
 });
 
 interface Props extends AccordionItemProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

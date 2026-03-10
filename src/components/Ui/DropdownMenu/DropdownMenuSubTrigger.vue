@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { DropdownMenuSubTriggerProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { DropdownMenuSubTrigger, useForwardProps } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const dropdownMenuSubTrigger = tv({
@@ -25,7 +24,7 @@ type DropdownMenuSubTriggerVariants = VariantProps<
 >;
 
 interface Props extends DropdownMenuSubTriggerProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
   inset?: DropdownMenuSubTriggerVariants["inset"];
 }
 

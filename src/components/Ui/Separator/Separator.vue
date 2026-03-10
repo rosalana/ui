@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { SeparatorProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { Separator } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 
 const separator = tv({
   base: "shrink-0 bg-border",
@@ -18,7 +17,7 @@ const separator = tv({
 });
 
 interface Props extends SeparatorProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = withDefaults(defineProps<Props>(), {

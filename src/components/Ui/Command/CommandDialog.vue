@@ -7,7 +7,7 @@ import {
   DialogContent,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import Command from "./Command.vue";
 
 const dialogOverlay = tv({

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { PrimitiveProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
+import type { ClassValue } from "tailwind-variants";
 import { Primitive } from "reka-ui";
 
 interface Props extends PrimitiveProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

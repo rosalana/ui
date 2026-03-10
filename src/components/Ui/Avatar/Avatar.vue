@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { AvatarRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { AvatarRoot, useForwardProps } from "reka-ui";
-import { tv, type VariantProps } from "tailwind-variants";
+import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 
 const avatar = tv({
   base: "relative flex shrink-0 overflow-hidden rounded-full",
@@ -23,7 +22,7 @@ type AvatarVariants = VariantProps<typeof avatar>;
 
 interface Props extends AvatarRootProps {
   size?: AvatarVariants["size"];
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();

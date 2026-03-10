@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { PaginationFirstProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
 import { PaginationFirst, useForwardProps } from "reka-ui";
-import { tv } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
 const paginationFirst = tv({
@@ -10,7 +9,7 @@ const paginationFirst = tv({
 });
 
 interface Props extends PaginationFirstProps {
-  class?: HTMLAttributes["class"];
+  class?: ClassValue;
 }
 
 const props = defineProps<Props>();
