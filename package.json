@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@iconify/vue": "^5.0.0",
+    "@rosalana/sandbox": "^0.2.1",
     "@vueuse/core": "^14.1.0",
     "autoprefixer": "^10.4.21",
     "axios": "^1.11.0",
