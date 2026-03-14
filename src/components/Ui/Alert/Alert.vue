@@ -7,7 +7,7 @@ import { UiIcon } from "../../index";
 
 const alert = tv({
   base: [
-    "relative w-full flex items-start gap-3 rounded-xl border p-4.5 text-sm",
+    "relative w-full flex items-start gap-3 rounded-lg border p-4.5 text-sm",
     "bg-background text-foreground border border-border",
     "shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-black/5",
     "[&>svg]:size-4.5 [&>svg]:shrink-0",
