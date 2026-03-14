@@ -5,7 +5,7 @@ import { tv, type ClassValue } from "tailwind-variants";
 import { initials } from "../../../helpers";
 
 const avatarFallback = tv({
-  base: "flex select-none size-full items-center justify-center rounded-full bg-muted",
+  base: "flex select-none size-full items-center justify-center rounded-full bg-muted border border-border",
 });
 
 interface Props extends AvatarFallbackProps {
