@@ -4,20 +4,22 @@ import {
   DropdownMenuRootEmits,
   DropdownMenuRootProps,
 } from "reka-ui";
+import { ComputedRef, Ref } from "vue";
 
 export type ActionItem = {
-  label: string;
+  label?: string;
   class?: string;
   onClick?: () => void;
   icon?: string;
   disabled?: boolean;
   hidden?: boolean;
   children?: ActionItem[];
+  divider?: boolean;
 };
 
 export interface ActionsProps {
   /** Array of action items */
-  items: ActionItem[];
+  items: ActionItem[] | (() => ActionItem[]) | ComputedRef<ActionItem[]> | Ref<ActionItem[]>;
   /** Custom class for the actions container */
   class?: string;
   /** Optional label for the actions block */

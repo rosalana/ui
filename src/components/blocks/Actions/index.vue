@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, useModel } from "vue";
-import { ActionsEmits, ActionsProps } from "./types";
+import { computed, isRef, onMounted, useModel } from "vue";
+import { ActionItem, ActionsEmits, ActionsProps } from "./types";
 import {
   UiButton,
   UiDropdownMenu,
@@ -27,7 +27,16 @@ const actions = tv({
 });
 
 const visible = computed(() => {
-  return props.items.filter((item) => !item.hidden);
+  let is = props.items;
+  if (typeof props.items === "function") {
+    is = props.items();
+  }
+
+  if (isRef(is)) {
+    is = is.value;
+  }
+
+  return (is as ActionItem[]).filter((item) => !item.hidden);
 });
 
 const open = useModel<"open", ActionsProps, "open">(props, "open");
@@ -82,8 +91,9 @@ onMounted(() => {
       </template>
 
       <template v-else v-for="item in visible" :key="item.label">
+        <UiDropdownMenuSeparator v-if="item.divider" />
         <UiDropdownMenuItem
-          v-if="!item.children"
+          v-else-if="!item.children"
           :class="item.class"
           @click="item.onClick"
           :disabled="item.disabled"
@@ -101,7 +111,9 @@ onMounted(() => {
           </UiDropdownMenuSubTrigger>
           <UiDropdownMenuSubContent>
             <template v-for="child in item.children" :key="child.label">
+              <UiDropdownMenuSeparator v-if="child.divider" />
               <UiDropdownMenuItem
+                v-else
                 :class="child.class"
                 @click="child.onClick"
                 :disabled="child.disabled"
