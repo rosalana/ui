@@ -12,7 +12,12 @@
       "require": "./dist/index.cjs.js",
       "types": "./dist/index.d.ts"
     },
-    "./tailwind.css": "./src/tailwind.css"
+    "./tailwind.css": "./src/tailwind.css",
+    "./helpers": {
+      "import": "./dist/helpers.es.js",
+      "require": "./dist/helpers.cjs.js",
+      "types": "./dist/helpers/index.d.ts"
+    }
   },
   "files": [
     "dist",
