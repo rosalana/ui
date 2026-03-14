@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useForwardExpose } from "reka-ui";
-import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
+import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
 import { UiButton, UiIcon } from "../../index";
 import { AnimatePresence, motion } from "motion-v";
 
@@ -133,7 +133,10 @@ const activeState = computed(() => {
       @input="handleInput"
     />
 
-    <div class="absolute bg-background top-1 bottom-1 right-1 flex items-center pr-1">
+    <div
+      class="absolute top-1 bottom-1 right-1 flex items-center pr-1"
+      :class="{ 'bg-background': activeState?.icon !== ' ', 'bg-transparent': activeState?.icon === ' '}"
+    >
       <AnimatePresence mode="popLayout">
         <motion.div
           v-if="activeState"
@@ -146,6 +149,7 @@ const activeState = computed(() => {
           <UiButton
             variant="clear"
             size="icon-sm"
+            tabindex="-1"
             class="size-7"
             type="button"
             :class="[
