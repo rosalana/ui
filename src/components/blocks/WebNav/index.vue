@@ -112,7 +112,7 @@ const openSections = ref<Record<string, boolean>>({});
           v-if="menu?.length"
           variant="ghost"
           size="icon-sm"
-          class="border-none hover:bg-transparent md:hidden"  
+          class="border-none hover:bg-transparent md:hidden"
           :aria-label="mobileOpen ? 'Close menu' : 'Open menu'"
           @click="mobileOpen = !mobileOpen"
         >
