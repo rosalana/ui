@@ -3,8 +3,9 @@ import type { PrimitiveProps } from "reka-ui";
 import { computed, ref } from "vue";
 import { Primitive } from "reka-ui";
 import { AnimatePresence, motion } from "motion-v";
-import { VariantProps, tv , type ClassValue } from "tailwind-variants";
+import { VariantProps, tv, type ClassValue } from "tailwind-variants";
 import { UiIcon } from "../../index";
+import { Link } from "@inertiajs/vue3";
 
 const button = tv({
   base: [
@@ -50,12 +51,10 @@ const button = tv({
         "hover:bg-muted hover:border-border/40",
       ],
       link: [
-        "text-primary",
-        "relative no-underline! after:absolute after:bottom-2 after:h-px after:w-2/3 after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-in-out hover:after:origin-bottom-left hover:after:scale-x-100",
+        "text-primary p-0!",
+        "relative no-underline! after:absolute after:bottom-2 after:left-0 after:h-px after:w-2/3 after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-in-out hover:after:origin-bottom-left hover:after:scale-x-100",
       ],
-      clear: [
-        "bg-transparent text-foreground",
-      ],
+      clear: ["bg-transparent text-foreground"],
     },
     size: {
       default: "h-10 px-5 py-2 has-[>svg]:px-4",
@@ -73,6 +72,11 @@ const button = tv({
 
 type ButtonVariants = VariantProps<typeof button>;
 
+type MethodAndUrl = {
+  method: string;
+  url: string;
+};
+
 interface Props extends PrimitiveProps {
   variant?: ButtonVariants["variant"];
   size?: ButtonVariants["size"];
@@ -80,6 +84,7 @@ interface Props extends PrimitiveProps {
   disabled?: boolean;
   loading?: boolean;
   arrow?: boolean;
+  href?: string | MethodAndUrl;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -95,7 +100,14 @@ const isHovered = ref<boolean>(false);
 <template>
   <Primitive
     data-slot="button"
-    :as="as"
+    :href="
+      props.href
+        ? typeof props.href === 'string'
+          ? props.href
+          : props.href?.url
+        : undefined
+    "
+    :as="props.href ? Link : as"
     :as-child="asChild"
     :disabled="isDisabled || undefined"
     :class="button({ variant, size, class: props.class })"
