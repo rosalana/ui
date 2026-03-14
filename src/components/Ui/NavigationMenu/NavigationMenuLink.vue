@@ -12,7 +12,7 @@ const navigationMenuLink = tv({
     "bg-transparent transition-all duration-200 ease-out text-foreground border border-transparent",
     "hover:bg-muted hover:border-border/40",
     "leading-none no-underline",
-    "active:scale-[0.97]",
+    "active:scale-[0.97] data-[active]:text-primary",
   ],
 });
 

@@ -12,12 +12,13 @@ const navigationMenuTrigger = tv({
     "disabled:pointer-events-none disabled:opacity-50",
     "active:scale-[0.97]",
     "outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-    "data-[active]:bg-muted data-[state=open]:bg-muted data-[state=open]:border-border/40 data-[active]:border-border/40",
+    "data-[active]:text-primary data-[state=open]:bg-muted data-[state=open]:border-border/40",
   ],
 });
 
 interface Props extends NavigationMenuTriggerProps {
   class?: ClassValue;
+  active?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -27,6 +28,7 @@ const forwarded = useForwardProps(props);
 <template>
   <NavigationMenuTrigger
     data-slot="navigation-menu-trigger"
+    :data-active="props.active ? '' : undefined"
     v-bind="forwarded"
     :class="[navigationMenuTrigger({ class: props.class })]"
   >

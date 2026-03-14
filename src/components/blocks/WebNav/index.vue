@@ -25,6 +25,8 @@ const scrolled = computed(() => y.value > 16);
 
 const mobileOpen = ref(false);
 const openSections = ref<Record<string, boolean>>({});
+
+const currentRoute = computed(() => window.location.pathname);
 </script>
 
 <template>
@@ -42,11 +44,13 @@ const openSections = ref<Record<string, boolean>>({});
 
       <!-- Navigation (desktop) -->
       <div class="hidden md:flex">
-        <UiNavigationMenu v-if="menu?.length">
+        <UiNavigationMenu v-if="menu?.length" data-slot="web-nav">
           <UiNavigationMenuList>
             <UiNavigationMenuItem v-for="item in menu" :key="item.title">
               <template v-if="item.children">
-                <UiNavigationMenuTrigger>
+                <UiNavigationMenuTrigger
+                  :active="item.children.some((c) => c.href === currentRoute)"
+                >
                   {{ item.title }}
                 </UiNavigationMenuTrigger>
                 <UiNavigationMenuContent>
@@ -61,6 +65,9 @@ const openSections = ref<Record<string, boolean>>({});
                       >
                         <div
                           class="mb-1 flex items-center gap-2 text-sm font-medium leading-none text-foreground"
+                          :data-active="
+                            child.href === currentRoute ? '' : undefined
+                          "
                         >
                           {{ child.title }}
                           <span
@@ -84,8 +91,9 @@ const openSections = ref<Record<string, boolean>>({});
 
               <template v-else>
                 <UiNavigationMenuLink
+                  :active="item.href === currentRoute"
                   :disabled="item.disabled"
-                  class="shadow-none h-9 inline-flex"
+                  class="shadow-none h-9 inline-flex font-medium"
                   :class="item.disabled ? 'pointer-events-none opacity-50' : ''"
                   as-child
                 >
@@ -140,13 +148,14 @@ const openSections = ref<Record<string, boolean>>({});
         :transition="{ type: 'spring', stiffness: 400, damping: 38 }"
         class="overflow-hidden md:hidden border-t border-border/60 bg-background"
       >
-        <nav class="px-4 py-3 space-y-0.5">
+        <nav class="px-4 py-3 space-y-0.5" data-slot="web-nav">
           <template v-for="item in menu" :key="item.title">
             <!-- Item with children via Collapsible -->
             <UiCollapsible
               v-if="item.children"
               v-model:open="openSections[item.title]"
               :disabled="item.disabled"
+              :default-open="item.children.some((c) => c.href === currentRoute)"
             >
               <UiCollapsibleTrigger as-child>
                 <button
@@ -180,11 +189,12 @@ const openSections = ref<Record<string, boolean>>({});
                     :key="child.title"
                     :href="child.disabled ? undefined : (child.href ?? '#')"
                     :class="[
-                      'block px-3 py-2 rounded-lg text-sm transition-colors',
+                      'block px-3 py-2 rounded-lg data-[active]:text-primary text-sm transition-colors',
                       child.disabled
                         ? 'pointer-events-none opacity-40 text-foreground/50'
                         : 'text-foreground/60 hover:text-foreground hover:bg-muted/60',
                     ]"
+                    :data-active="child.href === currentRoute ? '' : undefined"
                   >
                     <div class="flex items-center gap-2 font-medium">
                       {{ child.title }}
@@ -210,8 +220,9 @@ const openSections = ref<Record<string, boolean>>({});
             <a
               v-else
               :href="item.disabled ? undefined : (item.href ?? '#')"
+              :data-active="item.href === currentRoute ? '' : undefined"
               :class="[
-                'flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
+                'flex items-center px-3 py-2.5 rounded-xl text-sm data-[active]:text-primary font-medium transition-colors',
                 item.disabled
                   ? 'pointer-events-none opacity-40 text-foreground/60'
                   : 'text-foreground/70 hover:text-foreground hover:bg-muted/60',
