@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import type { AvatarFallbackProps } from "reka-ui";
 import { AvatarFallback, useForwardProps } from "reka-ui";
-import { tv , type ClassValue } from "tailwind-variants";
+import { tv, type ClassValue } from "tailwind-variants";
+import { initials } from "../../../helpers";
 
 const avatarFallback = tv({
-  base: "flex size-full items-center justify-center rounded-full bg-muted",
+  base: "flex select-none size-full items-center justify-center rounded-full bg-muted",
 });
 
 interface Props extends AvatarFallbackProps {
   class?: ClassValue;
+  name?: string;
 }
 
 const props = defineProps<Props>();
@@ -21,6 +23,8 @@ const forwarded = useForwardProps(props);
     v-bind="forwarded"
     :class="[avatarFallback({ class: props.class })]"
   >
-    <slot />
+    <slot>
+      {{ props?.name ? initials(props.name) : "?" }}
+    </slot>
   </AvatarFallback>
 </template>
