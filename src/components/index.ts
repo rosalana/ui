@@ -277,3 +277,6 @@ export type { ActionsProps, ActionsEmits, ActionItem } from "./blocks/Actions/ty
 // WebNav
 export { default as WebNav } from "./blocks/WebNav/index.vue";
 export type { WebNavItem, WebNavProps } from "./blocks/WebNav/types";
+
+// TextEffect
+export { TextEffect } from "./blocks/TextEffect/index";
