@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import { AnimatePresence, motion } from "motion-v";
-import { useForwardProps } from "reka-ui";
 import { computed } from "vue";
-import { TextEffectProps } from ".";
+import { TextEffectProps } from "./types";
 
 export interface FadeProps extends TextEffectProps {}
 
 const props = defineProps<FadeProps>();
-const forwarded = useForwardProps(props);
 
 const letters = computed(() =>
-  props.text.split("").map((char, i) => ({ char, i })),
+  props.whole
+    ? [props.text].map((char, i) => ({ char, i }))
+    : props.text.split("").map((char, i) => ({ char, i })),
 );
 </script>
 
 <template>
-  <span :class="props?.class" v-bind="forwarded" data-slot="text-effect-fade">
+  <span :class="props.class" data-slot="text-effect-fade">
     <AnimatePresence mode="wait">
       <motion.span
-        :key="text"
+        :key="props.text"
         :exit="{ opacity: 0, transition: { duration: 0.15, ease: 'easeIn' } }"
         class="inline-block"
       >

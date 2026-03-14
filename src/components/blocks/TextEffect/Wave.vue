@@ -1,42 +1,19 @@
 <script setup lang="ts">
 import { motion } from "motion-v";
 import { useForwardProps } from "reka-ui";
-import { computed, onUnmounted, watch } from "vue";
-import { TextEffectProps } from ".";
+import { computed } from "vue";
+import { TextEffectProps } from "./types";
 
 export interface WaveProps extends TextEffectProps {}
 
 const props = defineProps<WaveProps>();
 const forwarded = useForwardProps(props);
 
-const emit = defineEmits<{
-  animationstart: [];
-  animationend: [];
-}>();
-
 const letters = computed(() =>
-  props.text.split("").map((char, i) => ({ char, i })),
+  props.whole
+    ? [props.text].map((char, i) => ({ char, i }))
+    : props.text.split("").map((char, i) => ({ char, i })),
 );
-
-// continuous animation — emit animationend immediately after delay
-let startTimer: ReturnType<typeof setTimeout> | null = null;
-
-watch(
-  () => props.text,
-  () => {
-    if (startTimer) clearTimeout(startTimer);
-    const delay = props.delay ?? 0;
-    startTimer = setTimeout(() => {
-      emit("animationstart");
-      emit("animationend");
-    }, delay);
-  },
-  { immediate: true },
-);
-
-onUnmounted(() => {
-  if (startTimer) clearTimeout(startTimer);
-});
 </script>
 
 <template>

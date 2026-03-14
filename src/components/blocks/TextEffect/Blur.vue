@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from "motion-v";
 import { useForwardProps } from "reka-ui";
 import { computed } from "vue";
-import { TextEffectProps } from ".";
+import { TextEffectProps } from "./types";
 
 export interface BlurProps extends TextEffectProps {}
 
@@ -10,7 +10,9 @@ const props = defineProps<BlurProps>();
 const forwarded = useForwardProps(props);
 
 const words = computed(() =>
-  props.text.split(" ").map((word, i) => ({ word, i })),
+  props.whole
+    ? [props.text].map((word, i) => ({ word, i }))
+    : props.text.split(" ").map((word, i) => ({ word, i })),
 );
 </script>
 

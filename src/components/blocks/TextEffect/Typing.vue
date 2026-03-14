@@ -2,14 +2,18 @@
 import { AnimatePresence, motion } from "motion-v";
 import { useForwardProps } from "reka-ui";
 import { computed } from "vue";
-import { TextEffectProps } from ".";
+import { TextEffectProps } from "./types";
 
-const props = defineProps<TextEffectProps>();
+export interface TypingProps extends TextEffectProps {}
+
+const props = defineProps<TypingProps>();
 
 const forwarded = useForwardProps(props);
 
 const letters = computed(() =>
-  props.text.split("").map((char, i) => ({ char, i })),
+  props.whole
+    ? [props.text].map((char, i) => ({ char, i }))
+    : props.text.split("").map((char, i) => ({ char, i })),
 );
 </script>
 

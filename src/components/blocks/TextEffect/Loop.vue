@@ -8,10 +8,10 @@ import {
 } from "vue";
 import { Primitive, PrimitiveProps } from "reka-ui";
 import None from "./None.vue";
+import { TextEffectProps } from "./types";
 
-export interface LoopProps {
+export interface LoopProps extends Omit<TextEffectProps, "text"> {
   texts: string[];
-  class?: HTMLAttributes["class"];
   delay?: number;
   interval?: number;
   effect?: PrimitiveProps["as"];
@@ -20,6 +20,7 @@ export interface LoopProps {
 const props = withDefaults(defineProps<LoopProps>(), {
   interval: 3500,
   effect: None,
+  whole: false,
 });
 
 const currentIndex = ref(0);
@@ -49,5 +50,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Primitive :as="props.effect" :text="currentText" :class="props?.class" />
+  <Primitive
+    :as="props.effect"
+    :text="currentText"
+    :whole="props.whole ? true : undefined"
+    :class="props?.class"
+  />
 </template>

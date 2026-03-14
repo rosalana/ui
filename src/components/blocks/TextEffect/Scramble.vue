@@ -1,24 +1,17 @@
 <script setup lang="ts">
 import { useForwardProps } from "reka-ui";
 import { onUnmounted, ref, watch } from "vue";
-import { TextEffectProps } from ".";
+import { TextEffectProps } from "./types";
 
 export interface ScrambleProps extends TextEffectProps {}
 
 const props = defineProps<ScrambleProps>();
 const forwarded = useForwardProps(props);
 
-const emit = defineEmits<{
-  animationstart: [];
-  animationend: [];
-}>();
-
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&";
 
 const displayed = ref(props.text);
-
 let animFrame: number | null = null;
-let delayTimer: ReturnType<typeof setTimeout> | null = null;
 
 const randomChar = () => CHARS[Math.floor(Math.random() * CHARS.length)];
 
@@ -32,7 +25,10 @@ const scramble = (target: string) => {
       .split("")
       .map((char, i) => {
         if (char === " ") return " ";
-        const resolveAt = Math.floor((i / length) * totalFrames);
+        // whole=true: all chars resolve simultaneously at the end
+        const resolveAt = props.whole
+          ? totalFrames
+          : Math.floor((i / length) * totalFrames);
         return frame >= resolveAt ? char : randomChar();
       })
       .join("");
@@ -43,7 +39,6 @@ const scramble = (target: string) => {
       animFrame = requestAnimationFrame(tick);
     } else {
       displayed.value = target;
-      emit("animationend");
     }
   };
 
@@ -54,26 +49,17 @@ watch(
   () => props.text,
   (newText) => {
     if (animFrame) cancelAnimationFrame(animFrame);
-    if (delayTimer) clearTimeout(delayTimer);
-
-    // show scrambled immediately while waiting for delay
     displayed.value = newText
       .split("")
       .map((c) => (c === " " ? " " : randomChar()))
       .join("");
-
-    const delay = props.delay ?? 0;
-    delayTimer = setTimeout(() => {
-      emit("animationstart");
-      scramble(newText);
-    }, delay);
+    scramble(newText);
   },
   { immediate: true },
 );
 
 onUnmounted(() => {
   if (animFrame) cancelAnimationFrame(animFrame);
-  if (delayTimer) clearTimeout(delayTimer);
 });
 </script>
 

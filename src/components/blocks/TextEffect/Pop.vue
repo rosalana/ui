@@ -1,50 +1,19 @@
 <script setup lang="ts">
 import { AnimatePresence, motion } from "motion-v";
 import { useForwardProps } from "reka-ui";
-import { computed, onUnmounted, watch } from "vue";
-import { TextEffectProps } from ".";
+import { computed } from "vue";
+import { TextEffectProps } from "./types";
 
 export interface PopProps extends TextEffectProps {}
 
 const props = defineProps<PopProps>();
 const forwarded = useForwardProps(props);
 
-const emit = defineEmits<{
-  animationstart: [];
-  animationend: [];
-}>();
-
 const words = computed(() =>
-  props.text.split(" ").map((word, i) => ({ word, i })),
+  props.whole
+    ? [props.text].map((word, i) => ({ word, i }))
+    : props.text.split(" ").map((word, i) => ({ word, i })),
 );
-
-// stiffness=600, damping=20 settles in ~350ms, stagger=60ms per word
-const animDuration = computed(
-  () => Math.max(0, (words.value.length - 1) * 60) + 350,
-);
-
-let startTimer: ReturnType<typeof setTimeout> | null = null;
-let endTimer: ReturnType<typeof setTimeout> | null = null;
-
-watch(
-  () => props.text,
-  () => {
-    if (startTimer) clearTimeout(startTimer);
-    if (endTimer) clearTimeout(endTimer);
-    const delay = props.delay ?? 0;
-    startTimer = setTimeout(() => emit("animationstart"), delay);
-    endTimer = setTimeout(
-      () => emit("animationend"),
-      delay + animDuration.value,
-    );
-  },
-  { immediate: true },
-);
-
-onUnmounted(() => {
-  if (startTimer) clearTimeout(startTimer);
-  if (endTimer) clearTimeout(endTimer);
-});
 </script>
 
 <template>
@@ -68,7 +37,7 @@ onUnmounted(() => {
             type: 'spring',
             stiffness: 600,
             damping: 20,
-            delay: (props.delay ?? 0) / 1000 + word.i * 0.06,
+            delay: word.i * 0.06,
           }"
           class="inline-block mr-[0.25em] origin-bottom"
           >{{ word.word }}</motion.span

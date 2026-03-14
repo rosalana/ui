@@ -9,16 +9,8 @@ import Bounce from "./Bounce.vue";
 import Rise from "./Rise.vue";
 import Wave from "./Wave.vue";
 import Scramble from "./Scramble.vue";
-import None from "./None.vue";
-import { HtmlHTMLAttributes } from "vue";
-
-export interface TextEffectProps {
-    text: string;
-    class?: HtmlHTMLAttributes['class'];
-}
 
 export const TextEffect = {
-  None,
   Typing,
   Fade,
   Blur,

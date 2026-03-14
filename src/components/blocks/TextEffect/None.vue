@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { TextEffectProps } from ".";
+import { TextEffectProps } from './types';
 
-const props = defineProps<TextEffectProps>();
+
+export interface NoneProps extends TextEffectProps {}
+
+const props = defineProps<NoneProps>();
 </script>
 <template>
   <span data-slot="text-effect-none" :class="props?.class">
