@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from "motion-v";
 const dropdownMenuSubContent = tv({
   base: [
     "z-50 min-w-[8rem] overflow-hidden",
-    "rounded-xl border bg-background p-1.5 text-foreground",
+    "rounded-lg border bg-background p-1.5 text-foreground",
     "shadow-[0_4px_16px_-4px,0_8px_32px_-8px] shadow-theme/15",
     "data-[side=bottom]:origin-top data-[side=bottom]:[--y-from:-10px]",
     "data-[side=top]:origin-bottom data-[side=top]:[--y-from:10px]",

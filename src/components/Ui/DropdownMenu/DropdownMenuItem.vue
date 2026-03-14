@@ -5,10 +5,10 @@ import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 
 const dropdownMenuItem = tv({
   base: [
-    "relative flex cursor-pointer select-none items-center gap-2",
-    "rounded-lg px-2.5 py-2 text-sm outline-none",
+    "relative flex cursor-pointer select-none items-center gap-1",
+    "rounded-lg px-2 py-1.5 text-sm outline-none border border-transparent",
     "transition-colors duration-150",
-    "focus:bg-accent focus:text-accent-foreground",
+    "focus:bg-accent focus:border-border/40 focus:text-accent-foreground",
     "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
     "[&>svg]:size-4 [&>svg]:shrink-0",
   ],
