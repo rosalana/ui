@@ -272,7 +272,7 @@ import { Button, useForwardProps } from "reka-ui";
 import { tv, type VariantProps } from "tailwind-variants";
 
 const buttonStyles = tv({
-  base: "rounded-xl px-4 py-2 font-medium transition-all",
+  base: "rounded-lg px-4 py-2 font-medium transition-all",
   variants: {
     variant: {
       primary: "bg-primary text-primary-foreground hover:brightness-105",
