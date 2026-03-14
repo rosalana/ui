@@ -147,6 +147,7 @@ const activeState = computed(() => {
             variant="clear"
             size="icon-sm"
             class="size-7"
+            type="button"
             :class="[
               activeState.color,
               !activeState.clickable && 'pointer-events-none cursor-default',
