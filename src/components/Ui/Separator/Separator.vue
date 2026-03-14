@@ -18,6 +18,7 @@ const separator = tv({
 
 interface Props extends SeparatorProps {
   class?: ClassValue;
+  text?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -26,7 +27,18 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
+  <div v-if="text" class="relative flex items-center">
+    <Separator
+      data-slot="separator"
+      v-bind="props"
+      :class="[separator({ orientation, class: props.class })]"
+    />
+    <span class="absolute left-1/2 -translate-x-1/2 bg-background px-3 font-mono text-[10px] uppercase tracking-widest text-foreground/20">
+      {{ text }}
+    </span>
+  </div>
   <Separator
+    v-else
     data-slot="separator"
     v-bind="props"
     :class="[separator({ orientation, class: props.class })]"
