@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import type { NavigationMenuLinkProps } from "reka-ui";
 import { NavigationMenuLink, useForwardProps } from "reka-ui";
-import { tv , type ClassValue } from "tailwind-variants";
+import { tv, type ClassValue } from "tailwind-variants";
 
 const navigationMenuLink = tv({
-  base: "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+  base: [
+    "block select-none",
+    "rounded-lg p-3 text-sm font-normal",
+    "disabled:pointer-events-none disabled:opacity-50",
+    "outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "bg-transparent transition-all duration-200 ease-out text-foreground border border-transparent",
+    "hover:bg-muted hover:border-border/40",
+    "leading-none no-underline",
+    "active:scale-[0.97]",
+  ],
 });
 
 interface Props extends NavigationMenuLinkProps {
