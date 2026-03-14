@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import type { DropdownMenuContentProps } from "reka-ui";
+import type {
+  DropdownMenuContentEmits,
+  DropdownMenuContentProps,
+} from "reka-ui";
 import {
   DropdownMenuContent,
   DropdownMenuPortal,
-  useForwardProps,
+  useForwardPropsEmits,
 } from "reka-ui";
-import { tv , type ClassValue } from "tailwind-variants";
+import { tv, type ClassValue } from "tailwind-variants";
 import { AnimatePresence, motion } from "motion-v";
 
 const dropdownMenuContent = tv({
@@ -28,7 +31,9 @@ const props = withDefaults(defineProps<Props>(), {
   sideOffset: 4,
 });
 
-const forwarded = useForwardProps(props);
+const emit = defineEmits<DropdownMenuContentEmits>();
+
+const forwarded = useForwardPropsEmits(props, emit);
 </script>
 
 <template>

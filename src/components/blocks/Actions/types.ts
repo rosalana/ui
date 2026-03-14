@@ -1,10 +1,9 @@
 import {
-  DropdownMenuContentEmits,
   DropdownMenuContentProps,
   DropdownMenuRootEmits,
   DropdownMenuRootProps,
 } from "reka-ui";
-import { ComputedRef, Ref } from "vue";
+import { MaybeRef } from "vue";
 
 export type ActionItem = {
   label?: string;
@@ -14,12 +13,13 @@ export type ActionItem = {
   disabled?: boolean;
   hidden?: boolean;
   children?: ActionItem[];
+  preserve?: boolean; // Whether to preserve the dropdown open state after clicking this item
   divider?: boolean;
 };
 
 export interface ActionsProps {
   /** Array of action items */
-  items: ActionItem[] | (() => ActionItem[]) | ComputedRef<ActionItem[]> | Ref<ActionItem[]>;
+  items: MaybeRef<ActionItem[]> | (() => MaybeRef<ActionItem[]>);
   /** Custom class for the actions container */
   class?: string;
   /** Optional label for the actions block */

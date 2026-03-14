@@ -96,6 +96,7 @@ onMounted(() => {
           v-else-if="!item.children"
           :class="item.class"
           @click="item.onClick"
+          @select="(e) => item.preserve && e.preventDefault()"
           :disabled="item.disabled"
         >
           <UiIcon v-if="item.icon" :name="item.icon" class="size-3.5 mr-2" />

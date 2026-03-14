@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { DropdownMenuItemProps } from "reka-ui";
-import { DropdownMenuItem, useForwardProps } from "reka-ui";
-import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
+import {
+  DropdownMenuItem,
+  DropdownMenuItemEmits,
+  useForwardPropsEmits,
+} from "reka-ui";
+import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
 
 const dropdownMenuItem = tv({
   base: [
@@ -27,7 +31,8 @@ interface Props extends DropdownMenuItemProps {
 }
 
 const props = defineProps<Props>();
-const forwarded = useForwardProps(props);
+const emit = defineEmits<DropdownMenuItemEmits>();
+const forwarded = useForwardPropsEmits(props, emit);
 </script>
 
 <template>
