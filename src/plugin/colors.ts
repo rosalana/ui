@@ -293,7 +293,7 @@ const muted = (): NonNullable<Required<ColorsConfig["muted"]>> => ({
 });
 
 const destructive = (): NonNullable<Required<ColorsConfig["destructive"]>> => ({
-  color: "red",
+  color: "rose",
   default: "500",
 });
 

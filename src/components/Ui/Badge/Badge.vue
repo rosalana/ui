@@ -6,7 +6,7 @@ import { UiIcon } from "../../index";
 
 const badge = tv({
   base: [
-    "inline-flex cursor-default items-center rounded-lg border px-2.5 py-0.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "inline-flex cursor-default items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
     "transition-all duration-200 ease-out",
     "[&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0",
   ],
@@ -14,29 +14,29 @@ const badge = tv({
     variant: {
       default: [
         "border-transparent bg-primary text-primary-foreground hover:bg-primary/90",
-        "shadow-[0_1px_8px_-2px,0_1px_15px_-2px] shadow-primary/40",
+        // "shadow-[0_1px_8px_-2px,0_1px_15px_-2px] shadow-primary/40",
       ],
       secondary: [
         "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/90",
-        "shadow-[0_1px_8px_-2px,0_1px_15px_-2px] shadow-secondary/40",
+        // "shadow-[0_1px_8px_-2px,0_1px_15px_-2px] shadow-secondary/40",
       ],
       destructive: [
-        "border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20",
-        "shadow-[0_1px_8px_-2px,0_1px_15px_-2px] shadow-destructive/30",
+        "border-destructive-200 bg-destructive-50 text-destructive hover:bg-destructive-100",
+        // "shadow-[0_1px_3px_-2px,0_1px_15px_-2px] shadow-destructive/30",
       ],
       success: [
-        "border-success/20 bg-success/10 text-success hover:bg-success/20",
-        "shadow-[0_1px_8px_-2px,0_1px_15px_-2px] shadow-success/30",
+        "border-success-200 bg-success-50 text-success hover:bg-success-200",
+        // "shadow-[0_1px_3px_-2px,0_1px_15px_-2px] shadow-success/30",
       ],
       warning: [
-        "border-warning/20 bg-warning/10 text-warning hover:bg-warning/20",
-        "shadow-[0_1px_8px_-2px,0_1px_15px_-2px] shadow-warning/30",
+        "border-warning-200 bg-warning-50 text-warning hover:bg-warning-200",
+        // "shadow-[0_1px_3px_-2px,0_1px_15px_-2px] shadow-warning/30",
       ],
       info: [
-        "border-info/20 bg-info/10 text-info hover:bg-info/20",
-        "shadow-[0_1px_8px_-2px,0_1px_15px_-2px] shadow-info/30",
+        "border-info-200 bg-info-50 text-info hover:bg-info-200",
+        // "shadow-[0_1px_3px_-2px,0_1px_15px_-2px] shadow-info/30",
       ],
-      outline: "text-foreground hover:bg-muted border-border",
+      outline: "text-foreground hover:bg-muted border-border bg-background",
     },
   },
   defaultVariants: {
