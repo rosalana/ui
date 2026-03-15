@@ -51,8 +51,8 @@ const button = tv({
         "hover:bg-muted hover:border-border/40",
       ],
       link: [
-        "text-primary p-0!",
-        "relative no-underline! after:absolute after:bottom-2 after:left-0 after:h-px after:w-2/3 after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-in-out hover:after:origin-bottom-left hover:after:scale-x-100",
+        "text-primary p-0! h-auto!",
+        "relative no-underline! after:absolute after:bottom-0 after:left-0 after:h-px after:w-2/3 after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-in-out hover:after:origin-bottom-left hover:after:scale-x-100",
       ],
       clear: ["bg-transparent text-foreground"],
     },
