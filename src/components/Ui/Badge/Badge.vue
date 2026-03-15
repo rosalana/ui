@@ -40,7 +40,7 @@ const badge = tv({
     },
     size: {
       default: "px-3 py-1 text-[11px]",
-      sm: "px-2 py-0.5 text-[10px]",
+      sm: "px-2 py-0.5 text-[10px] gap-1",
       lg: "px-4 py-2 text-sm",
     },
   },
