@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { PrimitiveProps } from "reka-ui";
 import { Primitive } from "reka-ui";
-import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
+import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
 import { UiIcon } from "../../index";
 
 const badge = tv({
   base: [
-    "inline-flex cursor-default items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "inline-flex cursor-default items-center gap-2 rounded-full border font-semibold focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
     "transition-all duration-200 ease-out",
     "[&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0",
   ],
@@ -38,9 +38,15 @@ const badge = tv({
       ],
       outline: "text-foreground hover:bg-muted border-border bg-background",
     },
+    size: {
+      default: "px-3 py-1 text-[11px]",
+      sm: "px-2 py-0.5 text-[10px]",
+      lg: "px-4 py-2 text-sm",
+    },
   },
   defaultVariants: {
     variant: "default",
+    size: "default",
   },
 });
 
@@ -48,6 +54,7 @@ type BadgeVariants = VariantProps<typeof badge>;
 
 interface Props extends PrimitiveProps {
   variant?: BadgeVariants["variant"];
+  size?: BadgeVariants["size"];
   class?: ClassValue;
   icon?: string;
 }
@@ -62,7 +69,7 @@ const props = withDefaults(defineProps<Props>(), {
     data-slot="badge"
     :as="props.as ?? 'div'"
     :as-child="asChild"
-    :class="[badge({ variant, class: props.class })]"
+    :class="[badge({ variant, size, class: props.class })]"
   >
     <UiIcon v-if="icon" :name="icon" class="size-3 mr-1" />
     <slot />
