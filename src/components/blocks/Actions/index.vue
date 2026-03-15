@@ -18,6 +18,7 @@ import { tv } from "tailwind-variants";
 
 const props = withDefaults(defineProps<ActionsProps>(), {
   showEmptyState: true,
+  avoidCollisions: true,
 });
 
 const emit = defineEmits<ActionsEmits>();
