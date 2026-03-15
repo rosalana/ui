@@ -12,7 +12,7 @@ const navigationMenu = tv({
 });
 
 const navigationMenuViewport = tv({
-  base: "origin-top-center transition-all relative mt-1.5 h-[var(--reka-navigation-menu-viewport-height)] w-full overflow-hidden rounded-lg border bg-background text-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--reka-navigation-menu-viewport-width)]",
+  base: "origin-top-center transition-all shadow-[0_4px_16px_-4px,0_8px_32px_-8px] shadow-theme/15 relative mt-1.5 h-[var(--reka-navigation-menu-viewport-height)] w-full overflow-hidden rounded-xl border bg-background text-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--reka-navigation-menu-viewport-width)]",
 });
 
 interface Props extends NavigationMenuRootProps {
