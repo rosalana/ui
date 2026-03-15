@@ -37,7 +37,7 @@ const words = computed(() =>
             type: 'spring',
             stiffness: 600,
             damping: 20,
-            delay: word.i * 0.06,
+            delay: (props.delay ?? 0) + word.i * 0.06,
           }"
           class="inline-block mr-[0.25em] origin-bottom"
           >{{ word.word }}</motion.span

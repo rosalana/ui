@@ -14,6 +14,9 @@ const words = computed(() =>
     ? [props.text].map((word, i) => ({ word, i }))
     : props.text.split(" ").map((word, i) => ({ word, i })),
 );
+
+console.log(props.delay);
+console.log(props.whole);
 </script>
 
 <template>
@@ -37,7 +40,7 @@ const words = computed(() =>
             type: 'spring',
             stiffness: 400,
             damping: 22,
-            delay: word.i * 0.08,
+            delay: (props.delay ?? 0) + word.i * 0.08,
           }"
           class="inline-block mr-[0.25em]"
           >{{ word.word }}</motion.span

@@ -35,7 +35,7 @@ const words = computed(() =>
           :animate="{ opacity: 1, filter: 'blur(0px)' }"
           :transition="{
             duration: 0.5,
-            delay: word.i * 0.08,
+            delay: (props.delay ?? 0) + word.i * 0.08,
             ease: 'easeOut',
           }"
           class="inline-block mr-[0.25em]"

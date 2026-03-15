@@ -38,7 +38,7 @@ const letters = computed(() =>
             stiffness: 800,
             damping: 12,
             mass: 0.6,
-            delay: letter.i * 0.045,
+            delay: (props.delay ?? 0) + letter.i * 0.045,
           }"
           class="inline-block"
           >{{ letter.char === " " ? "\u00A0" : letter.char }}</motion.span

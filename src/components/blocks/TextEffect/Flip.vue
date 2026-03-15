@@ -42,7 +42,7 @@ const letters = computed(() =>
             type: 'spring',
             stiffness: 500,
             damping: 25,
-            delay: letter.i * 0.04,
+            delay: (props.delay ?? 0) + letter.i * 0.04,
           }"
           class="inline-block"
           >{{ letter.char === " " ? "\u00A0" : letter.char }}</motion.span

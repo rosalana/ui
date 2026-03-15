@@ -40,7 +40,7 @@ const words = computed(() =>
           :animate="{ opacity: 1, y: 0 }"
           :transition="{
             duration: 0.6,
-            delay: word.i * 0.1,
+            delay: (props.delay ?? 0) + word.i * 0.1,
             ease: [0.25, 0.46, 0.45, 0.94],
           }"
           class="inline-block"

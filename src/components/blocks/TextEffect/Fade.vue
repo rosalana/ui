@@ -29,7 +29,7 @@ const letters = computed(() =>
           :animate="{ opacity: 1 }"
           :transition="{
             duration: 0.3,
-            delay: letter.i * 0.04,
+            delay: (props.delay ?? 0) + letter.i * 0.04,
             ease: 'easeOut',
           }"
           class="inline-block"
