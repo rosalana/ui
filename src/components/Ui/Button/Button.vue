@@ -84,14 +84,15 @@ interface Props extends PrimitiveProps {
   disabled?: boolean;
   loading?: boolean;
   arrow?: boolean;
+  arrowBack?: boolean;
   href?: string | MethodAndUrl;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  as: "button",
   disabled: false,
   loading: false,
   arrow: false,
+  arrowBack: false,
 });
 
 const isDisabled = computed(() => props.loading || props.disabled);
@@ -107,7 +108,7 @@ const isHovered = ref<boolean>(false);
           : props.href?.url
         : undefined
     "
-    :as="props.href ? Link : as"
+    :as="props.href && !props.as ? Link : props.as ? props.as : 'button'"
     :as-child="asChild"
     :disabled="isDisabled || undefined"
     :class="button({ variant, size, class: props.class })"
@@ -126,6 +127,22 @@ const isHovered = ref<boolean>(false);
         class="inline-flex -mr-2 items-center overflow-hidden"
       >
         <UiIcon name="lucide:loader" class="flex-shrink-0 animate-spin" />
+      </motion.span>
+    </AnimatePresence>
+
+    <AnimatePresence>
+      <motion.span
+        v-if="arrowBack"
+        :initial="{ opacity: 0, width: 0, marginLeft: -8 }"
+        :animate="
+          isHovered
+            ? { opacity: 1, width: 'auto', marginLeft: 0 }
+            : { opacity: 0.5, width: 0, marginLeft: -8 }
+        "
+        :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+        class="inline-flex -ml-2 items-center overflow-hidden"
+      >
+        <UiIcon class="flex-shrink-0" name="lucide:arrow-left" />
       </motion.span>
     </AnimatePresence>
 
