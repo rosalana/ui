@@ -25,15 +25,15 @@ const badge = tv({
         // "shadow-[0_1px_3px_-2px,0_1px_15px_-2px] shadow-destructive/30",
       ],
       success: [
-        "border-success-200 bg-success-50 text-success hover:bg-success-200 dark:bg-success-950 dark:hover:bg-success-800 dark:border-success-700",
+        "border-success-200 bg-success-50 text-success hover:bg-success-100 dark:bg-success-950 dark:hover:bg-success-800 dark:border-success-700",
         // "shadow-[0_1px_3px_-2px,0_1px_15px_-2px] shadow-success/30",
       ],
       warning: [
-        "border-warning-200 bg-warning-50 text-warning hover:bg-warning-200 dark:bg-warning-950 dark:hover:bg-warning-900 dark:border-warning-700",
+        "border-warning-200 bg-warning-50 text-warning hover:bg-warning-100 dark:bg-warning-950 dark:hover:bg-warning-900 dark:border-warning-700",
         // "shadow-[0_1px_3px_-2px,0_1px_15px_-2px] shadow-warning/30",
       ],
       info: [
-        "border-info-200 bg-info-50 text-info hover:bg-info-200 dark:bg-info-950 dark:hover:bg-info-900 dark:border-info-700",
+        "border-info-200 bg-info-50 text-info hover:bg-info-100 dark:bg-info-950 dark:hover:bg-info-900 dark:border-info-700",
         // "shadow-[0_1px_3px_-2px,0_1px_15px_-2px] shadow-info/30",
       ],
       outline: "text-foreground hover:bg-muted border-border bg-background",
