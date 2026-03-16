@@ -2,24 +2,26 @@
 import type { PrimitiveProps } from "reka-ui";
 import { computed } from "vue";
 import { Primitive } from "reka-ui";
-import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
+import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
 import { UiIcon } from "../../index";
 
 const alert = tv({
   base: [
-    "relative w-full flex items-start gap-3 rounded-lg border p-4.5 text-sm",
+    "relative w-full flex items-start gap-3 rounded-xl border p-4.5 text-sm",
     "bg-background text-foreground border border-border",
-    "shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-black/5",
     "[&>svg]:size-4.5 [&>svg]:shrink-0",
     "transition-all duration-150",
   ],
   variants: {
     variant: {
-      default: "[&>svg]:text-white bg-theme hover:brightness-105 border-theme text-white [&_[data-slot=alert-description]]:text-white",
-      destructive: "[&>svg]:text-white bg-destructive hover:brightness-105 text-white [&_[data-slot=alert-description]]:text-white border-destructive shadow-destructive/40",
+      default:
+        "[&>svg]:text-white shadow-[0_2px_8px_-3px,0_4px_20px_-4px] bg-theme hover:brightness-105 border-theme text-white [&_[data-slot=alert-description]]:text-white shadow-primary/40",
+      destructive:
+        "[&>svg]:text-white bg-destructive shadow-[0_2px_8px_-3px,0_4px_20px_-4px] hover:brightness-105 text-white [&_[data-slot=alert-description]]:text-white border-destructive shadow-destructive/40",
       success: "[&>svg]:text-success hover:bg-muted",
       warning: "[&>svg]:text-warning hover:bg-muted",
       info: "[&>svg]:text-info hover:bg-muted",
+      outline: "border-border bg-background text-foreground hover:bg-muted",
     },
   },
   defaultVariants: {
@@ -46,6 +48,7 @@ const icon = computed(() => {
   if (props.variant === "success") return props.icon ?? "lucide:check-circle";
   if (props.variant === "warning") return props.icon ?? "lucide:alert-triangle";
   if (props.variant === "info") return props.icon ?? "lucide:info";
+  if (props.variant === "outline") return props.icon ?? "lucide:info";
   return props.icon;
 });
 </script>
@@ -60,7 +63,7 @@ const icon = computed(() => {
   >
     <UiIcon v-if="icon" :name="icon" />
 
-    <div>
+    <div class="flex-1">
       <slot />
     </div>
   </Primitive>
