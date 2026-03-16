@@ -4,7 +4,7 @@ import { AlertDialogTitle, useForwardProps } from "reka-ui";
 import { tv , type ClassValue } from "tailwind-variants";
 
 const alertDialogTitle = tv({
-  base: "text-lg font-semibold",
+  base: "text-lg font-semibold leading-none tracking-tight",
 });
 
 interface Props extends AlertDialogTitleProps {

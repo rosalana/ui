@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { tv , type ClassValue } from "tailwind-variants";
+import { tv, type ClassValue } from "tailwind-variants";
 
 const dialogHeader = tv({
-  base: "flex flex-col space-y-1.5 text-center sm:text-left",
+  base: "flex flex-col gap-1 text-center sm:text-left",
 });
 
 interface Props {

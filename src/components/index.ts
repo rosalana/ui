@@ -20,6 +20,7 @@ export { default as UiAlertDialogFooter } from "./Ui/AlertDialog/AlertDialogFoot
 export { default as UiAlertDialogTitle } from "./Ui/AlertDialog/AlertDialogTitle.vue";
 export { default as UiAlertDialogDescription } from "./Ui/AlertDialog/AlertDialogDescription.vue";
 export { default as UiAlertDialogAction } from "./Ui/AlertDialog/AlertDialogAction.vue";
+export { default as UiAlertDialogActionDanger } from "./Ui/AlertDialog/AlertDialogActionDanger.vue";
 export { default as UiAlertDialogCancel } from "./Ui/AlertDialog/AlertDialogCancel.vue";
 
 // AspectRatio

@@ -14,11 +14,12 @@ const alertDialogAction = tv({
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
     "active:scale-[0.97]",
 
-    "bg-primary text-primary-foreground",
-    "shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-primary/40",
-    "hover:shadow-primary",
+    "bg-destructive text-white",
+    "shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-destructive/40",
+    "hover:shadow-destructive",
     "hover:brightness-105",
-    
+    "focus-visible:ring-destructive/30",
+
     "h-10 px-5 py-2 has-[>svg]:px-4",
   ],
 });

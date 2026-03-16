@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { AlertDialogDescriptionProps } from "reka-ui";
 import { AlertDialogDescription, useForwardProps } from "reka-ui";
-import { tv , type ClassValue } from "tailwind-variants";
+import { tv, type ClassValue } from "tailwind-variants";
 
 const alertDialogDescription = tv({
-  base: "text-sm text-muted-foreground",
+  base: "text-sm text-theme",
 });
 
 interface Props extends AlertDialogDescriptionProps {
