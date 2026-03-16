@@ -4,7 +4,7 @@ import { Primitive } from "reka-ui";
 import { tv, type ClassValue } from "tailwind-variants";
 
 const card = tv({
-  base: "group rounded-xl border relative bg-background text-foreground hover:bg-muted hover:border-primary/20",
+  base: "group rounded-xl border relative bg-background transition-all text-foreground hover:bg-muted hover:border-primary/20",
 });
 
 interface Props extends PrimitiveProps {
