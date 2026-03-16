@@ -4,7 +4,7 @@ import { Primitive } from "reka-ui";
 import { tv , type ClassValue } from "tailwind-variants";
 
 const cardTitle = tv({
-  base: "font-semibold leading-none tracking-tight",
+  base: "font-semibold tracking-tight",
 });
 
 interface Props extends PrimitiveProps {
