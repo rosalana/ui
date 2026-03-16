@@ -1,3 +1,4 @@
+export * from "./useConfirm";
 export * from "./useTable";
 export * from "./useUser";
 export * from "./usePreferences";
