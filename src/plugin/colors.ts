@@ -308,6 +308,6 @@ const success = (): NonNullable<Required<ColorsConfig["success"]>> => ({
 });
 
 const warning = (): NonNullable<Required<ColorsConfig["warning"]>> => ({
-  color: "yellow",
+  color: "amber",
   default: "500 dark:400",
 });
