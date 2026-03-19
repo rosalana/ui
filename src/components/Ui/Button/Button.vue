@@ -6,6 +6,9 @@ import { AnimatePresence, motion } from "motion-v";
 import { VariantProps, tv, type ClassValue } from "tailwind-variants";
 import { UiIcon } from "../../index";
 import { Link } from "@inertiajs/vue3";
+import Tooltip from "../Tooltip/Tooltip.vue";
+import TooltipTrigger from "../Tooltip/TooltipTrigger.vue";
+import TooltipContent from "../Tooltip/TooltipContent.vue";
 
 const button = tv({
   base: [
@@ -86,6 +89,7 @@ interface Props extends PrimitiveProps {
   arrow?: boolean;
   arrowBack?: boolean;
   href?: string | MethodAndUrl;
+  tooltip?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -99,72 +103,93 @@ const isDisabled = computed(() => props.loading || props.disabled);
 const isHovered = ref<boolean>(false);
 </script>
 <template>
-  <Primitive
-    data-slot="button"
-    :href="
-      props.href
-        ? typeof props.href === 'string'
-          ? props.href
-          : props.href?.url
-        : undefined
-    "
-    :as="props.href && !props.as ? Link : props.as ? props.as : 'button'"
-    :as-child="asChild"
-    :disabled="isDisabled || undefined"
-    :class="button({ variant, size, class: props.class })"
-    @mouseover="isHovered = true"
-    @mouseleave="isHovered = false"
-    :data-loading="props.loading || undefined"
-  >
-    <!-- Loading spinner -->
-    <AnimatePresence>
-      <motion.span
-        v-if="loading"
-        :initial="{ opacity: 0, scale: 0.8, width: 0, marginRight: -8 }"
-        :animate="{ opacity: 1, scale: 1, width: 'auto', marginRight: 0 }"
-        :exit="{ opacity: 0, scale: 0.8, width: 0, marginRight: -8 }"
-        :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
-        class="inline-flex -mr-2 items-center overflow-hidden"
-      >
-        <UiIcon name="lucide:loader" class="flex-shrink-0 animate-spin" />
-      </motion.span>
-    </AnimatePresence>
-
-    <AnimatePresence>
-      <motion.span
-        v-if="arrowBack"
-        :initial="{ opacity: 0, width: 0, marginLeft: -8 }"
-        :animate="
-          isHovered
-            ? { opacity: 1, width: 'auto', marginLeft: 0 }
-            : { opacity: 0.5, width: 0, marginLeft: -8 }
+  <Tooltip>
+    <TooltipTrigger as-child>
+      <Primitive
+        data-slot="button"
+        :href="
+          props.href
+            ? typeof props.href === 'string'
+              ? props.href
+              : props.href?.url
+            : undefined
         "
-        :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
-        class="inline-flex -ml-2 items-center overflow-hidden"
-      >
-        <UiIcon class="flex-shrink-0" name="lucide:arrow-left" />
-      </motion.span>
-    </AnimatePresence>
-
-    <!-- Content -->
-    <span class="inline-flex items-center gap-2">
-      <slot />
-    </span>
-
-    <AnimatePresence>
-      <motion.span
-        v-if="arrow"
-        :initial="{ opacity: 0, width: 0, marginLeft: -8 }"
-        :animate="
-          isHovered
-            ? { opacity: 1, width: 'auto', marginLeft: 0 }
-            : { opacity: 0.5, width: 0, marginLeft: -8 }
+        :as="props.href && !props.as ? Link : props.as ? props.as : 'button'"
+        :as-child="asChild"
+        :disabled="isDisabled || undefined"
+        :class="button({ variant, size, class: props.class })"
+        @mouseover="
+          () => {
+            isHovered = true;
+            $emit('mouseover');
+          }
         "
-        :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
-        class="inline-flex -ml-2 items-center overflow-hidden"
+        @mouseleave="
+          () => {
+            isHovered = false;
+            $emit('mouseleave');
+          }
+        "
+        @click="$emit('click')"
+        @mousedown="$emit('mousedown')"
+        @mouseup="$emit('mouseup')"
+        @mouseenter="$emit('mouseenter')"
+        :data-loading="props.loading || undefined"
       >
-        <UiIcon class="flex-shrink-0" name="lucide:arrow-right" />
-      </motion.span>
-    </AnimatePresence>
-  </Primitive>
+        <!-- Loading spinner -->
+        <AnimatePresence>
+          <motion.span
+            v-if="loading"
+            :initial="{ opacity: 0, scale: 0.8, width: 0, marginRight: -8 }"
+            :animate="{ opacity: 1, scale: 1, width: 'auto', marginRight: 0 }"
+            :exit="{ opacity: 0, scale: 0.8, width: 0, marginRight: -8 }"
+            :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+            class="inline-flex -mr-2 items-center overflow-hidden"
+          >
+            <UiIcon name="lucide:loader" class="shrink-0 animate-spin" />
+          </motion.span>
+        </AnimatePresence>
+
+        <AnimatePresence>
+          <motion.span
+            v-if="arrowBack"
+            :initial="{ opacity: 0, width: 0, marginLeft: -8 }"
+            :animate="
+              isHovered
+                ? { opacity: 1, width: 'auto', marginLeft: 0 }
+                : { opacity: 0.5, width: 0, marginLeft: -8 }
+            "
+            :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+            class="inline-flex -ml-2 items-center overflow-hidden"
+          >
+            <UiIcon class="shrink-0" name="lucide:arrow-left" />
+          </motion.span>
+        </AnimatePresence>
+
+        <!-- Content -->
+        <span class="inline-flex items-center gap-2">
+          <slot />
+        </span>
+
+        <AnimatePresence>
+          <motion.span
+            v-if="arrow"
+            :initial="{ opacity: 0, width: 0, marginLeft: -8 }"
+            :animate="
+              isHovered
+                ? { opacity: 1, width: 'auto', marginLeft: 0 }
+                : { opacity: 0.5, width: 0, marginLeft: -8 }
+            "
+            :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+            class="inline-flex -ml-2 items-center overflow-hidden"
+          >
+            <UiIcon class="flex-shrink-0" name="lucide:arrow-right" />
+          </motion.span>
+        </AnimatePresence>
+      </Primitive>
+    </TooltipTrigger>
+    <TooltipContent v-if="props.tooltip">
+      {{ props.tooltip }}
+    </TooltipContent>
+  </Tooltip>
 </template>
