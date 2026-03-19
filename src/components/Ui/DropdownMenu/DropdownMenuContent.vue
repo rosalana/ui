@@ -20,6 +20,7 @@ const dropdownMenuContent = tv({
     "data-[side=top]:origin-bottom data-[side=top]:[--y-from:10px]",
     "data-[side=left]:origin-right data-[side=left]:[--x-from:10px]",
     "data-[side=right]:origin-left data-[side=right]:[--x-from:-10px]",
+    "data-[state=closed]:pointer-events-none"
   ],
 });
 
