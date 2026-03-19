@@ -50,13 +50,11 @@ const onCancel = () => {
         </UiAlertDialogTitle>
         <UiAlertDialogDescription>
           {{
-            (
-              state.options.description
-                ? state.options.description
-                : state.variant === "confirm"
-            )
-              ? "This action may have consequences."
-              : "Please verify the action by providing the required information."
+            state.options.description
+              ? state.options.description
+              : state.variant === "confirm"
+                ? "This action may have consequences."
+                : "Please verify the action by providing the required information."
           }}
         </UiAlertDialogDescription>
       </UiAlertDialogHeader>
@@ -74,15 +72,14 @@ const onCancel = () => {
         <UiAlertDialogCancel @click="onCancel">
           {{ state.options.cancel ?? "Cancel" }}
         </UiAlertDialogCancel>
-        <UiAlertDialogAction @click="onConfirm" as-child>
-          <UiButton
-            :variant="state.options.danger ? 'destructive' : 'default'"
-            :loading="loading"
-          >
-            <UiIcon v-if="state.options.icon" :name="state.options.icon" />
-            {{ state.options.confirm ?? "Confirm" }}
-          </UiButton>
-        </UiAlertDialogAction>
+        <UiButton
+          :variant="state.options.danger === true ? 'destructive' : 'default'"
+          :loading="loading"
+          @click="onConfirm"
+        >
+          <UiIcon v-if="state.options.icon" :name="state.options.icon" />
+          {{ state.options.confirm ?? "Confirm" }}
+        </UiButton>
       </UiAlertDialogFooter>
     </UiAlertDialogContent>
   </UiAlertDialog>
