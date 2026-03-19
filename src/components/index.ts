@@ -263,6 +263,9 @@ export { default as UiTooltip } from "./Ui/Tooltip/Tooltip.vue";
 export { default as UiTooltipTrigger } from "./Ui/Tooltip/TooltipTrigger.vue";
 export { default as UiTooltipContent } from "./Ui/Tooltip/TooltipContent.vue";
 
+// SmallAlert
+export { default as UiSmallAlert } from "./Ui/SmallAlert/SmallAlert.vue";
+
 // Blocks
 
 // DataTable
