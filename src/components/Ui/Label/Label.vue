@@ -4,7 +4,7 @@ import { Label } from "reka-ui";
 import { tv , type ClassValue } from "tailwind-variants";
 
 const label = tv({
-  base: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+  base: "block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 });
 
 interface Props extends LabelProps {
