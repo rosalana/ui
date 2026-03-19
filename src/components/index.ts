@@ -262,7 +262,6 @@ export { default as UiToggleGroupItem } from "./Ui/ToggleGroup/ToggleGroupItem.v
 export { default as UiTooltip } from "./Ui/Tooltip/Tooltip.vue";
 export { default as UiTooltipTrigger } from "./Ui/Tooltip/TooltipTrigger.vue";
 export { default as UiTooltipContent } from "./Ui/Tooltip/TooltipContent.vue";
-export { default as UiTooltipProvider } from "./Ui/Tooltip/TooltipProvider.vue";
 
 // Blocks
 
