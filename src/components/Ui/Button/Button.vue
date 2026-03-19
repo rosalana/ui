@@ -10,6 +10,8 @@ import Tooltip from "../Tooltip/Tooltip.vue";
 import TooltipTrigger from "../Tooltip/TooltipTrigger.vue";
 import TooltipContent from "../Tooltip/TooltipContent.vue";
 
+defineOptions({ inheritAttrs: false });
+
 const button = tv({
   base: [
     "cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium",
@@ -106,6 +108,7 @@ const isHovered = ref<boolean>(false);
   <Tooltip>
     <TooltipTrigger as-child>
       <Primitive
+        v-bind="$attrs"
         data-slot="button"
         :href="
           props.href
@@ -118,22 +121,8 @@ const isHovered = ref<boolean>(false);
         :as-child="asChild"
         :disabled="isDisabled || undefined"
         :class="button({ variant, size, class: props.class })"
-        @mouseover="
-          () => {
-            isHovered = true;
-            $emit('mouseover');
-          }
-        "
-        @mouseleave="
-          () => {
-            isHovered = false;
-            $emit('mouseleave');
-          }
-        "
-        @click="$emit('click')"
-        @mousedown="$emit('mousedown')"
-        @mouseup="$emit('mouseup')"
-        @mouseenter="$emit('mouseenter')"
+        @mouseover="isHovered = true"
+        @mouseleave="isHovered = false"
         :data-loading="props.loading || undefined"
       >
         <!-- Loading spinner -->
@@ -183,7 +172,7 @@ const isHovered = ref<boolean>(false);
             :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
             class="inline-flex -ml-2 items-center overflow-hidden"
           >
-            <UiIcon class="flex-shrink-0" name="lucide:arrow-right" />
+            <UiIcon class="shrink-0" name="lucide:arrow-right" />
           </motion.span>
         </AnimatePresence>
       </Primitive>
