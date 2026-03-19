@@ -43,7 +43,7 @@ const onCancel = () => {
 
 <template>
   <UiAlertDialog :open="state.open">
-    <UiAlertDialogContent class="max-w-sm">
+    <UiAlertDialogContent class="max-w-sm sm:max-w-md">
       <UiAlertDialogHeader>
         <UiAlertDialogTitle>
           {{ state.options.title ?? "Are you sure?" }}

@@ -2,7 +2,7 @@
 import { tv , type ClassValue } from "tailwind-variants";
 
 const alertDialogHeader = tv({
-  base: "flex flex-col gap-1 text-center sm:text-left",
+  base: "flex flex-col gap-2 text-center sm:text-left mb-2",
 });
 
 interface Props {
