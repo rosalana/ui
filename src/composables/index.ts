@@ -6,3 +6,4 @@ export * from "./useTheme";
 export * from "./useFetch";
 export * from "./useDetectLightness";
 export * from "./useAuth";
+export * from "./useShortcuts";
