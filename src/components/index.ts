@@ -16,6 +16,7 @@ export { default as UiAlertDialog } from "./Ui/AlertDialog/AlertDialog.vue";
 export { default as UiAlertDialogTrigger } from "./Ui/AlertDialog/AlertDialogTrigger.vue";
 export { default as UiAlertDialogContent } from "./Ui/AlertDialog/AlertDialogContent.vue";
 export { default as UiAlertDialogHeader } from "./Ui/AlertDialog/AlertDialogHeader.vue";
+export { default as UiAlertDialogIcon } from "./Ui/AlertDialog/AlertDialogIcon.vue";
 export { default as UiAlertDialogFooter } from "./Ui/AlertDialog/AlertDialogFooter.vue";
 export { default as UiAlertDialogTitle } from "./Ui/AlertDialog/AlertDialogTitle.vue";
 export { default as UiAlertDialogDescription } from "./Ui/AlertDialog/AlertDialogDescription.vue";
@@ -99,6 +100,7 @@ export { default as UiDialogPortal } from "./Ui/Dialog/DialogPortal.vue";
 export { default as UiDialogOverlay } from "./Ui/Dialog/DialogOverlay.vue";
 export { default as UiDialogContent } from "./Ui/Dialog/DialogContent.vue";
 export { default as UiDialogHeader } from "./Ui/Dialog/DialogHeader.vue";
+export { default as UiDialogIcon } from "./Ui/Dialog/DialogIcon.vue";
 export { default as UiDialogFooter } from "./Ui/Dialog/DialogFooter.vue";
 export { default as UiDialogTitle } from "./Ui/Dialog/DialogTitle.vue";
 export { default as UiDialogDescription } from "./Ui/Dialog/DialogDescription.vue";
@@ -274,7 +276,11 @@ export type { DataTableProps } from "./blocks/DataTable/types";
 
 // Actions
 export { default as Actions } from "./blocks/Actions/index.vue";
-export type { ActionsProps, ActionsEmits, ActionItem } from "./blocks/Actions/types";
+export type {
+  ActionsProps,
+  ActionsEmits,
+  ActionItem,
+} from "./blocks/Actions/types";
 
 // WebNav
 export { default as WebNav } from "./blocks/WebNav/index.vue";

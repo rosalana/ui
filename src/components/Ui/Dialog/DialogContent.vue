@@ -10,6 +10,7 @@ import {
 import { tv, type ClassValue } from "tailwind-variants";
 import { AnimatePresence, motion } from "motion-v";
 import UiIcon from "../Icon/Icon.vue";
+import Button from "../Button/Button.vue";
 
 const dialogOverlay = tv({
   base: "fixed inset-0 z-50 bg-white/20 dark:bg-black/20",
@@ -86,10 +87,13 @@ const forwarded = useForwardPropsEmits(props, emit);
 
           <DialogClose
             v-if="!hideCloseButton"
-            class="absolute right-4 top-4 rounded-lg p-1 opacity-50 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring disabled:pointer-events-none"
+            as-child
+            class="absolute right-4 top-4"
           >
-            <UiIcon name="lucide:x" class="size-4" />
-            <span class="sr-only">Close</span>
+            <Button variant="ghost" size="icon-sm">
+              <UiIcon name="lucide:x" class="size-4" />
+              <span class="sr-only">Close</span>
+            </Button>
           </DialogClose>
         </motion.div>
       </DialogContent>
