@@ -3,7 +3,12 @@ import { useForwardExpose } from "reka-ui";
 import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
 
 const textarea = tv({
-  base: "flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none",
+  base: [
+    "flex min-h-[60px] w-full rounded-xl border border-border bg-background text-foreground px-3 py-2 text-sm transition-colors placeholder:text-theme focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+    "shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-muted/40",
+    "resize-none hover:shadow-muted dark:shadow-muted/20 dark:hover:shadow-muted/80",
+    "transition-shadow duration-200 ease-out",
+  ],
   variants: {
     variant: {
       default: "",
