@@ -6,7 +6,7 @@ import { UiIcon } from "../../index";
 
 const badge = tv({
   base: [
-    "inline-flex cursor-default items-center gap-2 rounded-full border font-semibold focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "inline-flex cursor-default items-center gap-1 rounded-full border font-semibold focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
     "transition-all duration-200 ease-out",
     "[&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0",
   ],
@@ -41,7 +41,7 @@ const badge = tv({
     size: {
       default: "px-3 py-1 text-[11px]",
       sm: "px-2 py-0.5 text-[10px] gap-1",
-      lg: "px-4 py-2 text-sm",
+      lg: "px-4 py-2 text-sm gap-2",
     },
   },
   defaultVariants: {
