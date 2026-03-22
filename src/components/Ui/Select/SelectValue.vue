@@ -12,7 +12,7 @@ const forwarded = useForwardProps(props);
 </script>
 
 <template>
-  <SelectValue data-slot="select-value" v-bind="forwarded">
+  <SelectValue data-slot="select-value" v-bind="forwarded" class="data-placeholder:text-theme">
     <slot />
   </SelectValue>
 </template>
