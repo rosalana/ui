@@ -107,75 +107,77 @@ const isHovered = ref<boolean>(false);
 <template>
   <Tooltip>
     <TooltipTrigger as-child>
-      <Primitive
-        v-bind="$attrs"
-        data-slot="button"
-        :href="
-          props.href
-            ? typeof props.href === 'string'
-              ? props.href
-              : props.href?.url
-            : undefined
-        "
-        :as="props.href && !props.as ? Link : props.as ? props.as : 'button'"
-        :as-child="asChild"
-        :disabled="isDisabled || undefined"
-        :class="button({ variant, size, class: props.class })"
-        @mouseover="isHovered = true"
-        @mouseleave="isHovered = false"
-        :data-loading="props.loading || undefined"
-      >
-        <!-- Loading spinner -->
-        <AnimatePresence>
-          <motion.span
-            v-if="loading"
-            :initial="{ opacity: 0, scale: 0.8, width: 0, marginRight: -8 }"
-            :animate="{ opacity: 1, scale: 1, width: 'auto', marginRight: 0 }"
-            :exit="{ opacity: 0, scale: 0.8, width: 0, marginRight: -8 }"
-            :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
-            class="inline-flex -mr-2 items-center overflow-hidden"
-          >
-            <UiIcon name="lucide:loader" class="shrink-0 animate-spin" />
-          </motion.span>
-        </AnimatePresence>
+      <div>
+        <Primitive
+          v-bind="$attrs"
+          data-slot="button"
+          :href="
+            props.href
+              ? typeof props.href === 'string'
+                ? props.href
+                : props.href?.url
+              : undefined
+          "
+          :as="props.href && !props.as ? Link : props.as ? props.as : 'button'"
+          :as-child="asChild"
+          :disabled="isDisabled || undefined"
+          :class="button({ variant, size, class: props.class })"
+          @mouseover="isHovered = true"
+          @mouseleave="isHovered = false"
+          :data-loading="props.loading || undefined"
+        >
+          <!-- Loading spinner -->
+          <AnimatePresence>
+            <motion.span
+              v-if="loading"
+              :initial="{ opacity: 0, scale: 0.8, width: 0, marginRight: -8 }"
+              :animate="{ opacity: 1, scale: 1, width: 'auto', marginRight: 0 }"
+              :exit="{ opacity: 0, scale: 0.8, width: 0, marginRight: -8 }"
+              :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+              class="inline-flex -mr-2 items-center overflow-hidden"
+            >
+              <UiIcon name="lucide:loader" class="shrink-0 animate-spin" />
+            </motion.span>
+          </AnimatePresence>
 
-        <AnimatePresence>
-          <motion.span
-            v-if="arrowBack"
-            :initial="{ opacity: 0, width: 0, marginLeft: -8 }"
-            :animate="
-              isHovered
-                ? { opacity: 1, width: 'auto', marginLeft: 0 }
-                : { opacity: 0.5, width: 0, marginLeft: -8 }
-            "
-            :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
-            class="inline-flex -ml-2 items-center overflow-hidden"
-          >
-            <UiIcon class="shrink-0" name="lucide:arrow-left" />
-          </motion.span>
-        </AnimatePresence>
+          <AnimatePresence>
+            <motion.span
+              v-if="arrowBack"
+              :initial="{ opacity: 0, width: 0, marginLeft: -8 }"
+              :animate="
+                isHovered
+                  ? { opacity: 1, width: 'auto', marginLeft: 0 }
+                  : { opacity: 0.5, width: 0, marginLeft: -8 }
+              "
+              :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+              class="inline-flex -ml-2 items-center overflow-hidden"
+            >
+              <UiIcon class="shrink-0" name="lucide:arrow-left" />
+            </motion.span>
+          </AnimatePresence>
 
-        <!-- Content -->
-        <span class="inline-flex items-center gap-2">
-          <slot />
-        </span>
+          <!-- Content -->
+          <span class="inline-flex items-center gap-2">
+            <slot />
+          </span>
 
-        <AnimatePresence>
-          <motion.span
-            v-if="arrow"
-            :initial="{ opacity: 0, width: 0, marginLeft: -8 }"
-            :animate="
-              isHovered
-                ? { opacity: 1, width: 'auto', marginLeft: 0 }
-                : { opacity: 0.5, width: 0, marginLeft: -8 }
-            "
-            :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
-            class="inline-flex -ml-2 items-center overflow-hidden"
-          >
-            <UiIcon class="shrink-0" name="lucide:arrow-right" />
-          </motion.span>
-        </AnimatePresence>
-      </Primitive>
+          <AnimatePresence>
+            <motion.span
+              v-if="arrow"
+              :initial="{ opacity: 0, width: 0, marginLeft: -8 }"
+              :animate="
+                isHovered
+                  ? { opacity: 1, width: 'auto', marginLeft: 0 }
+                  : { opacity: 0.5, width: 0, marginLeft: -8 }
+              "
+              :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+              class="inline-flex -ml-2 items-center overflow-hidden"
+            >
+              <UiIcon class="shrink-0" name="lucide:arrow-right" />
+            </motion.span>
+          </AnimatePresence>
+        </Primitive>
+      </div>
     </TooltipTrigger>
     <TooltipContent v-if="props.tooltip">
       {{ props.tooltip }}
