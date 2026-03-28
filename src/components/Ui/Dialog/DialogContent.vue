@@ -50,7 +50,7 @@ const forwarded = useForwardPropsEmits(props, emit);
         >
           <!-- Grid overlay -->
           <div
-            class="pointer-events-none absolute inset-0 [background-size:72px_72px] opacity-[0.3]"
+            class="pointer-events-none absolute inset-0 bg-size-[72px_72px] opacity-[0.3]"
             style="
               background-image:
                 linear-gradient(var(--color-border) 1px, transparent 1px),
@@ -64,7 +64,7 @@ const forwarded = useForwardPropsEmits(props, emit);
 
           <!-- Gradient accent -->
           <div
-            class="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-secondary/15"
+            class="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/15 via-transparent to-secondary/15"
           />
         </motion.div>
       </DialogOverlay>

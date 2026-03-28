@@ -100,7 +100,7 @@ const props = defineProps<{
         </div>
 
         <!-- Page indicator -->
-        <div class="min-w-[5rem] text-center text-sm text-theme tabular-nums">
+        <div class="min-w-20 text-center text-sm text-theme tabular-nums">
           <span class="font-medium text-foreground">{{ table.paginator.current }}</span>
           <span class="mx-1 opacity-40">/</span>
           {{ table.paginator.total || 1 }}
