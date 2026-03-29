@@ -274,6 +274,9 @@ export { default as UiSmallAlert } from "./Ui/SmallAlert/SmallAlert.vue";
 export { default as DataTable } from "./blocks/DataTable/index.vue";
 export type { DataTableProps } from "./blocks/DataTable/types";
 
+// RemoteTable
+export { default as RemoteTable } from "./blocks/RemoteTable/index.vue";
+
 // Actions
 export { default as Actions } from "./blocks/Actions/index.vue";
 export type {

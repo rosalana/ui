@@ -1,4 +1,5 @@
 import { useTable } from ".";
+import { Column } from "../useTableColumns/types";
 
 export type TableConfig<T = any> = {
   /** Data to display */
@@ -17,42 +18,6 @@ export type TableConfig<T = any> = {
     /** id of the instance */
     id?: string;
   };
-};
-
-export type Column<T = any> = {
-  /** Key in your Data Object to bind column to. When data does not exist in this key the key will display */
-  key: string;
-  /** Header for the column */
-  header: string | ((row: T) => any);
-  /** Render your data in different format or as a component */
-  render?: (row: T) => any;
-  /** Enable the option to automaticly sort by this column (default: true) */
-  sortable?: boolean;
-  /** Enable the option to automaticly generate filters for this column. Dont use this when you render `Header` as a component (default: false) */
-  filterable?: boolean;
-  /** Enable the option to search in this column (default: true) */
-  searchable?: boolean;
-  /** Enable the option to toggle the column vissiblity (default: true) */
-  toggleable?: boolean;
-  /** Make the column hidden as default */
-  hidden?: boolean;
-  /** Override the default behavior of relevant columns */
-  relevant?: boolean;
-  /** Optional position-binding string for matching in layouts */
-  bindTo?: string;
-};
-
-export type ResolvedColumn<T = any> = Column<T> & {
-  /** Column ID, used for tracking column state */
-  id: string;
-  /** Determines the content of the column */
-  content: (row: T) => any;
-  /** The current value of the key in data */
-  value: (row: T) => any;
-  /** Flag for extended/generated columns */
-  generated: boolean;
-  /** Flag for additional columns */
-  additional: boolean;
 };
 
 export type TableState<T = any> = {

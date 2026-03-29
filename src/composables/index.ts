@@ -1,5 +1,7 @@
 export * from "./useConfirm";
+export * from "./useTableColumns";
 export * from "./useTable";
+export * from "./useRemoteTable";
 export * from "./usePreferences";
 export * from "./useComputedPage";
 export * from "./useTheme";

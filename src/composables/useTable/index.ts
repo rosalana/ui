@@ -1,21 +1,19 @@
 import { useDebounceFn } from "@vueuse/core";
-import { computed, defineComponent, reactive, ref, watch } from "vue";
-import type { Column, ResolvedColumn, TableConfig, TableState } from "./types";
+import { computed, reactive, ref, watch } from "vue";
+import { useTableColumns, type ResolvedColumn } from "../useTableColumns";
+import { TableErrors } from "../../helpers/table_errors";
+import { tableDebug } from "../../helpers/tableDebug";
+import type { TableConfig, TableState } from "./types";
 export * from "./types";
 
-const debug = ref(true);
 export function useTable<T = any>(config: TableConfig<T>) {
   const ROW_UNIQUE_ID = "_row_unique_id";
 
-  function getValueByPath(obj: any, path: string): any {
-    if (path === ROW_UNIQUE_ID) return getRowId(obj);
-    return path.split(".").reduce((acc, part) => acc?.[part], obj);
-  }
-
   if (config.options?.debug !== undefined) {
-    debug.value = config.options.debug;
+    tableDebug.value = config.options.debug;
   }
 
+  // Inject internal row-ID column as first column
   config.columns.unshift({
     key: ROW_UNIQUE_ID,
     header: "_ID",
@@ -28,40 +26,94 @@ export function useTable<T = any>(config: TableConfig<T>) {
   });
 
   /**
+   * Dot-notation value accessor with ROW_UNIQUE_ID support.
+   * Used externally via table.getValueByPath().
+   */
+  function getValueByPath(obj: any, path: string): any {
+    if (path === ROW_UNIQUE_ID) return getRowId(obj);
+    return path.split(".").reduce((acc, part) => acc?.[part], obj);
+  }
+
+  /**
    * -------------------------------
-   * Helper States
+   * Row identification
    * -------------------------------
    */
   const rowKeyValid = ref<boolean | null>(null);
-  const columns = ref<ResolvedColumn<T>[]>([]);
 
-  /** Resolve columns from config */
-  columns.value = config.columns.map((column, index) =>
-    reactive({
-      id: hashColumn(column),
-      sortable: true,
-      searchable: true,
-      filterable: false,
-      toggleable: true,
-      hidden: false,
-      relevant: !!(!column.hidden || column.relevant),
-      generated: column.key === ROW_UNIQUE_ID,
-      additional: false,
-      value: (row: T) => getValueByPath(row, column.key),
-      content: (row: T) =>
-        column.render && column.render(row)
-          ? column.render(row)
-          : getValueByPath(row, column.key),
-      ...column,
-    }),
-  );
+  function hashRow(row: T): string {
+    const str = JSON.stringify(row);
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash |= 0;
+    }
+    return `table-row-${Math.abs(hash)}`;
+  }
 
+  const getRowId = (row: T): string | number => {
+    const key = config.options?.key;
+    const path = key ?? "";
+
+    if (rowKeyValid.value === null) {
+      if (!key) {
+        console.warn(...TableErrors.row.notDefinedKey);
+        rowKeyValid.value = false;
+        return hashRow(row);
+      }
+      const result = path
+        .split(".")
+        .reduce((acc: any, part) => acc?.[part], row);
+      const isUnique =
+        config.data.filter(
+          (r) =>
+            path.split(".").reduce((acc: any, part) => acc?.[part], r) ===
+            result,
+        ).length === 1;
+
+      if (
+        result === undefined ||
+        result === null ||
+        (typeof result !== "string" && typeof result !== "number")
+      ) {
+        console.warn(...TableErrors.row.invalidTypeKey);
+        rowKeyValid.value = false;
+        return hashRow(row);
+      }
+
+      if (!isUnique) {
+        console.warn(...TableErrors.row.notUniqueKey);
+        rowKeyValid.value = false;
+        return hashRow(row);
+      }
+
+      rowKeyValid.value = true;
+      return result;
+    } else if (rowKeyValid.value === true) {
+      return path.split(".").reduce((acc: any, part) => acc?.[part], row);
+    } else {
+      return hashRow(row);
+    }
+  };
+
+  /**
+   * -------------------------------
+   * Data augmentation
+   * -------------------------------
+   */
   const originalData = computed(() =>
     config.data.map((row) => ({
       ...row,
       [ROW_UNIQUE_ID]: getRowId(row),
     })),
   );
+
+  const columns = useTableColumns<T>(config.columns);
+
+  // Mark the injected column as generated
+  const generatedCol = columns.getByKey(ROW_UNIQUE_ID);
+  if (generatedCol) generatedCol.generated = true;
 
   /**
    * -------------------------------
@@ -137,91 +189,25 @@ export function useTable<T = any>(config: TableConfig<T>) {
         ),
       );
     }
-    shouldCatch.search = true;
+    shouldCatch.select = true;
   });
+
   /**
    * -------------------------------
    * Helper Functions
    * -------------------------------
    */
-
-  // Debounce function to limit search calls
   const debounceSearch = useDebounceFn((searchTerm) => {
     state.search = searchTerm;
   }, 500);
 
-  // generate a hash from the row object
-  function hashRow(row: T): string {
-    const str = JSON.stringify(row);
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return `table-row-${Math.abs(hash)}`;
-  }
-
-  function hashColumn(column: Column): string {
-    const str = JSON.stringify(column);
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return `table-column-${Math.abs(hash)}`;
-  }
-
-  // get the row id
-  const getRowId = (row: T): string | number => {
-    const key = config.options?.key;
-
-    if (rowKeyValid.value === null) {
-      if (!key) {
-        console.warn(...TableErrors.row.notDefinedKey);
-        rowKeyValid.value = false;
-        return hashRow(row);
-      }
-      const result = getValueByPath(row, key);
-      const isUnique =
-        config.data.filter((row) => getValueByPath(row, key) === result)
-          .length === 1;
-
-      if (
-        result === undefined ||
-        result === null ||
-        (typeof result !== "string" && typeof result !== "number")
-      ) {
-        console.warn(...TableErrors.row.invalidTypeKey);
-        rowKeyValid.value = false;
-        return hashRow(row);
-      }
-
-      if (!isUnique) {
-        console.warn(...TableErrors.row.notUniqueKey);
-        rowKeyValid.value = false;
-        return hashRow(row);
-      }
-      // Vše OK
-      rowKeyValid.value = true;
-      return result;
-    } else if (rowKeyValid.value === true) {
-      return getValueByPath(row, key as string);
-    } else {
-      return hashRow(row);
-    }
-  };
-
-  // build-in search function
   const searchToFilterFn = (row: T) => {
     if (!state.search) return true;
     const search = state.search.toLowerCase();
-    const relevantColumns = columns.value.filter((col) => col.relevant);
+    const relevantColumns = columns.relevant;
 
-    // If no columns at all are searchable, return all rows (no filtering)
-    if (!columns.value.some((col) => col.searchable)) {
-      if (debug.value) {
+    if (!columns.all.some((col) => col.searchable)) {
+      if (tableDebug.value) {
         console.warn(...TableErrors.column.noSearchable);
       }
       return true;
@@ -247,10 +233,9 @@ export function useTable<T = any>(config: TableConfig<T>) {
    */
   const sortedData = computed(() => {
     const { id, order } = state.sort;
-
     if (!id) return [...originalData.value];
 
-    const col = columns.value.find((c) => c.id === id);
+    const col = columns.all.find((c) => c.id === id);
     if (!col || !col.sortable) return [...originalData.value];
 
     const direction = order === "asc" ? 1 : -1;
@@ -259,56 +244,38 @@ export function useTable<T = any>(config: TableConfig<T>) {
       const aVal = col.value(a);
       const bVal = col.value(b);
 
-      // Null / undefined
       if (aVal == null && bVal == null) return 0;
       if (aVal == null) return 1 * direction;
       if (bVal == null) return -1 * direction;
 
-      // Array
-      //   if (Array.isArray(aVal) && Array.isArray(bVal)) {
-      //     for (let i = 0; i < Math.min(aVal.length, bVal.length); i++) {
-      //       if (aVal[i] < bVal[i]) return -1 * direction;
-      //       if (aVal[i] > bVal[i]) return 1 * direction;
-      //     }
-      //     return (aVal.length - bVal.length) * direction;
-      //   }
       if (Array.isArray(aVal) && Array.isArray(bVal)) {
         const aEmpty = aVal.length === 0;
         const bEmpty = bVal.length === 0;
-
-        // posuň prázdné pole dolů
         if (aEmpty && !bEmpty) return 1 * direction;
         if (!aEmpty && bEmpty) return -1 * direction;
         if (aEmpty && bEmpty) return 0;
-
-        // porovnej jednotlivé hodnoty
         for (let i = 0; i < Math.min(aVal.length, bVal.length); i++) {
           if (aVal[i] < bVal[i]) return -1 * direction;
           if (aVal[i] > bVal[i]) return 1 * direction;
         }
-
-        // jinak podle délky (např. [a,b] < [a,b,c])
         return (aVal.length - bVal.length) * direction;
       }
 
-      // Normal compare
       if (aVal < bVal) return -1 * direction;
       if (aVal > bVal) return 1 * direction;
       return 0;
     });
   });
 
-  const filteredData = computed(() => {
-    return sortedData.value.filter(
+  const filteredData = computed(() =>
+    sortedData.value.filter(
       (row) => state.filter(row) && searchToFilterFn(row),
-    );
-  });
+    ),
+  );
 
   const paginatedData = computed(() => {
     const totalPages = Math.ceil(filteredData.value.length / state.pageSize);
-    if (state.page > totalPages) {
-      state.page = 1;
-    }
+    if (state.page > totalPages) state.page = 1;
     const start = (state.page - 1) * state.pageSize;
     return filteredData.value.slice(start, start + state.pageSize);
   });
@@ -336,145 +303,7 @@ export function useTable<T = any>(config: TableConfig<T>) {
         );
       },
     },
-    columns: {
-      get all() {
-        return columns.value;
-      },
-      add(column: Column & { index?: number }) {
-        const resolved = reactive<ResolvedColumn>({
-          id: hashColumn(column),
-          sortable: true,
-          searchable: true,
-          filterable: false,
-          toggleable: true,
-          hidden: false,
-          relevant: !!(!column.hidden || column.relevant),
-          generated: false,
-          additional: true,
-          value: (row: T) => getValueByPath(row, column.key),
-          content: (row: T) =>
-            column.render && column.render(row)
-              ? column.render(row)
-              : getValueByPath(row, column.key),
-          ...column,
-        });
-        if (
-          column.index !== undefined &&
-          column.index >= 0 &&
-          column.index < columns.value.length
-        ) {
-          columns.value.splice(column.index, 0, resolved);
-        } else {
-          columns.value.push(resolved);
-        }
-        return resolved;
-      },
-      remove(column: ResolvedColumn) {
-        const index = columns.value.findIndex((col) => col.id === column.id);
-        if (index !== -1) {
-          columns.value.splice(index, 1);
-        }
-      },
-      move(column: ResolvedColumn, newIndex: number) {
-        const currentIndex = columns.value.findIndex(
-          (col) => col.id === column.id,
-        );
-        if (currentIndex === -1) return;
-
-        if (newIndex < 0) newIndex = 0;
-        if (newIndex >= columns.value.length)
-          newIndex = columns.value.length - 1;
-
-        columns.value.splice(currentIndex, 1);
-        columns.value.splice(newIndex, 0, column);
-      },
-      moveToEnd(column: ResolvedColumn) {
-        this.move(column, columns.value.length - 1);
-      },
-      moveToStart(column: ResolvedColumn) {
-        this.move(column, 0);
-      },
-      moveAfter(column: ResolvedColumn, targetColumn: ResolvedColumn) {
-        const targetColumnIndex = columns.value.findIndex(
-          (col) => col.id === targetColumn.id,
-        );
-        if (targetColumnIndex === -1) return;
-        this.move(column, targetColumnIndex + 1);
-      },
-      moveBefore(column: ResolvedColumn, targetColumn: ResolvedColumn) {
-        const targetColumnIndex = columns.value.findIndex(
-          (col) => col.id === targetColumn.id,
-        );
-        if (targetColumnIndex === -1) return;
-        this.move(column, targetColumnIndex);
-      },
-      moveLeft(column: ResolvedColumn) {
-        const currentIndex = columns.value.findIndex(
-          (col) => col.id === column.id,
-        );
-        if (currentIndex > 0) {
-          this.move(column, currentIndex - 1);
-        }
-      },
-      moveRight(column: ResolvedColumn) {
-        const currentIndex = columns.value.findIndex(
-          (col) => col.id === column.id,
-        );
-        if (currentIndex < columns.value.length - 1) {
-          this.move(column, currentIndex + 1);
-        }
-      },
-      get visible() {
-        return this.all.filter((col) => col.hidden !== true);
-        // return columns.value.filter((col) => !col.hidden);
-      },
-      get hidden() {
-        return this.all.filter((col) => col.hidden === true);
-      },
-      get relevant() {
-        return this.all.filter(
-          (col) =>
-            col.relevant === true ||
-            col.filterable === true ||
-            col.key === "id",
-        );
-      },
-      get toggleable() {
-        return this.all.filter((col) => col.toggleable === true);
-      },
-      get filterable() {
-        return this.all.filter((col) => col.filterable === true);
-      },
-      binded(key: string): ResolvedColumn | undefined {
-        return this.visible.find((col) => col.bindTo === key);
-      },
-      unbinded() {
-        return this.visible.filter((col) => !col.bindTo);
-      },
-      getByKey(key: string): ResolvedColumn | undefined {
-        return columns.value.find((col) => col.key === key);
-      },
-      uniqueOf(column?: ResolvedColumn<T>): any[] {
-        if (!column) return [];
-        const rawValues = originalData.value.map((row) => column.value(row));
-
-        const flat = rawValues.flatMap((value) => {
-          if (Array.isArray(value)) {
-            return value.filter(
-              (v) => v !== null && v !== undefined && v !== "",
-            );
-          } else if (value !== null && value !== undefined && value !== "") {
-            return [value];
-          }
-          return [];
-        });
-
-        return Array.from(new Set(flat)).sort(); // unikátní a seřazené
-      },
-      valuesOf(column: ResolvedColumn<T>): any[] {
-        return originalData.value.map((row) => column.value(row));
-      },
-    },
+    columns,
     select: {
       isIndeterminate() {
         return (
@@ -570,41 +399,51 @@ export function useTable<T = any>(config: TableConfig<T>) {
       set size(size: string) {
         if (Number(size) < 1) return;
         state.pageSize = Number(size);
-
-        if (this.current > this.total) {
-          this.current = this.total;
-        }
+        if (this.current > this.total) this.current = this.total;
       },
       next() {
-        if (!this.last) {
-          this.current++;
-        }
+        if (!this.last) this.current++;
       },
       prev() {
-        if (!this.first) {
-          this.current--;
-        }
+        if (!this.first) this.current--;
       },
     },
     operation: {
       sum: (column: ResolvedColumn<T>) => {
-        const values = originalData.value.map((row) => column.value(row));
-        const flat = values.flatMap((value) => {
+        const values = originalData.value.map((row: T) => column.value(row));
+        const flat = values.flatMap((value: any) => {
           if (Array.isArray(value)) {
             return value.filter(
-              (v) => v !== null && v !== undefined && v !== "",
+              (v: any) => v !== null && v !== undefined && v !== "",
             );
           } else if (value !== null && value !== undefined && value !== "") {
             return [value];
           }
           return [];
         });
-        return flat.reduce((acc, val) => {
-          if (typeof val === "number") {
-            return acc + val;
+        return flat.reduce(
+          (acc: number, val: any) =>
+            typeof val === "number" ? acc + val : acc,
+          0,
+        );
+      },
+      uniqueOf(column?: ResolvedColumn<T>): any[] {
+        if (!column) return [];
+        const rawValues = originalData.value.map((row: T) => column.value(row));
+        const flat = rawValues.flatMap((value: any) => {
+          if (Array.isArray(value)) {
+            return value.filter(
+              (v: any) => v !== null && v !== undefined && v !== "",
+            );
+          } else if (value !== null && value !== undefined && value !== "") {
+            return [value];
           }
-          return acc;
-        }, 0);
+          return [];
+        });
+        return Array.from(new Set(flat)).sort();
+      },
+      valuesOf(column: ResolvedColumn<T>): any[] {
+        return originalData.value.map((row: T) => column.value(row));
       },
     },
     filter(filter: (row: T) => boolean) {
@@ -620,15 +459,17 @@ export function useTable<T = any>(config: TableConfig<T>) {
         state.search = search;
       }
     },
-    toggle(column: ResolvedColumn) {
-      if (column.toggleable) {
-        column.hidden = !column.hidden;
-        if (config.on?.toggle) {
-          config.on.toggle(column);
-        }
+    /**
+     * Toggles column visibility and fires the on.toggle event.
+     * Use table.columns.toggle() if you only want to flip without the event.
+     */
+    toggle(column: ResolvedColumn<T>) {
+      columns.toggle(column);
+      if (config.on?.toggle) {
+        config.on.toggle(column);
       }
     },
-    sort(column: ResolvedColumn) {
+    sort(column: ResolvedColumn<T>) {
       if (column.sortable) {
         if (state.sort.id === column.id) {
           if (state.sort.order === "asc") {
@@ -644,143 +485,7 @@ export function useTable<T = any>(config: TableConfig<T>) {
       }
     },
     getValueByPath,
-    getInstanceId: () => {
-      return config.options?.id;
-    },
+    getInstanceId: () => config.options?.id,
     getRowId,
   };
 }
-
-export const HeaderRender = defineComponent({
-  props: ["column", "context"],
-  setup(props: { column: ResolvedColumn; context: any }) {
-    return () => {
-      if (!props.column) {
-        if (debug.value) {
-          console.warn("[HeaderRender] No column provided");
-        }
-        return;
-      }
-
-      let result;
-      if (typeof props.column?.header === "function") {
-        result = props.column.header(props.context);
-      } else {
-        result = props.column.header;
-      }
-
-      if (!result) {
-        if (debug.value) {
-          console.warn(
-            ...TableErrors.render.invalidType.null,
-            `${props.column.key} header`,
-            result,
-          );
-        }
-        return String(result);
-      }
-
-      return result;
-    };
-  },
-});
-
-export const ColumnRender = defineComponent({
-  props: ["column", "context"],
-  setup(props: { column: ResolvedColumn; context: any }) {
-    return () => {
-      if (!props.column) {
-        if (debug.value) {
-          console.warn("[ColumnRender] No column provided");
-        }
-        return;
-      }
-
-      const value = props.column?.value(props.context);
-      const content = props.column?.content(props.context);
-
-      if (!content) {
-        if (debug.value) {
-          console.warn(
-            ...TableErrors.render.invalidType.null,
-            `${props.column.key} reading`,
-            value,
-            props.context,
-          );
-        }
-        return String(value);
-      }
-
-      if (typeof value === "object" && value === content) {
-        if (debug.value) {
-          console.warn(
-            ...TableErrors.render.invalidType.object,
-            `${props.column.key} reading`,
-            value,
-            props.context,
-          );
-        }
-        return String(value);
-      }
-
-      return content;
-    };
-  },
-});
-
-const TableErrors = {
-  column: {
-    noSearchable: [
-      "%c[Table Warning]: No searchable columns are defined.\n\n" +
-        "%cFallback: All rows will be displayed without filtering.",
-      "font-weight: bold; color: orange;",
-      "",
-    ],
-  },
-  row: {
-    invalidTypeKey: [
-      "%c[Table Warning]: The provided key in Config.Options.Key is not a string or number.\n\n" +
-        "%cFallback: Using a hashed row identifier instead.",
-      "font-weight: bold; color: orange;",
-      "",
-    ],
-    notUniqueKey: [
-      "%c[Table Warning]: The provided key in Config.Options.Key is not unique.\n\n" +
-        "%cFallback: Using a hashed row identifier instead.",
-      "font-weight: bold; color: orange;",
-      "",
-    ],
-    notDefinedKey: [
-      "%c[Table Warning]: Config.Options.Key is not defined.\n\n" +
-        "%cFallback: Using a hashed row identifier instead.",
-      "font-weight: bold; color: orange;",
-      "",
-    ],
-  },
-  render: {
-    invalidType: {
-      object: [
-        "%c[Table Warning]: Attempted to render an object as a string.\n\n" +
-          "%cRendering objects directly is not supported. Use the render() function to define custom rendering logic.\n\n" +
-          "%cNote: Rendering is separate from data representation.\n\n" +
-          "%cTip: %cConsider using the render() function to handle object rendering.\n\n Details:",
-        "font-weight: bold; color: orange;",
-        "",
-        "font-style: italic;",
-        "font-weight: bold; color: black;",
-        "",
-      ],
-      null: [
-        "%c[Table Warning]: Attempted to render a null or undefined value as a string.\n\n" +
-          "%cNullable values in your data should be handled explicitly for better user experience.\n\n" +
-          "%cNote: Rendering is separate from data representation.\n\n" +
-          "%cTip: %cConsider handling null or undefined values in your render logic.\n\n Details:",
-        "font-weight: bold; color: orange;",
-        "",
-        "font-style: italic;",
-        "font-weight: bold; color: black;",
-        "",
-      ],
-    },
-  },
-};
