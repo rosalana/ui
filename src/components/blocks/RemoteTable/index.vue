@@ -1,13 +1,13 @@
 <script setup lang="ts" generic="T">
-import { type Ref, h, onMounted } from "vue";
+import { h, onMounted, ref, watch } from "vue";
 import { tv } from "tailwind-variants";
 import {
   useRemoteTable,
   ColumnRender,
   HeaderRender,
 } from "../../../composables";
-import type { Column, RemoteTableState } from "../../../composables";
-import type { RemoteTableProps } from "./types";
+import type { RemoteTableState } from "../../../composables";
+import type { RemoteTableEmits, RemoteTableProps } from "./types";
 import Actions from "../Actions/index.vue";
 import RemoteTableSearch from "./RemoteTableSearch.vue";
 import RemoteTableColumnToggle from "./RemoteTableColumnToggle.vue";
@@ -28,21 +28,27 @@ import {
 const styles = tv({ base: "w-full" });
 
 const props = withDefaults(defineProps<RemoteTableProps<T>>(), {
-  page: 1,
-  pageSize: 25,
   pageSizeOptions: () => [10, 25, 50, 100],
   showSearch: true,
   columnToggle: true,
   paginate: true,
+  page: 1,
+  size: 10,
+  search: "",
+  sort: () => ({ id: null, order: "asc" }),
+  loading: false,
 });
 
-const emit = defineEmits<{
-  sort: [sort: RemoteTableState["sort"], loading: Ref<boolean>];
-  search: [search: string, loading: Ref<boolean>];
-  page: [page: number, loading: Ref<boolean>];
-  pageSize: [pageSize: number, loading: Ref<boolean>];
-  toggle: [column: Column<T>];
-}>();
+const loading = ref(props.loading);
+
+watch(
+  () => props.loading,
+  (newVal) => {
+    loading.value = newVal;
+  },
+);
+
+const emit = defineEmits<RemoteTableEmits<T>>();
 
 const table = useRemoteTable<T>({
   get data() {
@@ -56,14 +62,35 @@ const table = useRemoteTable<T>({
   },
   state: {
     page: props.page,
-    pageSize: props.pageSize,
+    pageSize: props.size,
+    search: props.search,
+    sort: props.sort,
   },
   on: {
-    sort: (sort, loading) => emit("sort", sort, loading),
-    search: (search, loading) => emit("search", search, loading),
-    page: (page, loading) => emit("page", page, loading),
-    pageSize: (pageSize, loading) => emit("pageSize", pageSize, loading),
-    toggle: (column) => emit("toggle", column),
+    sort: (sort) => {
+      if (sort.id !== null) {
+        sort.id = table.columns.getById(sort.id)?.key ?? null;
+      }
+
+      emit("update:sort", sort);
+      emit("update");
+    },
+    search: (search) => {
+      emit("update:search", search);
+      emit("update");
+    },
+    page: (page) => {
+      emit("update:page", page);
+      emit("update");
+    },
+    pageSize: (pageSize) => {
+      emit("update:size", pageSize);
+      emit("update");
+    },
+    toggle: (column) => {
+      emit("toggle", column);
+      emit("update");
+    },
   },
   options: {
     key: props.rowKey,
@@ -88,7 +115,7 @@ onMounted(() => {
           ? h(Actions, {
               items:
                 typeof props.headerActions === "function"
-                  ? props.headerActions(table.loading)
+                  ? props.headerActions(loading)
                   : props.headerActions,
             })
           : " ";
@@ -161,13 +188,13 @@ onMounted(() => {
 
         <UiTableBody>
           <!-- Loading skeleton -->
-          <template v-if="table.loading.value">
-            <UiTableRow v-for="i in props.pageSize" :key="`skeleton-${i}`">
+          <template v-if="loading">
+            <UiTableRow v-for="(i) in Number(props.size)" :key="`skeleton-${i}`">
               <UiTableCell
                 v-for="column in table.columns.visible"
                 :key="column.id"
               >
-                <UiSkeleton class="h-4 w-full" />
+                <UiSkeleton class="h-4 w-full my-2" />
               </UiTableCell>
             </UiTableRow>
           </template>

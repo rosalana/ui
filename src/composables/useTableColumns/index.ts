@@ -126,6 +126,9 @@ export function useTableColumns<T = any>(rawColumns: Column<T>[]) {
     getByKey(key: string): ResolvedColumn<T> | undefined {
       return columns.value.find((col) => col.key === key);
     },
+    getById(id: string): ResolvedColumn<T> | undefined {
+      return columns.value.find((col) => col.id === id);
+    },
     binded(key: string): ResolvedColumn<T> | undefined {
       return this.visible.find((col) => col.bindTo === key);
     },

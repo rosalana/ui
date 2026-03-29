@@ -1,4 +1,3 @@
-import type { Ref } from "vue";
 import type { Column } from "../useTableColumns/types";
 import type { TableState } from "../useTable/types";
 
@@ -10,13 +9,10 @@ export type RemoteTableState = {
 };
 
 export type RemoteTableEvents<T = any> = {
-  sort: (sort: RemoteTableState["sort"], loading: Ref<boolean>) => void;
-  search: (search: RemoteTableState["search"], loading: Ref<boolean>) => void;
-  page: (page: RemoteTableState["page"], loading: Ref<boolean>) => void;
-  pageSize: (
-    pageSize: RemoteTableState["pageSize"],
-    loading: Ref<boolean>,
-  ) => void;
+  sort: (sort: RemoteTableState["sort"]) => void;
+  search: (search: RemoteTableState["search"]) => void;
+  page: (page: RemoteTableState["page"]) => void;
+  pageSize: (pageSize: RemoteTableState["pageSize"]) => void;
   toggle: (column: Column<T>) => void;
 };
 

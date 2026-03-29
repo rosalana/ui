@@ -12,10 +12,6 @@ export interface RemoteTableProps<T = any> {
   columns: Column<T>[];
   /** Row key field for unique identification */
   rowKey?: string;
-  /** Initial page */
-  page?: number;
-  /** Initial page size */
-  pageSize?: number;
   /** Available page size options */
   pageSizeOptions?: number[];
   /** Show search input */
@@ -30,12 +26,23 @@ export interface RemoteTableProps<T = any> {
   rowActions?: ActionItem[] | ((row: T) => ActionItem[]);
   /** Custom class */
   class?: HTMLAttributes["class"];
+  /** Initial page */
+  page?: number;
+  /** Initial page size */
+  size?: number;
+  /** Initial search string */
+  search?: string;
+  /** Initial sort state */
+  sort?: RemoteTableState["sort"];
+  /** Loading ref */
+  loading?: boolean;
 }
 
 export type RemoteTableEmits<T = any> = {
-  sort: [sort: RemoteTableState["sort"], loading: Ref<boolean>];
-  search: [search: string, loading: Ref<boolean>];
-  page: [page: number, loading: Ref<boolean>];
-  pageSize: [pageSize: number, loading: Ref<boolean>];
+  "update:sort": [sort: RemoteTableState["sort"]];
+  "update:search": [search: string];
+  "update:page": [page: number];
+  "update:size": [pageSize: number];
   toggle: [column: Column<T>];
+  update: [];
 };

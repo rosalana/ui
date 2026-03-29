@@ -14,12 +14,6 @@ export function useRemoteTable<T = any>(config: RemoteTableConfig<T>) {
   const columns = useTableColumns<T>(config.columns);
 
   /**
-   * Shared loading ref — passed to all event handlers so they can show/hide
-   * the loading skeleton by setting loading.value = true / false.
-   */
-  const loading = ref(false);
-
-  /**
    * -------------------------------
    * Row identification
    * -------------------------------
@@ -52,7 +46,7 @@ export function useRemoteTable<T = any>(config: RemoteTableConfig<T>) {
   const state = reactive<RemoteTableState>({
     sort: config.state?.sort ?? { id: null, order: "asc" },
     page: config.state?.page ?? 1,
-    pageSize: config.state?.pageSize ?? 15,
+    pageSize: config.state?.pageSize ?? 10,
     search: config.state?.search ?? "",
   });
 
@@ -70,14 +64,14 @@ export function useRemoteTable<T = any>(config: RemoteTableConfig<T>) {
    * -------------------------------
    */
   watch(state.sort, (newSort) => {
-    if (shouldCatch.sort) config.on?.sort?.({ ...newSort }, loading);
+    if (shouldCatch.sort) config.on?.sort?.({ ...newSort });
     shouldCatch.sort = true;
   });
 
   watch(
     () => state.page,
     (newPage) => {
-      if (shouldCatch.page) config.on?.page?.(newPage, loading);
+      if (shouldCatch.page) config.on?.page?.(newPage);
       shouldCatch.page = true;
     },
   );
@@ -85,7 +79,7 @@ export function useRemoteTable<T = any>(config: RemoteTableConfig<T>) {
   watch(
     () => state.pageSize,
     (newPageSize) => {
-      if (shouldCatch.pageSize) config.on?.pageSize?.(newPageSize, loading);
+      if (shouldCatch.pageSize) config.on?.pageSize?.(newPageSize);
       shouldCatch.pageSize = true;
     },
   );
@@ -93,7 +87,7 @@ export function useRemoteTable<T = any>(config: RemoteTableConfig<T>) {
   watch(
     () => state.search,
     (newSearch) => {
-      if (shouldCatch.search) config.on?.search?.(newSearch, loading);
+      if (shouldCatch.search) config.on?.search?.(newSearch);
       shouldCatch.search = true;
     },
   );
@@ -119,8 +113,6 @@ export function useRemoteTable<T = any>(config: RemoteTableConfig<T>) {
     Math.max(1, Math.ceil(config.total / state.pageSize));
 
   return {
-    /** Shared loading ref — set to true by event handlers to show skeleton. */
-    loading,
     data: {
       get final() {
         return config.data;
