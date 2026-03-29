@@ -29,7 +29,7 @@ const styles = tv({ base: "w-full" });
 
 const props = withDefaults(defineProps<RemoteTableProps<T>>(), {
   page: 1,
-  pageSize: 15,
+  pageSize: 25,
   pageSizeOptions: () => [10, 25, 50, 100],
   showSearch: true,
   columnToggle: true,
