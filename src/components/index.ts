@@ -276,6 +276,7 @@ export type { DataTableProps } from "./blocks/DataTable/types";
 
 // RemoteTable
 export { default as RemoteTable } from "./blocks/RemoteTable/index.vue";
+export type { RemoteTableProps } from "./blocks/RemoteTable/types";
 
 // Actions
 export { default as Actions } from "./blocks/Actions/index.vue";
