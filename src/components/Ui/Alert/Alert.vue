@@ -17,11 +17,12 @@ const alert = tv({
       default:
         "[&>svg]:text-white shadow-[0_2px_8px_-3px,0_4px_20px_-4px] bg-theme hover:brightness-105 border-theme text-white [&_[data-slot=alert-description]]:text-white shadow-primary/40",
       destructive:
-        "[&>svg]:text-white bg-destructive shadow-[0_2px_8px_-3px,0_4px_20px_-4px] hover:brightness-105 text-white [&_[data-slot=alert-description]]:text-white border-destructive shadow-destructive/40",
+        "[&>svg]:text-white bg-destructive shadow-[0_2px_8px_-3px,0_4px_20px_-4px] hover:brightness-105 text-white [&_[data-slot=alert-description]]:text-white [&_[data-slot=alert-title]]:font-semibold border-destructive shadow-destructive/40",
       success: "[&>svg]:text-success hover:bg-muted",
       warning: "[&>svg]:text-warning hover:bg-muted",
       info: "[&>svg]:text-info hover:bg-muted",
       outline: "border-border bg-background text-foreground hover:bg-muted",
+      danger: "[&>svg]:text-destructive hover:bg-muted",
     },
   },
   defaultVariants: {
@@ -43,7 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const icon = computed(() => {
   if (props.variant === "default") return props.icon ?? "lucide:star";
-  if (props.variant === "destructive")
+  if (props.variant === "destructive" || props.variant === "danger")
     return props.icon ?? "lucide:alert-circle";
   if (props.variant === "success") return props.icon ?? "lucide:check-circle";
   if (props.variant === "warning") return props.icon ?? "lucide:alert-triangle";
