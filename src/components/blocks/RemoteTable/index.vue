@@ -64,7 +64,6 @@ const table = useRemoteTable<T>({
     page: props.page,
     pageSize: props.size,
     search: props.search,
-    sort: props.sort,
   },
   on: {
     sort: (sort) => {
@@ -107,6 +106,13 @@ const getSortIcon = (columnId: string): string => {
 };
 
 onMounted(() => {
+  if (props.sort.id !== null) {
+    table.state.sort = {
+      id: table.columns.getByKey(props.sort.id)?.id ?? null,
+      order: props.sort.order,
+    };
+  }
+
   if (props.rowActions || props.headerActions) {
     table.columns.add({
       key: "__actions_column__",
@@ -143,6 +149,9 @@ onMounted(() => {
 
 <template>
   <div data-slot="remote-table" :class="[styles(), props.class]">
+    
+    <slot name="header" />
+
     <!-- Toolbar -->
     <div class="flex justify-between items-center gap-4 py-4">
       <!-- Search -->
@@ -155,6 +164,8 @@ onMounted(() => {
         <RemoteTableColumnToggle :table="table" />
       </slot>
     </div>
+
+    <slot name="above-table" />
 
     <!-- Table -->
     <UiScrollArea orientation="horizontal">
@@ -189,7 +200,7 @@ onMounted(() => {
         <UiTableBody>
           <!-- Loading skeleton -->
           <template v-if="loading">
-            <UiTableRow v-for="(i) in Number(props.size)" :key="`skeleton-${i}`">
+            <UiTableRow v-for="i in Number(props.size)" :key="`skeleton-${i}`">
               <UiTableCell
                 v-for="column in table.columns.visible"
                 :key="column.id"
@@ -226,6 +237,8 @@ onMounted(() => {
       </UiTable>
     </UiScrollArea>
 
+    <slot name="below-table" />
+
     <!-- Pagination -->
     <slot name="pagination" v-if="props.paginate">
       <RemoteTablePagination
@@ -233,5 +246,7 @@ onMounted(() => {
         :page-size-options="props.pageSizeOptions"
       />
     </slot>
+
+    <slot name="footer" />
   </div>
 </template>
