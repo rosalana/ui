@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "motion-v";
 const checkbox = tv({
   base: [
     "peer cursor-pointer size-4.5 shrink-0 rounded-md border border-border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground",
-    "shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-black/15",
+    "shadow-[0_2px_4px_-3px,0_4px_10px_-4px] shadow-black/15",
     "hover:shadow-primary hover:border-primary/30",
     "data-[state=checked]:shadow-primary data-[state=indeterminate]:shadow-primary",
     "data-[state=checked]:border-primary data-[state=indeterminate]:border-primary",
