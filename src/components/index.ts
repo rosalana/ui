@@ -292,3 +292,6 @@ export type { WebNavItem, WebNavProps } from "./blocks/WebNav/types";
 
 // TextEffect
 export { TextEffect } from "./blocks/TextEffect/index";
+
+// Dump
+export { default as Dump } from "./blocks/Dump/index.vue";
