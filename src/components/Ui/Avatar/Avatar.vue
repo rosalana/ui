@@ -7,10 +7,10 @@ const avatar = tv({
   base: "relative flex shrink-0 overflow-hidden rounded-full",
   variants: {
     size: {
-      default: "size-10",
-      sm: "size-8",
-      lg: "size-12",
-      xl: "size-42",
+      default: "size-10 text-sm",
+      sm: "size-8 text-base",
+      lg: "size-12 text-base",
+      xl: "size-42 text-lg",
     },
   },
   defaultVariants: {
