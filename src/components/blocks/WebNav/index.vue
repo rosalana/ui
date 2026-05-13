@@ -26,7 +26,7 @@ const scrolled = computed(() => y.value > 16);
 const mobileOpen = ref(false);
 const openSections = ref<Record<string, boolean>>({});
 
-const currentRoute = computed(() => window.location.pathname);
+const currentRoute = computed(() => window.location.href);
 </script>
 
 <template>
@@ -54,7 +54,7 @@ const currentRoute = computed(() => window.location.pathname);
                   {{ item.title }}
                 </UiNavigationMenuTrigger>
                 <UiNavigationMenuContent>
-                  <ul class="grid w-[440px] gap-1 p-3 md:grid-cols-2">
+                  <ul class="grid w-110 gap-1 p-3 md:grid-cols-2">
                     <li v-for="child in item.children" :key="child.title">
                       <UiNavigationMenuLink
                         :as="Link"
@@ -189,7 +189,7 @@ const currentRoute = computed(() => window.location.pathname);
                     :key="child.title"
                     :href="child.disabled ? undefined : (child.href ?? '#')"
                     :class="[
-                      'block px-3 py-2 rounded-lg data-[active]:text-primary text-sm transition-colors',
+                      'block px-3 py-2 rounded-lg data-active:text-primary text-sm transition-colors',
                       child.disabled
                         ? 'pointer-events-none opacity-40 text-foreground/50'
                         : 'text-foreground/60 hover:text-foreground hover:bg-muted/60',
@@ -222,7 +222,7 @@ const currentRoute = computed(() => window.location.pathname);
               :href="item.disabled ? undefined : (item.href ?? '#')"
               :data-active="item.href === currentRoute ? '' : undefined"
               :class="[
-                'flex items-center px-3 py-2.5 rounded-lg text-sm data-[active]:text-primary font-medium transition-colors',
+                'flex items-center px-3 py-2.5 rounded-lg text-sm data-active:text-primary font-medium transition-colors',
                 item.disabled
                   ? 'pointer-events-none opacity-40 text-foreground/60'
                   : 'text-foreground/70 hover:text-foreground hover:bg-muted/60',
