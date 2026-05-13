@@ -40,11 +40,11 @@
   }
 
   .document-content pre {
-    @apply mb-6 mt-4 overflow-x-auto rounded-lg border border-border bg-muted p-4;
+    @apply mb-6 mt-4 overflow-x-auto rounded-lg border border-border bg-muted p-4 whitespace-pre-wrap break-words;
   }
 
   .document-content pre code {
-    @apply bg-transparent p-0 text-sm text-foreground/80;
+    @apply bg-transparent p-0 text-sm text-foreground/80 whitespace-pre-wrap;
   }
 
   .document-content blockquote {
