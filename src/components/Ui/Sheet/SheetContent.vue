@@ -4,12 +4,14 @@ import type { DialogContentEmits, DialogContentProps } from "reka-ui";
 import {
   DialogClose,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
   DialogPortal,
   DialogOverlay,
   injectDialogRootContext,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
+import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
 import { computed } from "vue";
 import { AnimatePresence, motion } from "motion-v";
 import UiIcon from "../Icon/Icon.vue";
@@ -26,7 +28,8 @@ const sheetContent = tv({
       top: "inset-x-0 top-0 border-b rounded-b-2xl",
       bottom: "inset-x-0 bottom-0 border-t rounded-t-2xl",
       left: "inset-y-0 left-0 h-full w-3/4 border-r rounded-r-2xl sm:max-w-sm",
-      right: "inset-y-0 right-0 h-full w-3/4 border-l rounded-l-2xl sm:max-w-sm",
+      right:
+        "inset-y-0 right-0 h-full w-3/4 border-l rounded-l-2xl sm:max-w-sm",
     },
   },
   defaultVariants: {
@@ -49,8 +52,18 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<DialogContentEmits>();
 
 // Exclude asChild and forceMount from forwarded — we set them explicitly
-const { asChild: _a, forceMount: _fm, class: _c, side: _s, hideCloseButton: _h, ...contentProps } = props;
-const forwarded = useForwardPropsEmits(contentProps as DialogContentProps, emit);
+const {
+  asChild: _a,
+  forceMount: _fm,
+  class: _c,
+  side: _s,
+  hideCloseButton: _h,
+  ...contentProps
+} = props;
+const forwarded = useForwardPropsEmits(
+  contentProps as DialogContentProps,
+  emit,
+);
 
 const { open } = injectDialogRootContext();
 
@@ -91,8 +104,12 @@ const panelInitial = computed(() => {
             :transition="{ type: 'spring', stiffness: 380, damping: 38 }"
             :class="[sheetContent({ side: props.side, class: props.class })]"
           >
+            <DialogTitle class="sr-only"> Sheet Content </DialogTitle>
+            <DialogDescription class="sr-only">
+              This is the content of the sheet. It can be used to display
+              information or actions related to the current page.
+            </DialogDescription>
             <slot />
-
             <DialogClose
               v-if="!hideCloseButton"
               class="absolute right-4 top-4 flex items-center justify-center size-8 rounded-lg text-foreground/60 hover:text-foreground hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring/30 disabled:pointer-events-none active:scale-[0.97]"
