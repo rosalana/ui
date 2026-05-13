@@ -27,6 +27,13 @@ const mobileOpen = ref(false);
 const openSections = ref<Record<string, boolean>>({});
 
 const currentRoute = computed(() => window.location.href);
+
+function isActive(href?: string): boolean {
+  if (!href) return false;
+  return (
+    currentRoute.value === href || currentRoute.value.startsWith(href + "/")
+  );
+}
 </script>
 
 <template>
@@ -49,7 +56,7 @@ const currentRoute = computed(() => window.location.href);
             <UiNavigationMenuItem v-for="item in menu" :key="item.title">
               <template v-if="item.children">
                 <UiNavigationMenuTrigger
-                  :active="item.children.some((c) => c.href === currentRoute)"
+                  :active="item.children.some((c) => isActive(c.href))"
                 >
                   {{ item.title }}
                 </UiNavigationMenuTrigger>
@@ -65,9 +72,7 @@ const currentRoute = computed(() => window.location.href);
                       >
                         <div
                           class="mb-1 flex items-center gap-2 text-sm font-medium leading-none text-foreground"
-                          :data-active="
-                            child.href === currentRoute ? '' : undefined
-                          "
+                          :data-active="isActive(child.href) ? '' : undefined"
                         >
                           {{ child.title }}
                           <span
@@ -91,7 +96,7 @@ const currentRoute = computed(() => window.location.href);
 
               <template v-else>
                 <UiNavigationMenuLink
-                  :active="item.href === currentRoute"
+                  :active="isActive(item.href)"
                   :disabled="item.disabled"
                   class="shadow-none h-9 inline-flex font-medium"
                   :class="item.disabled ? 'pointer-events-none opacity-50' : ''"
@@ -155,7 +160,7 @@ const currentRoute = computed(() => window.location.href);
               v-if="item.children"
               v-model:open="openSections[item.title]"
               :disabled="item.disabled"
-              :default-open="item.children.some((c) => c.href === currentRoute)"
+              :default-open="item.children.some((c) => isActive(c.href))"
             >
               <UiCollapsibleTrigger as-child>
                 <button
@@ -194,7 +199,7 @@ const currentRoute = computed(() => window.location.href);
                         ? 'pointer-events-none opacity-40 text-foreground/50'
                         : 'text-foreground/60 hover:text-foreground hover:bg-muted/60',
                     ]"
-                    :data-active="child.href === currentRoute ? '' : undefined"
+                    :data-active="isActive(child.href) ? '' : undefined"
                   >
                     <div class="flex items-center gap-2 font-medium">
                       {{ child.title }}
@@ -220,7 +225,7 @@ const currentRoute = computed(() => window.location.href);
             <Link
               v-else
               :href="item.disabled ? undefined : (item.href ?? '#')"
-              :data-active="item.href === currentRoute ? '' : undefined"
+              :data-active="isActive(item.href) ? '' : undefined"
               :class="[
                 'flex items-center px-3 py-2.5 rounded-lg text-sm data-active:text-primary font-medium transition-colors',
                 item.disabled

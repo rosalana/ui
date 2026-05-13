@@ -295,3 +295,7 @@ export { TextEffect } from "./blocks/TextEffect/index";
 
 // Dump
 export { default as Dump } from "./blocks/Dump/index.vue";
+
+// SideNav
+export { default as SideNav } from "./blocks/SideNav/index.vue";
+export type { SideNavItem, SideNavProps } from "./blocks/SideNav/types";
