@@ -1,0 +1,57 @@
+@layer utilities {
+  .document-content {
+    @apply text-foreground/80 leading-relaxed;
+  }
+
+  .document-content h1 {
+    @apply text-3xl font-black tracking-tight text-foreground mb-6 mt-0;
+  }
+
+  .document-content h2 {
+    @apply text-xl font-bold tracking-tight text-foreground mb-4 mt-10 pb-2 border-b border-border;
+  }
+
+  .document-content h3 {
+    @apply text-base font-semibold text-foreground mb-3 mt-8;
+  }
+
+  .document-content p {
+    @apply mb-4;
+  }
+
+  .document-content ul {
+    @apply mb-4 ml-4 space-y-1.5 list-disc;
+  }
+
+  .document-content ol {
+    @apply mb-4 ml-4 space-y-1.5 list-decimal;
+  }
+
+  .document-content li {
+    @apply text-foreground/75;
+  }
+
+  .document-content a {
+    @apply text-rose-500 underline underline-offset-2 hover:text-rose-400 transition-colors;
+  }
+
+  .document-content code {
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground;
+  }
+
+  .document-content pre {
+    @apply mb-6 mt-4 overflow-x-auto rounded-lg border border-border bg-muted p-4;
+  }
+
+  .document-content pre code {
+    @apply bg-transparent p-0 text-sm text-foreground/80;
+  }
+
+  .document-content blockquote {
+    @apply mb-4 border-l-2 border-rose-500/40 pl-4 italic text-foreground/50;
+  }
+
+  .document-content strong {
+    @apply font-semibold text-foreground;
+  }
+}
