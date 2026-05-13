@@ -19,11 +19,11 @@ const props = defineProps<SideNavProps>();
 const { y } = useScroll(window);
 const scrolled = computed(() => y.value > 16);
 
-const currentPath = ref(window.location.pathname);
+const currentRoute = ref(window.location.href);
 
 function isActive(href?: string): boolean {
   if (!href) return false;
-  return currentPath.value === href || currentPath.value.startsWith(href + '/');
+  return currentRoute.value === href || currentRoute.value.startsWith(href + '/');
 }
 
 function sectionHasActive(children?: WebNavItem[]): boolean {

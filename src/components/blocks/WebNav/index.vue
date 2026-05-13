@@ -26,7 +26,7 @@ const scrolled = computed(() => y.value > 16);
 const mobileOpen = ref(false);
 const openSections = ref<Record<string, boolean>>({});
 
-const currentRoute = computed(() => window.location.href);
+const currentRoute = ref(window.location.href);
 
 function isActive(href?: string): boolean {
   if (!href) return false;
