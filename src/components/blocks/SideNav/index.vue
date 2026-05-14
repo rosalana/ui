@@ -33,7 +33,7 @@ function sectionHasActive(children?: WebNavItem[]): boolean {
 const openSections = ref<Record<string, boolean>>(
   Object.fromEntries(
     (props.menu ?? [])
-      .filter((item) => item.children && sectionHasActive(item.children))
+      .filter((item) => (item.children && sectionHasActive(item.children)) || (item.children && item.defaultOpen))
       .map((item) => [item.title, true]),
   ),
 );
