@@ -105,7 +105,7 @@ const activeState = computed(() => {
 </script>
 
 <template>
-  <div class="relative">
+  <div class="relative w-full">
     <input
       :ref="forwardRef"
       data-slot="input"
