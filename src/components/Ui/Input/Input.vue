@@ -55,6 +55,8 @@ const props = withDefaults(defineProps<Props>(), {
   icon: " ",
 });
 
+defineOptions({ inheritAttrs: false });
+
 const emit = defineEmits<{
   "update:modelValue": [value: string];
 }>();
@@ -107,6 +109,7 @@ const activeState = computed(() => {
 <template>
   <div class="relative w-full">
     <input
+      v-bind="$attrs"
       :ref="forwardRef"
       data-slot="input"
       :type="
