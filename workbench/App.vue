@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, defineAsyncComponent, watch } from "vue";
 import { UiIcon } from "@rosalana/ui";
+import { DONE, UNTOUCHED } from "./componentStatus";
 
 const modules = import.meta.glob("./demos/*.vue");
 
@@ -8,8 +9,13 @@ const demos = Object.keys(modules)
   .map((p) => ({ name: p.replace("./demos/", "").replace(".vue", ""), load: modules[p] }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-const selected = ref(demos[0]?.name ?? "");
+const hashName = window.location.hash.slice(1);
+const selected = ref(demos.find((d) => d.name === hashName) ? hashName : (demos[0]?.name ?? ""));
 const search = ref("");
+
+watch(selected, (name) => {
+  window.location.hash = name;
+}, { immediate: true });
 
 const filtered = computed(() =>
   search.value
@@ -21,6 +27,9 @@ const currentDemo = computed(() => {
   const d = demos.find((d) => d.name === selected.value);
   return d ? defineAsyncComponent(d.load as any) : null;
 });
+
+const doneSet = new Set(DONE);
+const untouchedSet = new Set(UNTOUCHED);
 
 const isDark = ref(localStorage.getItem("appearance") === "dark");
 watch(
@@ -68,13 +77,22 @@ watch(
           :key="demo.name"
           @click="selected = demo.name"
           :class="[
-            'w-full text-left px-3 py-1.5 rounded-lg text-sm transition-all duration-150',
+            'w-full text-left px-3 py-1.5 rounded-lg text-sm transition-all duration-150 flex items-center justify-between gap-2',
             selected === demo.name
               ? 'bg-primary text-primary-foreground shadow-[0_2px_8px_-3px] shadow-primary/50 font-medium'
               : 'text-theme hover:bg-muted-100 dark:hover:bg-muted-900 hover:text-foreground',
           ]"
         >
-          {{ demo.name }}
+          <span>{{ demo.name }}</span>
+          <span
+            v-if="doneSet.has(demo.name) || untouchedSet.has(demo.name)"
+            :class="[
+              'shrink-0 size-1.5 rounded-full',
+              selected === demo.name
+                ? 'bg-primary-foreground/60'
+                : doneSet.has(demo.name) ? 'bg-success' : 'bg-warning'
+            ]"
+          />
         </button>
         <div v-if="filtered.length === 0" class="px-3 py-2 text-xs text-theme">
           No components found
