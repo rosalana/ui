@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { UiPopover, UiPopoverContent, UiPopoverTrigger } from "@rosalana/ui";
 import {
   formatPublic,
@@ -22,38 +22,66 @@ const props = withDefaults(defineProps<ColorPickerProps>(), {
 
 const emit = defineEmits<{ "update:modelValue": [string] }>();
 
-const color = computed<HSVA>({
-  get() {
-    const rgba = parseColor(props.modelValue || "") || {
-      r: 0,
-      g: 0,
-      b: 0,
-      a: 1,
+// ─── Internal HSVA state
+// H must live as a ref — it cannot be recovered from an achromatic string like
+// "#000000" or "oklch(0 0 0)". If we derived H from modelValue on every read,
+// moving the Value slider to 0 would permanently reset H to 0.
+const internalColor = ref<HSVA>({ h: 0, s: 0, v: 100, a: 1 });
+
+// The last string we emitted ourselves. When modelValue echoes it back we skip
+// the sync — otherwise every emission would trigger a re-derivation of H.
+const lastEmitted = ref<string | null>(null);
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (!val || val === lastEmitted.value) return;
+    const rgba = parseColor(val);
+    if (!rgba) return;
+    const hsva = rgbaToHsva(rgba);
+    internalColor.value = {
+      // Preserve H when the incoming color is achromatic (black, white, gray).
+      // Those colors have no meaningful hue, so we keep whatever the user had.
+      h: hsva.s > 2 ? hsva.h : internalColor.value.h,
+      s: hsva.s,
+      v: hsva.v,
+      a: hsva.a,
     };
-    return rgbaToHsva(rgba);
   },
+  { immediate: true },
+);
+
+// color is what every child component binds to via v-model
+const color = computed<HSVA>({
+  get: () => internalColor.value,
   set(newColor) {
-    const rgba = hsvaToRgba(newColor);
-    const formatted = formatPublic(rgba, props.format);
+    internalColor.value = newColor;
+    const formatted = formatPublic(hsvaToRgba(newColor), props.format);
+    lastEmitted.value = formatted;
     emit("update:modelValue", formatted);
   },
 });
 
 const preview = computed<string>(() => {
-  const { r, g, b } = hsvaToRgba(color.value);
-  return `rgba(${r}, ${g}, ${b}, ${color.value.a})`;
+  const { r, g, b } = hsvaToRgba(internalColor.value);
+  return `rgba(${r}, ${g}, ${b}, ${internalColor.value.a})`;
 });
 
 const formatted = computed<string>(() =>
-  formatPublic(hsvaToRgba(color.value), props.format),
+  formatPublic(hsvaToRgba(internalColor.value), props.format),
 );
 
 const inputValue = ref(formatted.value);
 const isInputFocused = ref(false);
 
+watch(formatted, (val) => {
+  if (!isInputFocused.value) inputValue.value = val;
+});
+
 function onInputFocus() {
   isInputFocused.value = true;
 }
+
 function onInputBlur() {
   isInputFocused.value = false;
   onInputCommit();
@@ -62,11 +90,10 @@ function onInputBlur() {
 function onInputCommit() {
   const parsed = parseColor(inputValue.value.trim());
   if (!parsed) {
-    inputValue.value = formatPublic(hsvaToRgba(color.value), props.format);
+    inputValue.value = formatted.value;
     return;
   }
-  const hsva = rgbaToHsva(parsed);
-  color.value = hsva;
+  color.value = rgbaToHsva(parsed);
 }
 </script>
 
@@ -115,15 +142,3 @@ function onInputCommit() {
     </UiPopoverContent>
   </UiPopover>
 </template>
-
-<style scoped>
-/* Make track and range transparent so the gradient backgrounds show through */
-.hue-slider-wrap :deep([data-slot="slider-track"]),
-.alpha-slider-wrap :deep([data-slot="slider-track"]) {
-  background: transparent;
-}
-.hue-slider-wrap :deep([data-slot="slider-range"]),
-.alpha-slider-wrap :deep([data-slot="slider-range"]) {
-  background: transparent;
-}
-</style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, shallowRef, watch, computed } from "vue";
+import { onMounted, onUnmounted, ref, shallowRef, watch } from "vue";
 import { Sandbox } from "@rosalana/sandbox";
 import pickerFrag from "./picker.frag?raw";
 import { type HSVA } from "../../../composables/useColorConverter";
@@ -8,47 +8,40 @@ const props = defineProps<{
   modelValue: HSVA;
 }>();
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits<{ "update:modelValue": [HSVA] }>();
 
-const picker = ref({ x: 0, y: 0 }); // x = saturation, y = value
+const picker = ref({ x: 0, y: 0 });
+const isDragging = ref(false);
 
-const color = computed<HSVA>({
-  get() {
-    picker.value.x = props.modelValue?.s ?? 0;
-    picker.value.y = props.modelValue?.v ?? 0;
-    return props.modelValue;
+// Sync dot position from parent — but never during drag (user is in control)
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (isDragging.value) return;
+    picker.value.x = val.s;
+    picker.value.y = val.v;
   },
-  set(newColor) {
-    emit("update:modelValue", newColor);
-  },
-});
+  { immediate: true, deep: true },
+);
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const sandbox = shallowRef<Sandbox | null>(null);
 
 onMounted(() => {
   if (!canvasRef.value) return;
-
-  // Initialize the WebGL sandbox
   sandbox.value = Sandbox.create(canvasRef.value, {
     fragment: pickerFrag,
-    uniforms: {
-      u_hue: color.value.h,
-    },
+    uniforms: { u_hue: props.modelValue.h },
     autoplay: false,
   });
-
   sandbox.value.render();
 });
 
-const isDragging = ref(false);
-
 watch(
-  () => color.value.h,
-  (newHue) => {
+  () => props.modelValue.h,
+  (h) => {
     if (!sandbox.value) return;
-
-    sandbox.value.setUniform("u_hue", newHue);
+    sandbox.value.setUniform("u_hue", h);
     sandbox.value.render();
   },
 );
@@ -90,14 +83,15 @@ function updateFromCanvas(e: MouseEvent) {
     0,
     Math.min(100, (1 - (e.clientY - rect.top) / rect.height) * 100),
   );
-
-  color.value = {
-    ...color.value,
+  // Only S and V change from canvas — H and A are never touched here
+  emit("update:modelValue", {
+    ...props.modelValue,
     s: picker.value.x,
     v: picker.value.y,
-  };
+  });
 }
 </script>
+
 <template>
   <div
     class="relative select-none overflow-hidden rounded-lg"
@@ -108,13 +102,9 @@ function updateFromCanvas(e: MouseEvent) {
       class="h-full w-full cursor-crosshair"
       @mousedown.prevent="onCanvasMouseDown"
     />
-    <!-- Selector dot -->
     <div
       class="pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md"
-      :style="{
-        left: `${picker.x}%`,
-        top: `${100 - picker.y}%`,
-      }"
+      :style="{ left: `${picker.x}%`, top: `${100 - picker.y}%` }"
     />
   </div>
 </template>
