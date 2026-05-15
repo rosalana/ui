@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["vite/client"],
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "declaration": false
+  },
+  "include": ["./**/*.ts", "./**/*.vue"]
+}
