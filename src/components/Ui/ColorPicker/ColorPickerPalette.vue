@@ -28,7 +28,7 @@ const handleSelect = (color: string) => {
       Palettes
     </p>
     <div class="flex-1 p-2">
-      <div class="hide-scrollbar overflow-y-auto max-h-64 divide-y">
+      <div class="hide-scrollbar h-full overflow-y-auto max-h-70 divide-y">
         <div v-for="family in colorFamilies" :key="family.name">
           <div class="flex gap-0.5 my-1.5">
             <UiButton

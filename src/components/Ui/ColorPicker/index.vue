@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { UiPopover, UiPopoverContent, UiPopoverTrigger } from "@rosalana/ui";
+import { UiPopover, UiPopoverContent, UiPopoverTrigger } from "../..";
 import {
   formatPublic,
   hsvaToRgba,
@@ -98,10 +98,6 @@ function onInputCommit() {
 </script>
 
 <template>
-  <span
-    class="size-14 shrink-0 rounded-sm flex items-center justify-center"
-    :style="{ background: preview }"
-  />
   <UiPopover>
     <UiPopoverTrigger as-child>
       <ColorPickerTrigger
@@ -112,7 +108,7 @@ function onInputCommit() {
     </UiPopoverTrigger>
 
     <UiPopoverContent class="p-0 flex w-max divide-x" align="start">
-      <!-- ── Left: picker ──────────────────────────────────────────────── -->
+      <!-- ── Left: picker -->
       <div class="flex flex-1 flex-col gap-3 p-3">
         <!-- WebGL canvas -->
         <ColorPickerCanvas v-model="color" />
