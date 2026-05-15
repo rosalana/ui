@@ -2,7 +2,6 @@
 import { Primitive, useForwardProps, type PrimitiveProps } from "reka-ui";
 import { type ClassValue, tv } from "tailwind-variants";
 import { UiIcon } from "../..";
-import { UiAccordion } from "dist";
 
 const colorPickerTrigger = tv({
   base: [
