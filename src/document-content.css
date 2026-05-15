@@ -47,6 +47,26 @@
     @apply bg-transparent p-0 text-sm text-foreground/80 whitespace-pre-wrap;
   }
 
+  .document-content table {
+    @apply w-full mb-6 mt-4 text-sm border-collapse;
+  }
+
+  .document-content thead {
+    @apply border-b border-border;
+  }
+
+  .document-content th {
+    @apply text-left font-semibold text-foreground py-2 px-3;
+  }
+
+  .document-content td {
+    @apply py-2 px-3 text-foreground/75 border-b border-border/50;
+  }
+
+  .document-content tr:last-child td {
+    @apply border-b-0;
+  }
+
   .document-content blockquote {
     @apply mb-4 border-l-2 border-rose-500/40 pl-4 italic text-foreground/50;
   }
