@@ -50,6 +50,10 @@ export { default as UiButton } from "./Ui/Button/Button.vue";
 // Calendar
 export { default as UiCalendar } from "./Ui/Calendar/Calendar.vue";
 
+// ColorPicker
+export { default as UiColorPicker } from "./Ui/ColorPicker/index.vue";
+export type { ColorPickerProps, PublicColorFormat } from "./Ui/ColorPicker/types";
+
 // Card
 export { default as UiCard } from "./Ui/Card/Card.vue";
 export { default as UiCardHeader } from "./Ui/Card/CardHeader.vue";
