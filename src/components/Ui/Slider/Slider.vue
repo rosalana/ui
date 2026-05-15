@@ -9,11 +9,19 @@ const sliderRoot = tv({
 })
 
 const sliderTrack = tv({
-  base: "relative h-2 w-full grow overflow-hidden rounded-full bg-primary/20 transition-colors duration-150",
+  base: "relative h-2 w-full grow overflow-hidden rounded-full transition-colors duration-150",
+  variants: {
+    transparent: { true: "bg-transparent", false: "bg-primary/20" },
+  },
+  defaultVariants: { transparent: false },
 })
 
 const sliderRange = tv({
-  base: "absolute h-full bg-primary transition-all duration-75",
+  base: "absolute h-full transition-all duration-75",
+  variants: {
+    transparent: { true: "bg-transparent", false: "bg-primary" },
+  },
+  defaultVariants: { transparent: false },
 })
 
 const sliderThumb = tv({
@@ -31,6 +39,7 @@ const sliderThumb = tv({
 
 interface Props extends SliderRootProps {
   class?: ClassValue
+  transparent?: boolean
 }
 
 const props = defineProps<Props>()
@@ -49,8 +58,8 @@ const thumbCount = computed(
     v-bind="forwarded"
     :class="sliderRoot({ class: props.class })"
   >
-    <SliderTrack data-slot="slider-track" :class="sliderTrack()">
-      <SliderRange data-slot="slider-range" :class="sliderRange()" />
+    <SliderTrack data-slot="slider-track" :class="sliderTrack({ transparent: !!props.transparent })">
+      <SliderRange data-slot="slider-range" :class="sliderRange({ transparent: !!props.transparent })" />
     </SliderTrack>
     <SliderThumb
       v-for="(_, index) in thumbCount"

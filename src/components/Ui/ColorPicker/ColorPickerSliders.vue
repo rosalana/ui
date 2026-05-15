@@ -53,85 +53,41 @@ const alpha = computed({
   },
 });
 </script>
+
 <template>
   <!-- Hue slider -->
-  <div class="hue-slider-wrap relative flex items-center">
+  <div class="relative flex items-center">
     <div
       class="pointer-events-none absolute inset-y-0 my-auto h-2 w-full rounded-full"
-      style="
-        background: linear-gradient(
-          to right,
-          #f00 0%,
-          #ff0 17%,
-          #0f0 33%,
-          #0ff 50%,
-          #00f 67%,
-          #f0f 83%,
-          #f00 100%
-        );
-      "
+      style="background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);"
     />
-    <UiSlider v-model="hue" :min="0" :max="360" :step="1" class="relative" />
+    <UiSlider v-model="hue" :min="0" :max="360" :step="1" :transparent="true" class="relative" />
   </div>
 
   <!-- Saturation slider -->
-  <div class="saturation-slider-wrap relative flex items-center">
+  <div class="relative flex items-center">
     <div
       class="pointer-events-none absolute inset-y-0 my-auto h-2 w-full rounded-full"
-      :style="{
-        background: `linear-gradient(to right, hsl(${color.h}, 0%, 50%), hsl(${color.h}, 100%, 50%))`,
-      }"
+      :style="{ background: `linear-gradient(to right, hsl(${color.h}, 0%, 50%), hsl(${color.h}, 100%, 50%))` }"
     />
-
-    <UiSlider
-      v-model="saturation"
-      :min="0"
-      :max="100"
-      :step="1"
-      class="relative"
-    />
+    <UiSlider v-model="saturation" :min="0" :max="100" :step="1" :transparent="true" class="relative" />
   </div>
 
   <!-- Value slider -->
-  <div class="value-slider-wrap relative flex items-center">
+  <div class="relative flex items-center">
     <div
       class="pointer-events-none absolute inset-y-0 my-auto h-2 w-full rounded-full"
-      :style="{
-        background: `linear-gradient(to right, hsl(${color.h}, ${color.s}%, 0%), hsl(${color.h}, ${color.s}%, 50%), hsl(${color.h}, ${color.s}%, 100%))`,
-      }"
+      :style="{ background: `linear-gradient(to right, hsl(${color.h}, ${color.s}%, 0%), hsl(${color.h}, ${color.s}%, 50%), hsl(${color.h}, ${color.s}%, 100%))`}"
     />
-    <UiSlider v-model="value" :min="0" :max="100" :step="1" class="relative" />
+    <UiSlider v-model="value" :min="0" :max="100" :step="1" :transparent="true" class="relative" />
   </div>
 
   <!-- Alpha slider -->
-  <div class="alpha-slider-wrap relative flex items-center">
+  <div class="relative flex items-center">
     <div
       class="pointer-events-none absolute inset-y-0 my-auto h-2 w-full rounded-full"
       :style="alphaTrackStyle"
     />
-    <UiSlider v-model="alpha" :min="0" :max="100" :step="1" class="relative" />
+    <UiSlider v-model="alpha" :min="0" :max="100" :step="1" :transparent="true" class="relative" />
   </div>
 </template>
-<style scoped>
-/* Make track and range transparent so the gradient backgrounds show through */
-.hue-slider-wrap :deep([data-slot="slider-track"]),
-.alpha-slider-wrap :deep([data-slot="slider-track"]) {
-  background: transparent;
-}
-.hue-slider-wrap :deep([data-slot="slider-range"]),
-.alpha-slider-wrap :deep([data-slot="slider-range"]) {
-  background: transparent;
-}
-.saturation-slider-wrap :deep([data-slot="slider-track"]) {
-  background: transparent;
-}
-.saturation-slider-wrap :deep([data-slot="slider-range"]) {
-  background: transparent;
-}
-.value-slider-wrap :deep([data-slot="slider-track"]) {
-  background: transparent;
-}
-.value-slider-wrap :deep([data-slot="slider-range"]) {
-  background: transparent;
-}
-</style>
