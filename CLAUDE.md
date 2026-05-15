@@ -277,6 +277,35 @@ Semantic colors: `primary`, `secondary`, `muted`, `destructive`, `info`, `succes
 - TypeScript declarations included
 - CSS: Import `@rosalana/ui/tailwind.css` in consuming apps
 
+## Workbench
+
+The workbench is a local development sandbox for previewing and testing all UI components.
+
+```bash
+npm run workbench   # Start workbench on http://localhost:4000
+```
+
+It auto-discovers every file in `workbench/demos/` — adding a new demo is as simple as creating `workbench/demos/{ComponentName}.vue`. No registration needed.
+
+### Adding a Demo
+
+When working on any Ui component, always check whether a demo file exists in `workbench/demos/`. If it does not, create one. The demo should cover:
+- All variants and sizes
+- Interactive states (disabled, loading, error…)
+- A realistic usage example
+
+### Component Status
+
+Every Ui component has an implementation status tracked in `workbench/componentStatus.ts`. The workbench sidebar shows a colored dot next to each component name.
+
+| Status | Dot | Meaning |
+|--------|-----|---------|
+| **Done** | 🟢 green | Fully implemented according to Rosalana UI standards. Safe to use in any app. |
+| **Untouched** | 🟠 orange | Usable but either has a known minor issue or was never reviewed against UI standards. Warn the developer and double-check before relying on it. |
+| **Not implemented** | — none | Copied from shadcn/reka-ui without Rosalana styling. **Do not use.** If a developer asks to use this component, block the request and explain it must be implemented to standard first. |
+
+When you finish implementing a component to Rosalana standards, add its name to the `DONE` array in `workbench/componentStatus.ts`. Remove it from `UNTOUCHED` if it was there.
+
 ## Common Tasks
 
 ```bash
