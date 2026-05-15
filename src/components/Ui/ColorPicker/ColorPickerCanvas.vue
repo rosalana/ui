@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, shallowRef, watch } from "vue";
+import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 import { Sandbox } from "@rosalana/sandbox";
 import pickerFrag from "./picker.frag?raw";
 import { type HSVA } from "../../../composables/useColorConverter";
@@ -46,7 +46,7 @@ watch(
   },
 );
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   sandbox.value?.destroy();
   document.removeEventListener("mousemove", onDocMouseMove);
   document.removeEventListener("mouseup", onDocMouseUp);

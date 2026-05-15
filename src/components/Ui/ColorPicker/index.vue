@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { UiPopover, UiPopoverContent, UiPopoverTrigger } from "../..";
+import {
+  UiButton,
+  UiIcon,
+  UiPopover,
+  UiPopoverContent,
+  UiPopoverTrigger,
+} from "../..";
 import {
   formatPublic,
   hsvaToRgba,
@@ -14,10 +20,13 @@ import ColorPickerPalette from "./ColorPickerPalette.vue";
 import ColorPickerCanvas from "./ColorPickerCanvas.vue";
 import ColorPickerSliders from "./ColorPickerSliders.vue";
 import { UiInput } from "../..";
+import { motion, AnimatePresence } from "motion-v";
 
 const props = withDefaults(defineProps<ColorPickerProps>(), {
   placeholder: "Pick a color",
   format: "hex",
+  palette: false,
+  input: true,
 });
 
 const emit = defineEmits<{ "update:modelValue": [string] }>();
@@ -31,6 +40,8 @@ const internalColor = ref<HSVA>({ h: 0, s: 0, v: 100, a: 1 });
 // The last string we emitted ourselves. When modelValue echoes it back we skip
 // the sync — otherwise every emission would trigger a re-derivation of H.
 const lastEmitted = ref<string | null>(null);
+
+const showPalette = ref<boolean>(false);
 
 watch(
   () => props.modelValue,
@@ -107,7 +118,7 @@ function onInputCommit() {
       />
     </UiPopoverTrigger>
 
-    <UiPopoverContent class="p-0 flex w-max divide-x" align="start">
+    <UiPopoverContent class="p-0 flex w-max" align="start">
       <!-- ── Left: picker -->
       <div class="flex flex-1 flex-col gap-3 p-3">
         <!-- WebGL canvas -->
@@ -117,7 +128,7 @@ function onInputCommit() {
         <ColorPickerSliders v-model="color" />
 
         <!-- Preview swatch + value input -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2" v-if="props.input">
           <span
             class="size-8 shrink-0 rounded-lg border border-black/10"
             :style="{ background: preview }"
@@ -133,8 +144,44 @@ function onInputCommit() {
         </div>
       </div>
 
+      <div class="flex items-center justify-center" v-if="props.palette">
+        <UiButton
+          variant="clear"
+          size="icon-sm"
+          class="w-5 mr-3 active:scale-85"
+          @click="showPalette = !showPalette"
+        >
+          <motion.span
+            :animate="{ rotate: showPalette ? 90 : 0 }"
+            :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
+            class="inline-flex"
+          >
+            <UiIcon
+              :name="showPalette ? 'lucide:x' : 'lucide:palette'"
+              class="size-4"
+            />
+          </motion.span>
+        </UiButton>
+      </div>
+
       <!-- Palettes -->
-      <ColorPickerPalette v-model="color" />
+      <AnimatePresence>
+        <motion.div
+          v-if="showPalette"
+          :initial="{ width: 0, opacity: 0 }"
+          :animate="{ width: 'auto', opacity: 1 }"
+          :exit="{ width: 0, opacity: 0 }"
+          :transition="{
+            type: 'spring',
+            stiffness: 300,
+            damping: 30,
+            opacity: { duration: 0.15 },
+          }"
+          class="shrink-0"
+        >
+          <ColorPickerPalette v-model="color" />
+        </motion.div>
+      </AnimatePresence>
     </UiPopoverContent>
   </UiPopover>
 </template>

@@ -8,4 +8,6 @@ export interface ColorPickerProps {
   format?: PublicColorFormat
   placeholder?: string
   class?: ClassValue
+  palette?: boolean
+  input?: boolean
 }

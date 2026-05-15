@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { UiButton } from "../..";
 import { colorFamilies } from "./palettes";
 import {
   parseColor,
@@ -31,14 +30,11 @@ const handleSelect = (color: string) => {
       <div class="hide-scrollbar h-full overflow-y-auto max-h-70 divide-y">
         <div v-for="family in colorFamilies" :key="family.name">
           <div class="flex gap-0.5 my-1.5">
-            <UiButton
+            <button
               v-for="shade in family.shades"
               :key="shade.shade"
               type="button"
-              variant="outline"
-              size="icon-sm"
-              class="size-4.5 flex rounded-sm hover:scale-115"
-              :class="`[shadow-color:${shade.value}] shadow-lg`"
+              class="size-4.5 rounded-sm shrink-0 border border-black/10 transition-transform hover:scale-115 cursor-pointer active:scale-95"
               :title="`${family.name}-${shade.shade}`"
               :style="{ background: shade.value }"
               @click="() => handleSelect(shade.value)"
