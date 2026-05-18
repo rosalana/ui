@@ -35,6 +35,8 @@ export { default as UiAvatarFallback } from "./Ui/Avatar/AvatarFallback.vue";
 // Badge
 export { default as UiBadge } from "./Ui/Badge/Badge.vue";
 
+export { default as UiTag } from "./Ui/Tag/Tag.vue";
+
 // Breadcrumb
 export { default as UiBreadcrumb } from "./Ui/Breadcrumb/Breadcrumb.vue";
 export { default as UiBreadcrumbList } from "./Ui/Breadcrumb/BreadcrumbList.vue";
