@@ -15,7 +15,7 @@ const alert = tv({
   variants: {
     variant: {
       default:
-        "[&>svg]:text-white shadow-[0_2px_8px_-3px,0_4px_20px_-4px] bg-theme hover:brightness-105 border-theme text-white [&_[data-slot=alert-description]]:text-white shadow-primary/40",
+        "[&>svg]:text-white shadow-[0_2px_8px_-3px,0_4px_20px_-4px] bg-theme hover:brightness-105 border-theme text-white [&_[data-slot=alert-description]]:text-white shadow-primary/40 bg-primary border-primary",
       destructive:
         "[&>svg]:text-white bg-destructive shadow-[0_2px_8px_-3px,0_4px_20px_-4px] hover:brightness-105 text-white [&_[data-slot=alert-description]]:text-white [&_[data-slot=alert-title]]:font-semibold border-destructive shadow-destructive/40",
       success: "[&>svg]:text-success hover:bg-muted",
