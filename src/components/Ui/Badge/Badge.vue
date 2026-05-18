@@ -50,7 +50,7 @@ const badge = tv({
   },
 });
 
-type BadgeVariants = VariantProps<typeof badge>;
+export type BadgeVariants = VariantProps<typeof badge>;
 
 interface Props extends PrimitiveProps {
   variant?: BadgeVariants["variant"];
@@ -66,7 +66,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
   <Primitive
-    data-slot="badge"
+    :data-slot="$attrs['data-slot'] ?? 'badge'"
     :as="props.as ?? 'div'"
     :as-child="asChild"
     :class="[badge({ variant, size, class: props.class })]"
