@@ -12,6 +12,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@rosalana/ui": path.resolve(__dirname, "../src/index.ts"),
+      "workbench": path.resolve(__dirname, "../workbench"),
     },
   },
   server: {

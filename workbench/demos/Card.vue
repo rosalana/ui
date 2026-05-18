@@ -9,43 +9,49 @@ import UiButton from "../../src/components/Ui/Button/Button.vue";
 import UiInput from "../../src/components/Ui/Input/Input.vue";
 import UiLabel from "../../src/components/Ui/Label/Label.vue";
 import UiBadge from "../../src/components/Ui/Badge/Badge.vue";
+import Section from "workbench/components/Section.vue";
 </script>
 
 <template>
-  <div class="space-y-6 max-w-2xl">
-    <div class="grid grid-cols-2 gap-6">
-      <!-- Basic card -->
-      <UiCard>
-        <UiCardHeader>
-          <UiCardTitle>Basic Card</UiCardTitle>
-          <UiCardDescription>A simple card with header and content.</UiCardDescription>
-        </UiCardHeader>
-        <UiCardContent>
-          <p class="text-sm text-theme">Card content goes here. You can put any content inside.</p>
-        </UiCardContent>
-      </UiCard>
+  <Section title="Basic Cards" class="grid grid-cols-2 gap-6 w-3xl">
+    <UiCard>
+      <UiCardHeader>
+        <UiCardTitle>Basic Card</UiCardTitle>
+        <UiCardDescription
+          >A simple card with header and content.</UiCardDescription
+        >
+      </UiCardHeader>
+      <UiCardContent>
+        <p class="text-sm text-theme">
+          Card content goes here. You can put any content inside.
+        </p>
+      </UiCardContent>
+    </UiCard>
 
-      <!-- Card with footer -->
-      <UiCard>
-        <UiCardHeader>
-          <UiCardTitle>With Footer</UiCardTitle>
-          <UiCardDescription>Card with actions in the footer.</UiCardDescription>
-        </UiCardHeader>
-        <UiCardContent>
-          <p class="text-sm text-theme">This card has a footer with action buttons.</p>
-        </UiCardContent>
-        <UiCardFooter class="flex justify-end gap-2">
-          <UiButton variant="outline" size="sm">Cancel</UiButton>
-          <UiButton size="sm">Confirm</UiButton>
-        </UiCardFooter>
-      </UiCard>
-    </div>
+    <UiCard>
+      <UiCardHeader>
+        <UiCardTitle>With Footer</UiCardTitle>
+        <UiCardDescription>Card with actions in the footer.</UiCardDescription>
+      </UiCardHeader>
+      <UiCardContent>
+        <p class="text-sm text-theme">
+          This card has a footer with action buttons.
+        </p>
+      </UiCardContent>
+      <UiCardFooter class="flex justify-end gap-2">
+        <UiButton variant="outline" size="sm">Cancel</UiButton>
+        <UiButton size="sm">Confirm</UiButton>
+      </UiCardFooter>
+    </UiCard>
+  </Section>
 
-    <!-- Form card -->
+  <Section title="Form Card" class="w-96">
     <UiCard>
       <UiCardHeader>
         <UiCardTitle>Login</UiCardTitle>
-        <UiCardDescription>Enter your credentials to access your account.</UiCardDescription>
+        <UiCardDescription
+          >Enter your credentials to access your account.</UiCardDescription
+        >
       </UiCardHeader>
       <UiCardContent class="space-y-4">
         <div class="space-y-1.5">
@@ -61,22 +67,36 @@ import UiBadge from "../../src/components/Ui/Badge/Badge.vue";
         <UiButton class="w-full">Sign in</UiButton>
       </UiCardFooter>
     </UiCard>
+  </Section>
 
-    <!-- Stats card -->
-    <div class="grid grid-cols-3 gap-4">
-      <UiCard v-for="stat in [
-        { label: 'Revenue', value: '$45,231', change: '+20.1%', color: 'success' },
+  <Section title="Stats Card" class="grid grid-cols-3 gap-4">
+    <UiCard
+      v-for="stat in [
+        {
+          label: 'Revenue',
+          value: '$45,231',
+          change: '+20.1%',
+          color: 'success',
+        },
         { label: 'Users', value: '2,350', change: '+180', color: 'info' },
-        { label: 'Churn', value: '3.2%', change: '-0.4%', color: 'destructive' },
-      ]" :key="stat.label">
-        <UiCardContent class="pt-5">
-          <div class="flex items-center justify-between mb-2">
-            <p class="text-xs text-theme font-medium">{{ stat.label }}</p>
-            <UiBadge :variant="stat.color as any" size="sm">{{ stat.change }}</UiBadge>
-          </div>
-          <p class="text-2xl font-bold tracking-tight">{{ stat.value }}</p>
-        </UiCardContent>
-      </UiCard>
-    </div>
-  </div>
+        {
+          label: 'Churn',
+          value: '3.2%',
+          change: '-0.4%',
+          color: 'destructive',
+        },
+      ]"
+      :key="stat.label"
+    >
+      <UiCardContent class="pt-5">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs text-theme font-medium">{{ stat.label }}</p>
+          <UiBadge :variant="stat.color as any" size="sm">{{
+            stat.change
+          }}</UiBadge>
+        </div>
+        <p class="text-2xl font-bold tracking-tight">{{ stat.value }}</p>
+      </UiCardContent>
+    </UiCard>
+  </Section>
 </template>
