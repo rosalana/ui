@@ -10,3 +10,4 @@ export * from "./useDetectLightness";
 export * from "./useAuth";
 export * from "./useShortcuts";
 export * from "./useColorConverter";
+export * from "./useSelect";

@@ -240,6 +240,10 @@ export { default as UiSlider } from "./Ui/Slider/Slider.vue";
 // Switch
 export { default as UiSwitch } from "./Ui/Switch/Switch.vue";
 
+// FrameSelection
+export { default as UiFrameSelection } from "./Ui/FrameSelection/FrameSelection.vue";
+export { default as UiFrameSelectionItem } from "./Ui/FrameSelection/FrameSelectionItem.vue";
+
 // Table
 export { default as UiTable } from "./Ui/Table/Table.vue";
 export { default as UiTableHeader } from "./Ui/Table/TableHeader.vue";
