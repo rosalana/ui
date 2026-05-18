@@ -33,6 +33,7 @@ export const DONE: string[] = [
   "Switch",
   "Table",
   "Tooltip",
+  "Tag",
 ];
 
 export const UNTOUCHED: string[] = [
