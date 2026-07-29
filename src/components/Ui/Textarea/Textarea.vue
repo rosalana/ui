@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForwardExpose } from "reka-ui";
 import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
+import { applyModelModifiers, type TextModelModifiers } from "../../../helpers";
 
 const textarea = tv({
   base: [
@@ -25,6 +26,11 @@ type TextareaVariants = VariantProps<typeof textarea>;
 interface Props {
   defaultValue?: string;
   modelValue?: string;
+  /**
+   * Filled in by Vue from `v-model.lazy.trim`. Handled here because Vue only applies those
+   * modifiers to native elements on its own. `.number` is left out — a textarea holds text.
+   */
+  modelModifiers?: TextModelModifiers;
   placeholder?: string;
   disabled?: boolean;
   readonly?: boolean;
@@ -50,9 +56,20 @@ const emit = defineEmits<{
 
 const { forwardRef } = useForwardExpose();
 
+function emitValue(raw: string) {
+  emit("update:modelValue", applyModelModifiers(raw, props.modelModifiers) as string);
+}
+
 function handleInput(event: Event) {
-  const target = event.target as HTMLTextAreaElement;
-  emit("update:modelValue", target.value);
+  if (props.modelModifiers?.lazy) return;
+
+  emitValue((event.target as HTMLTextAreaElement).value);
+}
+
+function handleChange(event: Event) {
+  if (!props.modelModifiers?.lazy) return;
+
+  emitValue((event.target as HTMLTextAreaElement).value);
 }
 </script>
 
@@ -74,5 +91,6 @@ function handleInput(event: Event) {
     :wrap="wrap"
     :class="[textarea({ variant, class: props.class })]"
     @input="handleInput"
+    @change="handleChange"
   />
 </template>
