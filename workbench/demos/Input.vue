@@ -8,6 +8,13 @@ import Section from "workbench/components/Section.vue";
 const text = ref("");
 const email = ref("");
 const password = ref("");
+
+// v-model modifiers. Vue applies these to native elements only, so the component honors the
+// modelModifiers prop itself.
+const eager = ref("");
+const lazy = ref("");
+const trimmed = ref("");
+const port = ref<string | number>(3737);
 </script>
 
 <template>
@@ -36,6 +43,36 @@ const password = ref("");
     <div class="space-y-3">
       <UiInput placeholder="Disabled" disabled />
       <UiInput placeholder="Read only" readonly value="Read only value" />
+    </div>
+  </Section>
+
+  <Section title="v-model Modifiers" class="w-96">
+    <div class="space-y-4">
+      <div class="space-y-1.5">
+        <UiLabel>Default — emits on every keystroke</UiLabel>
+        <UiInput v-model="eager" placeholder="Type here" />
+        <p class="font-mono text-xs text-theme">{{ JSON.stringify(eager) }}</p>
+      </div>
+
+      <div class="space-y-1.5">
+        <UiLabel>.lazy — emits on blur or Enter</UiLabel>
+        <UiInput v-model.lazy="lazy" placeholder="Type, then blur" />
+        <p class="font-mono text-xs text-theme">{{ JSON.stringify(lazy) }}</p>
+      </div>
+
+      <div class="space-y-1.5">
+        <UiLabel>.trim — strips surrounding whitespace</UiLabel>
+        <UiInput v-model.trim="trimmed" placeholder="  padded  " />
+        <p class="font-mono text-xs text-theme">{{ JSON.stringify(trimmed) }}</p>
+      </div>
+
+      <div class="space-y-1.5">
+        <UiLabel>.lazy.number — a number, only once it parses</UiLabel>
+        <UiInput v-model.lazy.number="port" type="number" />
+        <p class="font-mono text-xs text-theme">
+          {{ JSON.stringify(port) }} · {{ typeof port }}
+        </p>
+      </div>
     </div>
   </Section>
 

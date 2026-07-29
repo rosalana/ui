@@ -6,6 +6,11 @@ import UiButton from "../../src/components/Ui/Button/Button.vue";
 import Section from "workbench/components/Section.vue";
 
 const bio = ref("");
+
+// v-model modifiers. Vue applies these to native elements only, so the component honors the
+// modelModifiers prop itself.
+const lazyNote = ref("");
+const trimmedNote = ref("");
 const MAX = 280;
 </script>
 
@@ -50,6 +55,22 @@ const MAX = 280;
     <div class="space-y-3">
       <UiTextarea placeholder="Disabled textarea" disabled />
       <UiTextarea value="Read only content that cannot be edited." readonly />
+    </div>
+  </Section>
+
+  <Section title="v-model Modifiers" class="max-w-md">
+    <div class="space-y-4">
+      <div class="space-y-1.5">
+        <UiLabel>.lazy — emits on blur, not on every keystroke</UiLabel>
+        <UiTextarea v-model.lazy="lazyNote" placeholder="Type, then blur" rows="3" />
+        <p class="font-mono text-xs text-theme">{{ JSON.stringify(lazyNote) }}</p>
+      </div>
+
+      <div class="space-y-1.5">
+        <UiLabel>.trim — strips surrounding whitespace</UiLabel>
+        <UiTextarea v-model.trim="trimmedNote" placeholder="  padded  " rows="3" />
+        <p class="font-mono text-xs text-theme">{{ JSON.stringify(trimmedNote) }}</p>
+      </div>
     </div>
   </Section>
 
