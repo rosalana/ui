@@ -1,9 +1,10 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends string | number = string">
 import { computed, ref } from "vue";
 import { useForwardExpose } from "reka-ui";
 import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
 import { UiButton, UiIcon } from "../../index";
 import { AnimatePresence, motion } from "motion-v";
+import { applyModelModifiers, type ModelModifiers } from "../../../helpers";
 
 const input = tv({
   base: [
@@ -25,47 +26,71 @@ const input = tv({
 
 type InputVariants = VariantProps<typeof input>;
 
-interface Props {
-  defaultValue?: string | number;
-  modelValue?: string | number;
-  type?: HTMLInputElement["type"];
-  placeholder?: string;
-  disabled?: boolean;
-  readonly?: boolean;
-  required?: boolean;
-  name?: string;
-  id?: string;
-  autocomplete?: string;
-  autofocus?: boolean;
-  min?: string | number;
-  max?: string | number;
-  step?: string | number;
-  pattern?: string;
-  variant?: InputVariants["variant"];
-  class?: ClassValue;
-  showClear?: boolean;
-  passwordToggle?: boolean;
-  icon?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  type: "text",
-  variant: "default",
-  showClear: false,
-  icon: " ",
-});
+// Inline rather than a named interface: the emitted declaration of a generic component would
+// refer to that name, and a name local to <script setup> cannot be exported.
+const props = withDefaults(
+  defineProps<{
+    defaultValue?: T;
+    modelValue?: T;
+    /**
+     * Filled in by Vue from `v-model.lazy.number.trim`. Handled here because Vue only applies
+     * those modifiers to native elements on its own.
+     */
+    modelModifiers?: ModelModifiers;
+    type?: HTMLInputElement["type"];
+    placeholder?: string;
+    disabled?: boolean;
+    readonly?: boolean;
+    required?: boolean;
+    name?: string;
+    id?: string;
+    autocomplete?: string;
+    autofocus?: boolean;
+    min?: string | number;
+    max?: string | number;
+    step?: string | number;
+    pattern?: string;
+    variant?: InputVariants["variant"];
+    class?: ClassValue;
+    showClear?: boolean;
+    passwordToggle?: boolean;
+    icon?: string;
+  }>(),
+  {
+    type: "text",
+    variant: "default",
+    showClear: false,
+    icon: " ",
+  }
+);
 
 defineOptions({ inheritAttrs: false });
 
 const emit = defineEmits<{
-  "update:modelValue": [value: string];
+  "update:modelValue": [value: T];
 }>();
 
 const { forwardRef } = useForwardExpose();
 
+/**
+ * `.number` on an emptied field emits `""`, the same as Vue does on a native input, so the
+ * cast is a lie for that one keystroke. Guard on the consuming side if the value must always
+ * be a number.
+ */
+function emitValue(raw: string) {
+  emit("update:modelValue", applyModelModifiers(raw, props.modelModifiers) as T);
+}
+
 function handleInput(event: Event) {
-  const target = event.target as HTMLInputElement;
-  emit("update:modelValue", target.value);
+  if (props.modelModifiers?.lazy) return;
+
+  emitValue((event.target as HTMLInputElement).value);
+}
+
+function handleChange(event: Event) {
+  if (!props.modelModifiers?.lazy) return;
+
+  emitValue((event.target as HTMLInputElement).value);
 }
 
 const passwordShow = ref(false);
@@ -88,7 +113,7 @@ const activeState = computed(() => {
       color: "text-destructive",
       clickable: true,
       action: () => {
-        emit("update:modelValue", "");
+        emit("update:modelValue", "" as T);
       },
     };
   }
@@ -134,6 +159,7 @@ const activeState = computed(() => {
       :pattern="pattern"
       :class="[input({ variant, class: props.class })]"
       @input="handleInput"
+      @change="handleChange"
     />
 
     <div
