@@ -309,3 +309,6 @@ export { default as Dump } from "./blocks/Dump/index.vue";
 // SideNav
 export { default as SideNav } from "./blocks/SideNav/index.vue";
 export type { SideNavItem, SideNavProps } from "./blocks/SideNav/types";
+
+// ColorVars
+export { default as ColorVars } from "./blocks/ColorVars/index.vue";

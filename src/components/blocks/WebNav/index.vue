@@ -14,26 +14,20 @@ import {
   UiIcon,
   UiButton,
 } from "../../index";
-import { useScroll } from "@vueuse/core";
+import { useWindowScroll } from "@vueuse/core";
 import { AnimatePresence, motion } from "motion-v";
 import { Link } from "@inertiajs/vue3";
+import { useActiveRoute } from "../../../composables/useActiveRoute";
 
 const props = defineProps<WebNavProps>();
 
-const { y } = useScroll(window);
+const { y } = useWindowScroll();
 const scrolled = computed(() => y.value > 16);
 
 const mobileOpen = ref(false);
 const openSections = ref<Record<string, boolean>>({});
 
-const currentRoute = ref(window.location.href);
-
-function isActive(href?: string): boolean {
-  if (!href) return false;
-  return (
-    currentRoute.value === href || currentRoute.value.startsWith(href + "/")
-  );
-}
+const { isActive } = useActiveRoute();
 </script>
 
 <template>

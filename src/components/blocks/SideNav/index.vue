@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
+import { useActiveRoute } from '../../../composables/useActiveRoute';
 import { AnimatePresence, motion } from 'motion-v';
-import { useScroll } from '@vueuse/core';
+import { useWindowScroll } from '@vueuse/core';
 import type { WebNavItem } from '../WebNav/types';
 import type { SideNavProps } from './types';
 import {
@@ -16,15 +17,10 @@ import {
 
 const props = defineProps<SideNavProps>();
 
-const { y } = useScroll(window);
+const { y } = useWindowScroll();
 const scrolled = computed(() => y.value > 16);
 
-const currentRoute = ref(window.location.href);
-
-function isActive(href?: string): boolean {
-  if (!href) return false;
-  return currentRoute.value === href || currentRoute.value.startsWith(href + '/');
-}
+const { isActive } = useActiveRoute();
 
 function sectionHasActive(children?: WebNavItem[]): boolean {
   return children?.some((c) => isActive(c.href)) ?? false;

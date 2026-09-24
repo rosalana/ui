@@ -4,6 +4,7 @@ export * from "./useTable";
 export * from "./useRemoteTable";
 export * from "./usePreferences";
 export * from "./useComputedPage";
+export * from "./useActiveRoute";
 export * from "./useTheme";
 export * from "./useFetch";
 export * from "./useDetectLightness";

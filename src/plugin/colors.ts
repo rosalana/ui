@@ -7,6 +7,7 @@ import {
   UiColorProp,
 } from "./types";
 import { flush, inject, provide, RegistryKey } from "./provider";
+import { isBrowser } from "./env";
 import tailwindColors from "tailwindcss/colors";
 
 let darkStyles: string[] = [];
@@ -14,6 +15,8 @@ let lightStyles: string[] = [];
 
 const ROSALANA_UI_COLORS: RegistryKey<UiColorPalette[]> =
   Symbol("RosalanaUIColors");
+
+const ROSALANA_UI_CSS: RegistryKey<string> = Symbol("RosalanaUICSS");
 
 /**
  * Process the colors configuration and generate CSS variables.
@@ -23,6 +26,11 @@ export function processConfigColors(context: RosalanaUIContext): void {
 
   const processed = process(context.colors);
   const css = createCSS(processed as UiColorPalette[]);
+
+  // The CSS is a pure function of the config, so it is generated in every
+  // environment. In the browser it goes straight into <head> below; on the
+  // server it is read back through useColorCSS() and rendered by ColorVars.
+  provide(ROSALANA_UI_CSS, css);
 
   injectCSSVars(css);
 
@@ -96,14 +104,26 @@ function applySlot(pallete: UiColorPalette) {
 }
 
 function injectCSSVars(css: string) {
+  if (!isBrowser()) return;
+
   const id = "rosalana-ui-colors";
-  let style = document.getElementById(id) as HTMLStyleElement;
+  let style = document.getElementById(id) as HTMLStyleElement | null;
   if (!style) {
     style = document.createElement("style");
     style.id = id;
     document.head.appendChild(style);
   }
-  style.innerHTML = css;
+  style.textContent = css;
+}
+
+/**
+ * The generated CSS custom properties.
+ *
+ * Available on the server too, where there is no DOM to inject into — that is
+ * what the ColorVars component uses to put them in the server-rendered <head>.
+ */
+export function useColorCSS(): string {
+  return inject(ROSALANA_UI_CSS);
 }
 
 function process(colors: RosalanaUIContext["colors"]) {
@@ -182,11 +202,20 @@ function pickContrast(c: string): string {
   // Parse oklch format
   const oklchMatch = c.match(/oklch\(([^)]+)\)/);
   if (oklchMatch) {
-    const values = oklchMatch[1].split(/\s+/);
-    const lightness = parseFloat(values[0]);
-    return lightness > 80
-      ? (color("black") as string)
-      : (color("white") as string);
+    const raw = oklchMatch[1].split(/\s+/)[0];
+    // OKLCH lightness is 0-1, or a percentage. Normalise it to 0-100.
+    // The threshold is 70 rather than the 62 that 160/255 suggests: OKLCH
+    // lightness is perceptual, and sRGB 160 sits at L ~= 0.706. At 62 the
+    // Tailwind palettes (all OKLCH) would put black on blue-500.
+    const lightness = raw.endsWith("%")
+      ? parseFloat(raw)
+      : parseFloat(raw) * 100;
+
+    if (!isNaN(lightness)) {
+      return lightness > 70
+        ? (color("black") as string)
+        : (color("white") as string);
+    }
   }
 
   // Parse rgb/rgba format
