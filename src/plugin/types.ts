@@ -1,4 +1,5 @@
 import { ComputedRef, Ref } from "vue";
+import type { SonnerConfig } from "../composables/useSonner/state";
 
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -130,6 +131,8 @@ export type CreateRosalanaUIOptions = {
   // theme?: ThemeMode; // removed [NOT USING PROBABLY] -> mohlo by to být používané v useTheme ale tam je fallback na system a to asi stačí 
   /** Configuration for colors used in the UI */
   colors?: ColorsConfig;
+  /** Default configuration of toasts shown via `useSonner()` */
+  sonner?: Partial<SonnerConfig>;
   // motion?: {
   //   reduce?: boolean;
   //   disable?: boolean;
