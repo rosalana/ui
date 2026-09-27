@@ -30,6 +30,7 @@ export const DONE: string[] = [
   "Separator",
   "Skeleton",
   "SmallAlert",
+  "Sonner",
   "Switch",
   "Table",
   "Tooltip",
