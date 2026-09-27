@@ -2,49 +2,33 @@
 import { Head } from "@inertiajs/vue3";
 import { defineComponent, h } from "vue";
 import { useColorCSS } from "../../../plugin/colors";
-import { isBrowser } from "../../../plugin/env";
 
 /**
- * Puts the generated color variables into the server-rendered <head>.
+ * Keeps the palette in Inertia's head on the server and during hydration.
  *
- * Every `--color-*` the UI relies on comes from the plugin's palette. In the
- * browser the plugin writes them into <head> synchronously on install, which
- * is early enough that nothing ever paints without them. On the server there
- * is no DOM to write to, so without this component an SSR page would arrive
- * colorless and only pick up the palette after hydration.
+ * Register on both sides: a server-only Head entry is removed when Inertia's
+ * client head manager flushes, even if the plugin updated that same style node.
+ * The stable head key lets Inertia reconcile it without creating duplicates.
  *
- * Render it once, anywhere inside the Inertia app:
- *
- * ```ts
+ * Render after the Inertia App so its head manager is available:
  * createSSRApp({ render: () => [h(App, props), h(ColorVars)] })
- * ```
  *
- * Three things shape this file:
- *
- * 1. It renders on the server only. Inertia's client head manager is
- *    debounced, so emitting there too would either duplicate the plugin's
- *    style or — if the plugin stopped injecting — leave a gap before the
- *    first flush. Rendering nothing in the browser keeps the vnode structure
- *    identical on both sides, so hydration still matches.
- * 2. It is a render function, not a template. HTML parses `<style>` as raw
- *    text, so a `{{ }}` interpolation inside it is never compiled and would
- *    ship the literal braces. Passing the CSS as a vnode child avoids that.
- * 3. Render it *after* Inertia's own App component. The head manager is
- *    created in App's setup, so a sibling placed before it runs too early and
- *    finds nothing to register with.
+ * A render function is required because HTML parses style content as raw text.
  */
 export default defineComponent({
   name: "ColorVars",
   setup() {
-    if (isBrowser()) {
-      return () => null;
-    }
-
     const colorCSS = useColorCSS();
 
     return () =>
       h(Head, null, {
-        default: () => [h("style", { id: "rosalana-ui-colors" }, colorCSS)],
+        default: () => [
+          h(
+            "style",
+            { id: "rosalana-ui-colors", "head-key": "rosalana-ui-colors" },
+            colorCSS,
+          ),
+        ],
       });
   },
 });
