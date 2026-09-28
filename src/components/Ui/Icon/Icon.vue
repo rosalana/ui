@@ -26,7 +26,14 @@ const iconKeyAndClass = computed(() => {
 </script>
 
 <template>
+  <!--
+    `ssr` renders the icon right away instead of after mount, so it is in the server HTML.
+    Safe from hydration mismatches: bundled collections (see plugin/create.ts) resolve the
+    same on both sides, and icons from elsewhere render empty on both until they load.
+    Iconify declares its props untyped, so a bare `ssr` would arrive as "" (falsy).
+  -->
   <Icon
+    :ssr="true"
     :icon="iconKeyAndClass[0]"
     v-bind="
       props.size
