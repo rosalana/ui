@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AvatarRootProps } from "reka-ui";
 import { AvatarRoot, useForwardProps } from "reka-ui";
-import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
+import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
 
 const avatar = tv({
   base: "relative flex shrink-0 overflow-hidden rounded-full",
@@ -9,8 +9,8 @@ const avatar = tv({
     size: {
       default: "size-10 text-sm",
       sm: "size-8 text-base",
-      lg: "size-12 text-base",
-      xl: "size-42 text-lg",
+      lg: "size-12 text-base font-semibold",
+      xl: "size-36 text-4xl font-semibold",
     },
   },
   defaultVariants: {
