@@ -19,6 +19,7 @@ export const DONE: string[] = [
   "ColorPicker",
   "Dialog",
   "DropdownMenu",
+  "DropFile",
   "Icon",
   "Input",
   "Label",

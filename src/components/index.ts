@@ -128,6 +128,9 @@ export { default as UiDropdownMenuSub } from "./Ui/DropdownMenu/DropdownMenuSub.
 export { default as UiDropdownMenuSubTrigger } from "./Ui/DropdownMenu/DropdownMenuSubTrigger.vue";
 export { default as UiDropdownMenuSubContent } from "./Ui/DropdownMenu/DropdownMenuSubContent.vue";
 
+// DropFile
+export { default as UiDropfile } from "./Ui/DropFile/DropFile.vue";
+
 // HoverCard
 export { default as UiHoverCard } from "./Ui/HoverCard/HoverCard.vue";
 export { default as UiHoverCardTrigger } from "./Ui/HoverCard/HoverCardTrigger.vue";
