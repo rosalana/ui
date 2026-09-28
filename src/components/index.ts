@@ -31,6 +31,7 @@ export { default as UiAspectRatio } from "./Ui/AspectRatio/AspectRatio.vue";
 export { default as UiAvatar } from "./Ui/Avatar/Avatar.vue";
 export { default as UiAvatarImage } from "./Ui/Avatar/AvatarImage.vue";
 export { default as UiAvatarFallback } from "./Ui/Avatar/AvatarFallback.vue";
+export { default as UiAvatarLoading } from "./Ui/Avatar/AvatarLoading.vue";
 
 // Badge
 export { default as UiBadge } from "./Ui/Badge/Badge.vue";
