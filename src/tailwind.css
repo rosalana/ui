@@ -2,6 +2,8 @@
 
 @import "tw-animate-css";
 
+@import "vue-advanced-cropper/dist/style.css";
+
 @source "./**/*.{vue,ts,js}";
 
 @custom-variant dark (&:is(.dark *));
