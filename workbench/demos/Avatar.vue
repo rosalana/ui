@@ -2,6 +2,13 @@
 import UiAvatar from "../../src/components/Ui/Avatar/Avatar.vue";
 import UiAvatarImage from "../../src/components/Ui/Avatar/AvatarImage.vue";
 import UiAvatarFallback from "../../src/components/Ui/Avatar/AvatarFallback.vue";
+import UiAvatarLoading from "../../src/components/Ui/Avatar/AvatarLoading.vue";
+import UiButton from "../../src/components/Ui/Button/Button.vue";
+import { ref } from "vue";
+
+const uploading = ref(false);
+/** Changing the query string forces a fresh load, so the loading state is visible. */
+const reloadKey = ref(Date.now());
 import Section from "workbench/components/Section.vue";
 </script>
 
@@ -19,6 +26,23 @@ import Section from "workbench/components/Section.vue";
       <UiAvatarImage src="broken-url" alt="Broken" />
       <UiAvatarFallback>MB</UiAvatarFallback>
     </UiAvatar>
+  </Section>
+
+  <Section title="Loading" class="flex flex-wrap gap-4 items-center">
+    <UiAvatar size="lg">
+      <UiAvatarImage :src="`https://github.com/shadcn.png?${reloadKey}`" alt="User" />
+      <UiAvatarFallback>CN</UiAvatarFallback>
+      <UiAvatarLoading />
+    </UiAvatar>
+    <UiAvatar size="lg">
+      <UiAvatarImage src="https://github.com/radix-ui.png" alt="Radix" />
+      <UiAvatarFallback>RX</UiAvatarFallback>
+      <UiAvatarLoading :loading="uploading" />
+    </UiAvatar>
+    <UiButton size="sm" variant="outline" @click="reloadKey = Date.now()">Reload image</UiButton>
+    <UiButton size="sm" variant="outline" @click="uploading = !uploading">
+      {{ uploading ? "Stop upload" : "Simulate upload" }}
+    </UiButton>
   </Section>
 
   <Section title="Fallback Only" class="flex flex-wrap gap-4 items-center">
