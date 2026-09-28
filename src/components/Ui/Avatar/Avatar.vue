@@ -2,6 +2,7 @@
 import type { AvatarRootProps } from "reka-ui";
 import { AvatarRoot, useForwardProps } from "reka-ui";
 import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
+import { provideAvatarContext } from "./context";
 
 const avatar = tv({
   base: "relative flex shrink-0 overflow-hidden rounded-full",
@@ -27,6 +28,8 @@ interface Props extends AvatarRootProps {
 
 const props = defineProps<Props>();
 const forwarded = useForwardProps(props);
+
+provideAvatarContext();
 </script>
 
 <template>
