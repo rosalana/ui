@@ -324,3 +324,15 @@ export type {
   UploadFilesRejection,
   UploadFilesRejectReason,
 } from "./blocks/UploadFiles/types";
+
+// UploadImage
+export { default as UploadImage } from "./blocks/UploadImage/index.vue";
+export type {
+  UploadImageProps,
+  UploadImageEmits,
+  UploadImageFilter,
+  UploadImageAdjustments,
+  UploadImageAspectRatio,
+  UploadImageRadius,
+  UploadImageFormat,
+} from "./blocks/UploadImage/types";

@@ -37,6 +37,7 @@ export const DONE: string[] = [
   "Tooltip",
   "Tag",
   "UploadFiles",
+  "UploadImage",
 ];
 
 export const UNTOUCHED: string[] = [
