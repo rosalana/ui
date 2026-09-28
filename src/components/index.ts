@@ -315,3 +315,12 @@ export type { SideNavItem, SideNavProps } from "./blocks/SideNav/types";
 
 // ColorVars
 export { default as ColorVars } from "./blocks/ColorVars/index.vue";
+
+// UploadFiles
+export { default as UploadFiles } from "./blocks/UploadFiles/index.vue";
+export type {
+  UploadFilesProps,
+  UploadFilesEmits,
+  UploadFilesRejection,
+  UploadFilesRejectReason,
+} from "./blocks/UploadFiles/types";
