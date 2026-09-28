@@ -10,6 +10,8 @@ const avatar = ref<File | null>(null);
 const cover = ref<File | null>(null);
 const free = ref<File | null>(null);
 const existing = ref<File | null>(null);
+const bound = ref<File | null>(null);
+const boundEditing = ref(false);
 
 const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f472b6"/><stop offset="1" stop-color="#6366f1"/></linearGradient></defs><rect width="300" height="300" fill="url(#g)"/><text x="150" y="175" font-family="sans-serif" font-size="96" font-weight="600" fill="white" text-anchor="middle">R</text></svg>`,
@@ -87,6 +89,20 @@ function onRejected(file: File, reason: "type" | "size") {
         filters
         @cropped="onCropped"
       />
+    </Section>
+
+    <Section title="Bound editing state (v-model:editing)">
+      <div class="flex flex-col gap-3">
+        <p class="text-theme text-xs">
+          Editor is {{ boundEditing ? "open" : "closed" }} — parents can use this to hide their own UI.
+        </p>
+        <UploadImage
+          v-model="bound"
+          v-model:editing="boundEditing"
+          :aspect-ratio="1"
+          radius="full"
+        />
+      </div>
     </Section>
 
     <Section title="Disabled">
