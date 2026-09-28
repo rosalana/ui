@@ -4,6 +4,7 @@ import { motion } from "motion-v";
 import { tv, type ClassValue } from "tailwind-variants";
 import { toRef, useTemplateRef } from "vue";
 import Icon from "../Icon/Icon.vue";
+import { isAccepted } from "./accept";
 
 const dropFile = tv({
   base: [
@@ -50,33 +51,11 @@ const emits = defineEmits<{
   rejected: [files: File[]];
 }>();
 
-/**
- * Matches a file against an `accept` attribute value (`image/*`, `.pdf`, `application/json`).
- * The file dialog filters on its own, dropped files have to be checked here.
- */
-function isAccepted(file: File): boolean {
-  const rules = props.accept
-    .split(",")
-    .map((rule) => rule.trim().toLowerCase())
-    .filter(Boolean);
-
-  if (!rules.length || rules.includes("*") || rules.includes("*/*")) return true;
-
-  const name = file.name.toLowerCase();
-  const type = file.type.toLowerCase();
-
-  return rules.some((rule) => {
-    if (rule.startsWith(".")) return name.endsWith(rule);
-    if (rule.endsWith("/*")) return type.startsWith(rule.slice(0, -1));
-    return type === rule;
-  });
-}
-
 function handleDrop(files: File[] | null) {
   if (!files?.length || props.disabled) return;
 
-  const accepted = files.filter(isAccepted);
-  const rejected = files.filter((file) => !isAccepted(file));
+  const accepted = files.filter((file) => isAccepted(file, props.accept));
+  const rejected = files.filter((file) => !isAccepted(file, props.accept));
 
   if (rejected.length) emits("rejected", rejected);
   if (!accepted.length) return;
