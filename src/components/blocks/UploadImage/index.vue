@@ -215,7 +215,7 @@ const card =
 <template>
   <div
     data-slot="upload-image"
-    class="w-full"
+    class="w-full min-w-0"
     :style="{ '--upload-image-radius': radiusCss, '--upload-image-filter': cssFilter }"
   >
     <AnimatePresence mode="wait" :initial="false">
@@ -235,9 +235,10 @@ const card =
           data-slot="upload-image-cropper"
           class="relative h-80 overflow-hidden rounded-xl bg-muted-950 [&_img]:[filter:var(--upload-image-filter)]"
         >
+          <!-- Absolutely positioned so the cropper's pixel sizes never feed back into the layout -->
           <Cropper
             ref="cropper"
-            class="h-full"
+            class="absolute! inset-0"
             :src="sourceUrl"
             :stencil-props="stencilProps"
             :canvas="{ maxWidth: size, maxHeight: size }"
