@@ -41,6 +41,7 @@ const props = withDefaults(defineProps<UploadImageProps>(), {
   filters: false,
   presets: true,
   disabled: false,
+  skipEditor: false,
   title: "Click to upload or drag & drop an image.",
   icon: "lucide:image-up",
 });
@@ -104,7 +105,9 @@ function pick(file: File) {
 
   setSource(file);
   Object.assign(adjustments, neutralAdjustments());
-  editing.value = true;
+
+  if (props.skipEditor) autoCrop(file);
+  else editing.value = true;
 }
 
 const { open: openDialog, reset: resetDialog, onChange } = useFileDialog({
@@ -191,29 +194,81 @@ function cancel() {
   if (!model.value) setSource(null);
 }
 
+/** Encodes the cropped canvas into the model file. */
+async function commit(canvas: HTMLCanvasElement) {
+  if (!source.value) return;
+
+  applyAdjustments(canvas, adjustments);
+
+  const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, props.format, props.quality),
+    );
+  if (!blob) return;
+
+  const extension = props.format.split("/")[1].replace("jpeg", "jpg");
+  const name = `${source.value.name.replace(/\.[^.]+$/, "")}.${extension}`;
+  const file = new File([blob], name, { type: props.format });
+
+  resultRatio.value = canvas.width / canvas.height;
+  model.value = file;
+  editing.value = false;
+  emit("cropped", file);
+}
+
 async function save() {
   const result = cropper.value?.getResult();
-  if (!result?.canvas || !source.value) return;
+  if (!result?.canvas) return;
 
   saving.value = true;
 
   try {
-    const canvas = result.canvas;
-    applyAdjustments(canvas, adjustments);
+    await commit(result.canvas);
+  } finally {
+    saving.value = false;
+  }
+}
 
-    const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, props.format, props.quality),
-    );
-    if (!blob) return;
+/**
+ * Applies the default crop straight away, without opening the editor: the largest
+ * centered area in the current aspect ratio, scaled down to `size`.
+ */
+async function autoCrop(file: File) {
+  saving.value = true;
 
-    const extension = props.format.split("/")[1].replace("jpeg", "jpg");
-    const name = `${source.value.name.replace(/\.[^.]+$/, "")}.${extension}`;
-    const file = new File([blob], name, { type: props.format });
+  try {
+    const image = await createImageBitmap(file);
+    const target = ratio.value ?? image.width / image.height;
 
-    resultRatio.value = canvas.width / canvas.height;
-    model.value = file;
-    editing.value = false;
-    emit("cropped", file);
+    let width = image.width;
+    let height = width / target;
+    if (height > image.height) {
+      height = image.height;
+      width = height * target;
+    }
+
+    const scale = Math.min(1, props.size / Math.max(width, height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+    canvas
+      .getContext("2d")
+      ?.drawImage(
+        image,
+        (image.width - width) / 2,
+        (image.height - height) / 2,
+        width,
+        height,
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      );
+    image.close();
+
+    await commit(canvas);
+  } catch {
+    setSource(null);
+    emit("rejected", file, "type");
   } finally {
     saving.value = false;
   }

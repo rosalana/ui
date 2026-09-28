@@ -11,6 +11,7 @@ const cover = ref<File | null>(null);
 const free = ref<File | null>(null);
 const existing = ref<File | null>(null);
 const bound = ref<File | null>(null);
+const instant = ref<File | null>(null);
 const boundEditing = ref(false);
 
 const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
@@ -103,6 +104,17 @@ function onRejected(file: File, reason: "type" | "size") {
           radius="full"
         />
       </div>
+    </Section>
+
+    <Section title="Skip editor · crop later">
+      <UploadImage
+        v-model="instant"
+        :aspect-ratio="1"
+        radius="full"
+        skip-editor
+        @cropped="onCropped"
+        @rejected="onRejected"
+      />
     </Section>
 
     <Section title="Disabled">

@@ -50,6 +50,11 @@ export type UploadImageProps = {
   /** Shows one-click filter presets when filters are enabled. */
   presets?: boolean;
   disabled?: boolean;
+  /**
+   * Applies the default crop right after an image is picked instead of opening the editor.
+   * The original stays around, so the crop can still be adjusted later.
+   */
+  skipEditor?: boolean;
   title?: string;
   subtext?: string;
   icon?: string;
