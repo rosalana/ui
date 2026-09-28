@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, shallowRef, useId, watch } from "vue";
-import { useFileDialog, useResizeObserver } from "@vueuse/core";
+import { useDropZone, useFileDialog, useResizeObserver } from "@vueuse/core";
 import { AnimatePresence, motion } from "motion-v";
 import { Cropper } from "vue-advanced-cropper";
 import { UiButton, UiIcon, UiSlider } from "../../index";
 import UiDropFile from "../../Ui/DropFile/DropFile.vue";
+import { isAccepted } from "../../Ui/DropFile/accept";
 import {
   FILTERS,
   FILTER_NAMES,
@@ -148,6 +149,28 @@ function remove() {
   resultRatio.value = undefined;
   emit("removed");
 }
+
+// --- Drop to replace ---------------------------------------------------------
+// The empty state is a drop zone on its own; once there is an image, dropping a file
+// anywhere on the preview or the editor replaces it, like the Replace button does.
+
+const root = ref<InstanceType<typeof motion.div> | null>(null);
+
+const { isOverDropZone } = useDropZone(
+  () => ((editing.value && sourceUrl.value) || previewUrl.value ? root.value?.$el : undefined),
+  {
+    // Take the first file ourselves: with `multiple: false` a multi-file drop would be
+    // left unhandled and the browser would open the files instead.
+    multiple: true,
+    preventDefaultForUnhandled: true,
+    onDrop: (files) => {
+      const file = files?.[0];
+      if (!file || props.disabled) return;
+      if (!isAccepted(file, props.accept)) emit("rejected", file, "type");
+      else pick(file);
+    },
+  },
+);
 
 // --- Editor ------------------------------------------------------------------
 
@@ -311,6 +334,7 @@ const card =
 
 <template>
   <motion.div
+    ref="root"
     data-slot="upload-image"
     class="w-full min-w-0"
     :class="{ 'overflow-hidden': resizing }"
@@ -599,6 +623,21 @@ const card =
             @dropped="(files: File[]) => files[0] && pick(files[0])"
             @rejected="(files: File[]) => files[0] && emit('rejected', files[0], 'type')"
           />
+        </motion.div>
+      </AnimatePresence>
+
+      <AnimatePresence>
+        <motion.div
+          v-if="isOverDropZone && !disabled"
+          data-slot="upload-image-drop-overlay"
+          class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed border-primary bg-background/90 text-sm font-medium"
+          :initial="{ opacity: 0, scale: 0.98 }"
+          :animate="{ opacity: 1, scale: 1 }"
+          :exit="{ opacity: 0, scale: 0.98, transition: { duration: 0.12 } }"
+          :transition="spring"
+        >
+          <UiIcon name="lucide:image-up" class="text-primary size-5" />
+          Drop to replace
         </motion.div>
       </AnimatePresence>
     </div>
