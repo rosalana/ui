@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, shallowRef, useId, watch } from "vue";
-import { useDropZone, useFileDialog, useResizeObserver } from "@vueuse/core";
+import { useResizeObserver } from "@vueuse/core";
 import { AnimatePresence, motion } from "motion-v";
 import { Cropper } from "vue-advanced-cropper";
 import { UiButton, UiIcon, UiSlider } from "../../index";
 import UiDropFile from "../../Ui/DropFile/DropFile.vue";
-import { isAccepted } from "../../Ui/DropFile/accept";
 import {
   FILTERS,
   FILTER_NAMES,
@@ -65,12 +64,12 @@ const spring = { type: "spring", stiffness: 400, damping: 25 } as const;
 const heightSpring = { type: "spring", stiffness: 400, damping: 40 } as const;
 const viewExit = { opacity: 0, scale: 0.98, transition: { duration: 0.15 } } as const;
 
-const viewport = ref<HTMLElement | null>(null);
+const dropFile = ref<InstanceType<typeof UiDropFile> | null>(null);
 const viewportHeight = ref<number | "auto">("auto");
 /** Clip only while the height animates, so shadows and focus rings stay visible at rest. */
 const resizing = ref(false);
 
-useResizeObserver(viewport, ([entry]) => {
+useResizeObserver(() => dropFile.value?.$el as HTMLElement | undefined, ([entry]) => {
   viewportHeight.value = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
 });
 
@@ -111,16 +110,9 @@ function pick(file: File) {
   else editing.value = true;
 }
 
-const { open: openDialog, reset: resetDialog, onChange } = useFileDialog({
-  multiple: false,
-  accept: computed(() => props.accept),
-});
-
-onChange((files) => {
-  const file = files?.[0];
-  resetDialog();
-  if (file) pick(file);
-});
+function openDialog() {
+  dropFile.value?.open();
+}
 
 // --- Result preview ----------------------------------------------------------
 
@@ -149,28 +141,6 @@ function remove() {
   resultRatio.value = undefined;
   emit("removed");
 }
-
-// --- Drop to replace ---------------------------------------------------------
-// The empty state is a drop zone on its own; once there is an image, dropping a file
-// anywhere on the preview or the editor replaces it, like the Replace button does.
-
-const root = ref<InstanceType<typeof motion.div> | null>(null);
-
-const { isOverDropZone } = useDropZone(
-  () => ((editing.value && sourceUrl.value) || previewUrl.value ? root.value?.$el : undefined),
-  {
-    // Take the first file ourselves: with `multiple: false` a multi-file drop would be
-    // left unhandled and the browser would open the files instead.
-    multiple: true,
-    preventDefaultForUnhandled: true,
-    onDrop: (files) => {
-      const file = files?.[0];
-      if (!file || props.disabled) return;
-      if (!isAccepted(file, props.accept)) emit("rejected", file, "type");
-      else pick(file);
-    },
-  },
-);
 
 // --- Editor ------------------------------------------------------------------
 
@@ -328,13 +298,13 @@ defineExpose({
   saving,
 });
 
-const card =
-  "rounded-2xl border border-border bg-background shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-muted/40 dark:shadow-muted/20";
+const surface =
+  "rounded-2xl bg-background shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-muted/40 dark:shadow-muted/20";
+const previewCard = `${surface} border border-border`;
 </script>
 
 <template>
   <motion.div
-    ref="root"
     data-slot="upload-image"
     class="w-full min-w-0"
     :class="{ 'overflow-hidden': resizing }"
@@ -345,18 +315,33 @@ const card =
     @animation-start="resizing = true"
     @animation-complete="resizing = false"
   >
-    <div ref="viewport" class="relative">
+    <UiDropFile
+      v-slot="{ isOverDropZone }"
+      ref="dropFile"
+      :accept="accept"
+      :multiple="false"
+      :disabled="disabled"
+      :clickable="!editing && !previewUrl"
+      :class="
+        editing || previewUrl
+          ? 'block cursor-default rounded-none border-0! bg-transparent! shadow-none! hover:border-transparent! hover:shadow-none! dark:hover:shadow-none! focus-visible:ring-0 focus-visible:ring-offset-0'
+          : undefined
+      "
+      @dropped="(files: File[]) => files[0] && pick(files[0])"
+      @rejected="(files: File[]) => files[0] && emit('rejected', files[0], 'type')"
+    >
       <AnimatePresence mode="popLayout" :initial="false">
         <!-- Editor -->
         <motion.div
           v-if="editing && sourceUrl"
           key="editor"
           data-slot="upload-image-editor"
-          :class="[card, 'flex flex-col gap-3 p-3']"
+          :class="[surface, 'flex w-full flex-col gap-3 p-3']"
           :initial="{ opacity: 0, scale: 0.97 }"
           :animate="{ opacity: 1, scale: 1 }"
           :exit="viewExit"
           :transition="spring"
+          @click.stop
           @keydown.esc.prevent="cancel"
         >
           <div
@@ -543,16 +528,17 @@ const card =
           v-else-if="previewUrl"
           key="preview"
           data-slot="upload-image-preview"
-          :class="[card, 'flex items-center gap-4 p-3']"
+          :class="[previewCard, 'flex w-full items-center gap-4 p-3']"
           :initial="{ opacity: 0, scale: 0.97 }"
           :animate="{ opacity: 1, scale: 1 }"
           :exit="viewExit"
           :transition="spring"
+          @click.stop
         >
           <motion.button
             type="button"
             data-slot="upload-image-thumbnail"
-            class="group relative h-20 max-w-40 shrink-0 cursor-pointer overflow-hidden rounded-(--upload-image-radius) border border-border outline-none focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed"
+            class="group/thumbnail relative h-20 max-w-40 shrink-0 cursor-pointer overflow-hidden rounded-(--upload-image-radius) border border-border outline-none focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed"
             :style="{ aspectRatio: previewRatio }"
             :disabled="disabled"
             :while-hover="disabled ? undefined : { scale: 1.04 }"
@@ -563,7 +549,7 @@ const card =
           >
             <img :src="previewUrl" alt="" class="size-full object-cover" />
             <span
-              class="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+              class="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 transition-opacity duration-200 group-hover/thumbnail:opacity-100 group-focus-visible/thumbnail:opacity-100"
             >
               <UiIcon name="lucide:image-up" class="size-5" />
             </span>
@@ -613,24 +599,46 @@ const card =
           :exit="viewExit"
           :transition="spring"
         >
-          <UiDropFile
-            :title="title"
-            :subtext="subtext ?? (maxSize ? `Images up to ${formatSize(maxSize)}` : 'PNG, JPG, WEBP or GIF')"
-            :icon="icon"
-            :accept="accept"
-            :multiple="false"
-            :disabled="disabled"
-            @dropped="(files: File[]) => files[0] && pick(files[0])"
-            @rejected="(files: File[]) => files[0] && emit('rejected', files[0], 'type')"
-          />
+          <div class="flex flex-col items-center px-6 py-10 text-center">
+            <motion.div
+              v-if="icon"
+              class="inline-flex items-center justify-center rounded-xl border p-2.5 transition-colors duration-200"
+              :class="
+                isOverDropZone
+                  ? 'border-primary bg-primary text-primary-foreground shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-primary/40'
+                  : 'border-border bg-background text-theme shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-muted/40 group-hover:text-primary dark:shadow-muted/20'
+              "
+              :animate="
+                isOverDropZone
+                  ? { y: -6, scale: 1.1, rotate: -4 }
+                  : { y: 0, scale: 1, rotate: 0 }
+              "
+              :transition="spring"
+            >
+              <UiIcon :name="icon" class="size-6" />
+            </motion.div>
+            <p v-if="title" class="mt-4 text-sm font-medium" v-html="title" />
+            <p
+              class="text-theme mt-1 text-xs"
+              v-html="
+                subtext ??
+                (maxSize ? `Images up to ${formatSize(maxSize)}` : 'PNG, JPG, WEBP or GIF')
+              "
+            />
+          </div>
         </motion.div>
       </AnimatePresence>
 
       <AnimatePresence>
         <motion.div
-          v-if="isOverDropZone && !disabled"
+          v-if="isOverDropZone && !disabled && (editing || previewUrl)"
           data-slot="upload-image-drop-overlay"
-          class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed border-primary bg-background/90 text-sm font-medium"
+          class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5 rounded-2xl text-sm font-medium"
+          :class="
+            editing
+              ? 'bg-linear-to-b from-background/70 via-background/70 via-75% to-transparent'
+              : 'border border-dashed border-primary bg-background/90'
+          "
           :initial="{ opacity: 0, scale: 0.98 }"
           :animate="{ opacity: 1, scale: 1 }"
           :exit="{ opacity: 0, scale: 0.98, transition: { duration: 0.12 } }"
@@ -640,6 +648,6 @@ const card =
           Drop to replace
         </motion.div>
       </AnimatePresence>
-    </div>
+    </UiDropFile>
   </motion.div>
 </template>

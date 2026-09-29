@@ -4,7 +4,25 @@ import { motion } from "motion-v";
 import { tv, type ClassValue } from "tailwind-variants";
 import { toRef, useTemplateRef } from "vue";
 import Icon from "../Icon/Icon.vue";
-import { isAccepted } from "./accept";
+
+/** Matches dropped files against an `accept` attribute value. */
+function isAccepted(file: File, accept: string): boolean {
+  const rules = accept
+    .split(",")
+    .map((rule) => rule.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (!rules.length || rules.includes("*") || rules.includes("*/*")) return true;
+
+  const name = file.name.toLowerCase();
+  const type = file.type.toLowerCase();
+
+  return rules.some((rule) => {
+    if (rule.startsWith(".")) return name.endsWith(rule);
+    if (rule.endsWith("/*")) return type.startsWith(rule.slice(0, -1));
+    return type === rule;
+  });
+}
 
 const dropFile = tv({
   base: [
@@ -22,7 +40,18 @@ const dropFile = tv({
     disabled: {
       true: "pointer-events-none cursor-not-allowed opacity-50",
     },
+    clickable: {
+      true: "",
+      false: "cursor-default",
+    },
   },
+  compoundVariants: [
+    {
+      isOverDropZone: false,
+      clickable: false,
+      class: "hover:border-border hover:shadow-muted/40 dark:hover:shadow-muted/20",
+    },
+  ],
 });
 
 const props = withDefaults(
@@ -34,6 +63,7 @@ const props = withDefaults(
     multiple?: boolean;
     accept?: string;
     disabled?: boolean;
+    clickable?: boolean;
     class?: ClassValue;
   }>(),
   {
@@ -43,6 +73,7 @@ const props = withDefaults(
     multiple: true,
     accept: "*",
     disabled: false,
+    clickable: true,
   },
 );
 
@@ -80,6 +111,11 @@ function openDialog() {
   open();
 }
 
+function openDialogFromRoot() {
+  if (!props.clickable) return;
+  openDialog();
+}
+
 const dropZoneRef = useTemplateRef("dropZoneRef");
 
 const dropZoneEl = () => dropZoneRef.value?.$el as HTMLElement | undefined;
@@ -98,17 +134,17 @@ defineExpose({ dropZoneRef, open: openDialog });
   <motion.div
     ref="dropZoneRef"
     data-slot="dropfile"
-    role="button"
-    :tabindex="disabled ? -1 : 0"
+    :role="clickable ? 'button' : undefined"
+    :tabindex="disabled || !clickable ? -1 : 0"
     :aria-disabled="disabled || undefined"
     :data-over="isOverDropZone || undefined"
-    :class="dropFile({ isOverDropZone, disabled, class: props.class })"
+    :class="dropFile({ isOverDropZone, disabled, clickable, class: props.class })"
     :animate="{ scale: isOverDropZone ? 1.015 : 1 }"
-    :while-press="disabled ? undefined : { scale: 0.99 }"
+    :while-press="disabled || !clickable ? undefined : { scale: 0.99 }"
     :transition="spring"
-    @click="openDialog"
-    @keydown.enter.prevent="openDialog"
-    @keydown.space.prevent="openDialog"
+    @click="openDialogFromRoot"
+    @keydown.enter.prevent="openDialogFromRoot"
+    @keydown.space.prevent="openDialogFromRoot"
   >
     <slot :is-over-drop-zone="isOverDropZone" :open="openDialog">
       <slot name="message" :is-over-drop-zone="isOverDropZone">
