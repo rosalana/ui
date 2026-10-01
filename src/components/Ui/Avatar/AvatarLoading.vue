@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion-v";
 import { computed } from "vue";
 import { tv, type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
-import { injectAvatarContext } from "./context";
+import { injectAvatarContext, loadedSources } from "./context";
 
 const avatarLoading = tv({
   base: "absolute inset-0 z-10 flex select-none items-center justify-center rounded-full bg-muted border border-border text-theme",
@@ -30,13 +30,17 @@ const avatar = injectAvatarContext();
 /**
  * The image reports "idle" until it mounts, which is all the server ever sees,
  * so "idle" counts as loading too whenever there is an image to wait for.
+ * An image loaded before (e.g. before SPA navigation) is there at once, so it never shows.
  */
 const visible = computed(() => {
   if (props.loading !== undefined) return props.loading;
+  if (!avatar || avatar.images.value === 0) return false;
+
+  const src = avatar.src.value;
+  if (src && loadedSources.has(src)) return false;
 
   const status = rootContext.imageLoadingStatus.value;
-  if (status === "loading") return true;
-  return status === "idle" && (avatar?.images.value ?? 0) > 0;
+  return status === "idle" || status === "loading";
 });
 </script>
 
