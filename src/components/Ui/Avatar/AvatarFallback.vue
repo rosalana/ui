@@ -11,9 +11,12 @@ const avatarFallback = tv({
 interface Props extends AvatarFallbackProps {
   class?: ClassValue;
   name?: string;
+  modifier?: (name: string) => string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  modifier: (name: string) => initials(name)
+});
 const forwarded = useForwardProps(props);
 </script>
 
@@ -24,7 +27,7 @@ const forwarded = useForwardProps(props);
     :class="[avatarFallback({ class: props.class })]"
   >
     <slot>
-      {{ props?.name ? initials(props.name) : "?" }}
+      {{ props.name ? props.modifier!(props.name) : "?" }}
     </slot>
   </AvatarFallback>
 </template>
