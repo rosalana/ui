@@ -1,30 +1,47 @@
 <script setup lang="ts">
-import type { ComboboxGroupProps } from "reka-ui";
-import { ComboboxGroup, ComboboxLabel, useForwardProps } from "reka-ui";
-import { tv , type ClassValue } from "tailwind-variants";
+import type { ListboxGroupProps } from "reka-ui";
+import { ListboxGroup, ListboxGroupLabel, useForwardProps } from "reka-ui";
+import { computed } from "vue";
+import { tv, type ClassValue } from "tailwind-variants";
+import { injectCommandContext, provideCommandGroupContext } from "./context";
 
 const commandGroup = tv({
-  base: "overflow-hidden p-1 text-foreground [&_[data-slot=command-group-heading]]:px-2 [&_[data-slot=command-group-heading]]:py-1.5 [&_[data-slot=command-group-heading]]:text-xs [&_[data-slot=command-group-heading]]:font-medium [&_[data-slot=command-group-heading]]:text-muted-foreground",
+  base: "text-foreground not-first:mt-1",
 });
 
-interface Props extends ComboboxGroupProps {
+const commandGroupHeading = tv({
+  base: "px-2.5 py-1.5 text-xs font-semibold text-theme",
+});
+
+interface Props extends ListboxGroupProps {
   class?: ClassValue;
   heading?: string;
 }
 
 const props = defineProps<Props>();
 const forwarded = useForwardProps(props);
+
+const { isMatch } = injectCommandContext();
+const { items } = provideCommandGroupContext();
+
+const hasMatch = computed(() => [...items].some(isMatch));
 </script>
 
 <template>
-  <ComboboxGroup
+  <!-- v-show, not v-if: hidden items must stay mounted so they come back once the search changes -->
+  <ListboxGroup
+    v-show="hasMatch"
     data-slot="command-group"
     v-bind="forwarded"
     :class="[commandGroup({ class: props.class })]"
   >
-    <ComboboxLabel v-if="heading" data-slot="command-group-heading">
-      {{ heading }}
-    </ComboboxLabel>
+    <ListboxGroupLabel
+      v-if="heading || $slots.heading"
+      data-slot="command-group-heading"
+      :class="commandGroupHeading()"
+    >
+      <slot name="heading">{{ heading }}</slot>
+    </ListboxGroupLabel>
     <slot />
-  </ComboboxGroup>
+  </ListboxGroup>
 </template>
