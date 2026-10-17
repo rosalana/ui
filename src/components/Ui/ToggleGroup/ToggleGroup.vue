@@ -11,8 +11,8 @@ const toggleGroup = tv({
 type ToggleVariants = VariantProps<typeof toggleGroup>;
 
 interface Props extends ToggleGroupRootProps {
-  variant?: "default" | "outline";
-  size?: "default" | "sm" | "lg";
+  variant?: "default" | "destructive" | "secondary" | "outline" | "ghost";
+  size?: "default" | "sm" | "xs" | "lg" | "icon" | "icon-sm";
   class?: ClassValue;
 }
 
