@@ -62,6 +62,7 @@ const onCancel = () => {
         v-if="state.variant === 'verify'"
         v-model="input"
         :variant="error ? 'destructive' : 'default'"
+        :type="(state.options as VerifyConfirmOptions).password ? 'password' : 'text'"
         :placeholder="
           (state.options as VerifyConfirmOptions).placeholder ??
           'Type to verify...'

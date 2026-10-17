@@ -36,6 +36,8 @@ export interface VerifyConfirmOptions extends ConfirmOptions {
   callback: (input: string) => Promise<boolean>;
   /** An optional placeholder for the input field when using the match variant. */
   placeholder?: string;
+  /** Whether the input should be treated as a password field. */
+  password?: boolean;
 }
 
 interface ConfirmState {
