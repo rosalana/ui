@@ -19,53 +19,52 @@ const selected = ref<string | null>(null);
 
 <template>
   <Section title="Inline Command" class="w-96">
-    <div
-      class="rounded-xl border border-muted-200 dark:border-muted-800 overflow-hidden shadow-sm"
-    >
-      <UiCommand @update:model-value="(v) => (selected = v as string)">
-        <UiCommandInput placeholder="Search commands..." />
-        <UiCommandList>
-          <UiCommandEmpty>No results found.</UiCommandEmpty>
-          <UiCommandGroup heading="Navigation">
-            <UiCommandItem value="home">
-              <UiIcon name="lucide:home" />Home
-              <UiCommandShortcut>⌘H</UiCommandShortcut>
-            </UiCommandItem>
-            <UiCommandItem value="dashboard">
-              <UiIcon name="lucide:layout-dashboard" />Dashboard
-              <UiCommandShortcut>⌘D</UiCommandShortcut>
-            </UiCommandItem>
-            <UiCommandItem value="settings">
-              <UiIcon name="lucide:settings" />Settings
-              <UiCommandShortcut>⌘,</UiCommandShortcut>
-            </UiCommandItem>
-          </UiCommandGroup>
-          <UiCommandSeparator />
-          <UiCommandGroup heading="Actions">
-            <UiCommandItem value="new-file">
-              <UiIcon name="lucide:file-plus" />New File
-              <UiCommandShortcut>⌘N</UiCommandShortcut>
-            </UiCommandItem>
-            <UiCommandItem value="search">
-              <UiIcon name="lucide:search" />Search
-              <UiCommandShortcut>⌘F</UiCommandShortcut>
-            </UiCommandItem>
-            <UiCommandItem value="share">
-              <UiIcon name="lucide:share-2" />Share
-            </UiCommandItem>
-          </UiCommandGroup>
-          <UiCommandSeparator />
-          <UiCommandGroup heading="Help">
-            <UiCommandItem value="docs">
-              <UiIcon name="lucide:book-open" />Documentation
-            </UiCommandItem>
-            <UiCommandItem value="support">
-              <UiIcon name="lucide:life-buoy" />Support
-            </UiCommandItem>
-          </UiCommandGroup>
-        </UiCommandList>
-      </UiCommand>
-    </div>
+    <UiCommand @update:model-value="(v) => (selected = v as string)">
+      <UiCommandInput placeholder="Search commands..." />
+      <UiCommandList>
+        <UiCommandEmpty>No results found.</UiCommandEmpty>
+        <UiCommandGroup heading="Navigation">
+          <UiCommandItem value="home">
+            <UiIcon name="lucide:home" />Home
+            <UiCommandShortcut>⌘H</UiCommandShortcut>
+          </UiCommandItem>
+          <UiCommandItem value="dashboard">
+            <UiIcon name="lucide:layout-dashboard" />Dashboard
+            <UiCommandShortcut>⌘D</UiCommandShortcut>
+          </UiCommandItem>
+          <UiCommandItem value="settings">
+            <UiIcon name="lucide:settings" />Settings
+            <UiCommandShortcut>⌘,</UiCommandShortcut>
+          </UiCommandItem>
+        </UiCommandGroup>
+        <UiCommandSeparator />
+        <UiCommandGroup heading="Actions">
+          <UiCommandItem value="new-file">
+            <UiIcon name="lucide:file-plus" />New File
+            <UiCommandShortcut>⌘N</UiCommandShortcut>
+          </UiCommandItem>
+          <UiCommandItem value="search">
+            <UiIcon name="lucide:search" />Search
+            <UiCommandShortcut>⌘F</UiCommandShortcut>
+          </UiCommandItem>
+          <UiCommandItem value="share" :keywords="['send', 'invite']">
+            <UiIcon name="lucide:share-2" />Share
+          </UiCommandItem>
+          <UiCommandItem value="export" disabled>
+            <UiIcon name="lucide:download" />Export (disabled)
+          </UiCommandItem>
+        </UiCommandGroup>
+        <UiCommandSeparator />
+        <UiCommandGroup heading="Help">
+          <UiCommandItem value="docs">
+            <UiIcon name="lucide:book-open" />Documentation
+          </UiCommandItem>
+          <UiCommandItem value="support">
+            <UiIcon name="lucide:life-buoy" />Support
+          </UiCommandItem>
+        </UiCommandGroup>
+      </UiCommandList>
+    </UiCommand>
     <p v-if="selected" class="text-xs text-theme mt-2">
       Selected: <strong class="text-foreground">{{ selected }}</strong>
     </p>
