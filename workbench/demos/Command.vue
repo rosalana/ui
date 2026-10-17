@@ -47,7 +47,7 @@ const selected = ref<string | null>(null);
             <UiIcon name="lucide:search" />Search
             <UiCommandShortcut>⌘F</UiCommandShortcut>
           </UiCommandItem>
-          <UiCommandItem value="share" :keywords="['send', 'invite']">
+          <UiCommandItem value="share">
             <UiIcon name="lucide:share-2" />Share
           </UiCommandItem>
           <UiCommandItem value="export" disabled>
