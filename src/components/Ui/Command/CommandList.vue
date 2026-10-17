@@ -45,7 +45,7 @@ useResizeObserver(contentRef, ([entry]) => {
       :transition="{ type: 'spring', stiffness: 500, damping: 40 }"
     >
       <!-- isolate: the highlight sits behind every item's content, not only its own -->
-      <div ref="contentRef" class="isolate p-1.5">
+      <div ref="contentRef" data-slot="command-list-content" class="isolate p-1.5 empty:p-0">
         <slot />
       </div>
     </motion.div>

@@ -12,6 +12,8 @@ const command = tv({
     "shadow-[0_4px_16px_-4px,0_8px_32px_-8px] shadow-theme/15",
     // Groups without results are hidden while searching; their dividers would be left stacked.
     "[&:has([data-slot=command-group][hidden])_[data-slot=command-separator]]:hidden",
+    // Nothing to list (e.g. remote search before typing): show just the input, no divider.
+    "[&:has([data-slot=command-list-content]:empty)_[data-slot=command-input-wrapper]]:border-b-0",
   ],
 });
 
