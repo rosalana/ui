@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import UiCommand from "../../src/components/Ui/Command/Command.vue";
 import UiCommandInput from "../../src/components/Ui/Command/CommandInput.vue";
 import UiCommandList from "../../src/components/Ui/Command/CommandList.vue";
 import UiCommandEmpty from "../../src/components/Ui/Command/CommandEmpty.vue";
+import UiCommandLoading from "../../src/components/Ui/Command/CommandLoading.vue";
 import UiCommandGroup from "../../src/components/Ui/Command/CommandGroup.vue";
 import UiCommandItem from "../../src/components/Ui/Command/CommandItem.vue";
 import UiCommandSeparator from "../../src/components/Ui/Command/CommandSeparator.vue";
@@ -15,6 +16,25 @@ import Section from "workbench/components/Section.vue";
 
 const dialogOpen = ref(false);
 const selected = ref<string | null>(null);
+
+// Remote search: the server filters, so the command's own filter is off.
+const users = ["Anna Nováková", "Jan Svoboda", "Petr Dvořák", "Eva Černá", "Tomáš Procházka"];
+const search = ref("");
+const results = ref<string[]>([]);
+const loading = ref(false);
+let timer: ReturnType<typeof setTimeout> | undefined;
+
+watch(search, (term) => {
+  clearTimeout(timer);
+  results.value = [];
+  if (!term) return (loading.value = false);
+
+  loading.value = true;
+  timer = setTimeout(() => {
+    results.value = users.filter((u) => u.toLowerCase().includes(term.toLowerCase()));
+    loading.value = false;
+  }, 800);
+});
 </script>
 
 <template>
@@ -68,6 +88,21 @@ const selected = ref<string | null>(null);
     <p v-if="selected" class="text-xs text-theme mt-2">
       Selected: <strong class="text-foreground">{{ selected }}</strong>
     </p>
+  </Section>
+
+  <Section title="Remote Search (ignore-filter + loading)" class="w-96">
+    <UiCommand ignore-filter :loading="loading">
+      <UiCommandInput v-model="search" placeholder="Search users..." />
+      <UiCommandList>
+        <UiCommandLoading>Searching...</UiCommandLoading>
+        <UiCommandEmpty v-if="search">No users found.</UiCommandEmpty>
+        <UiCommandGroup v-if="results.length" heading="Users">
+          <UiCommandItem v-for="user in results" :key="user" :value="user">
+            <UiIcon name="lucide:user" />{{ user }}
+          </UiCommandItem>
+        </UiCommandGroup>
+      </UiCommandList>
+    </UiCommand>
   </Section>
 
   <Section title="Command Dialog (Palette)" class="w-96">
