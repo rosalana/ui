@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { tv , type ClassValue } from "tailwind-variants";
+import { tv, type ClassValue } from "tailwind-variants";
 
 const commandShortcut = tv({
-  base: "ml-auto text-xs tracking-widest text-muted-foreground",
+  base: "ml-auto text-xs tracking-widest opacity-60",
 });
 
 interface Props {
