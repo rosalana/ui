@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ComboboxRootEmits, ComboboxRootProps } from "reka-ui";
 import { ComboboxRoot, useForwardPropsEmits } from "reka-ui";
-import { useId } from "vue";
+import { computed, provide, useId } from "vue";
 import { tv , type ClassValue } from "tailwind-variants";
 import { LayoutGroup } from "motion-v";
 
@@ -17,6 +17,7 @@ const command = tv({
 
 interface Props extends ComboboxRootProps {
   class?: ClassValue;
+  loading?: boolean;
 }
 
 // A command list is always shown; a closed combobox would not render CommandList at all.
@@ -29,6 +30,9 @@ const forwarded = useForwardPropsEmits(props, emit);
 
 // Scopes the highlight's layoutId, so it only slides between items of this command.
 const layoutGroupId = useId();
+
+// Read by CommandLoading and CommandEmpty, so "no results" is not shown while results load.
+provide("commandLoading", computed(() => props.loading));
 </script>
 
 <template>

@@ -78,6 +78,7 @@ export { default as UiCommand } from "./Ui/Command/Command.vue";
 export { default as UiCommandInput } from "./Ui/Command/CommandInput.vue";
 export { default as UiCommandList } from "./Ui/Command/CommandList.vue";
 export { default as UiCommandEmpty } from "./Ui/Command/CommandEmpty.vue";
+export { default as UiCommandLoading } from "./Ui/Command/CommandLoading.vue";
 export { default as UiCommandGroup } from "./Ui/Command/CommandGroup.vue";
 export { default as UiCommandItem } from "./Ui/Command/CommandItem.vue";
 export { default as UiCommandSeparator } from "./Ui/Command/CommandSeparator.vue";

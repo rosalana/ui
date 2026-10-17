@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ComboboxEmptyProps } from "reka-ui";
 import { ComboboxEmpty, useForwardProps } from "reka-ui";
+import { inject, type Ref } from "vue";
 import { tv , type ClassValue } from "tailwind-variants";
 import { motion } from "motion-v";
 import UiIcon from "../Icon/Icon.vue";
@@ -15,10 +16,13 @@ interface Props extends ComboboxEmptyProps {
 
 const props = defineProps<Props>();
 const forwarded = useForwardProps(props);
+
+const loading = inject<Ref<boolean>>("commandLoading");
 </script>
 
 <template>
   <ComboboxEmpty
+    v-if="!loading"
     data-slot="command-empty"
     v-bind="forwarded"
     :class="[commandEmpty({ class: props.class })]"
