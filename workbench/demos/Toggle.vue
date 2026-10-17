@@ -13,23 +13,34 @@ const underline = ref(false);
   <Section title="Basic" class="max-w-md">
     <div class="flex gap-2">
       <UiToggle>Toggle</UiToggle>
-      <UiToggle :default-pressed="true">Pressed</UiToggle>
+      <UiToggle :default-value="true">Pressed</UiToggle>
       <UiToggle disabled>Disabled</UiToggle>
     </div>
   </Section>
 
   <Section title="Variants" class="max-w-md">
-    <div class="flex gap-2">
-      <UiToggle variant="default">Default</UiToggle>
-      <UiToggle variant="outline">Outline</UiToggle>
+    <div class="space-y-2">
+      <div
+        v-for="variant in (['default', 'secondary', 'destructive', 'outline', 'ghost'] as const)"
+        :key="variant"
+        class="flex gap-2"
+      >
+        <UiToggle :variant="variant">{{ variant }}</UiToggle>
+        <UiToggle :variant="variant" :default-value="true">{{ variant }} on</UiToggle>
+      </div>
     </div>
   </Section>
 
   <Section title="Sizes" class="max-w-md">
     <div class="flex items-center gap-2">
-      <UiToggle size="sm"><UiIcon name="lucide:bold" /></UiToggle>
-      <UiToggle size="default"><UiIcon name="lucide:bold" /></UiToggle>
-      <UiToggle size="lg"><UiIcon name="lucide:bold" /></UiToggle>
+      <UiToggle size="xs" variant="outline">xs</UiToggle>
+      <UiToggle size="sm" variant="outline">sm</UiToggle>
+      <UiToggle size="default" variant="outline">default</UiToggle>
+      <UiToggle size="lg" variant="outline">lg</UiToggle>
+    </div>
+    <div class="mt-3 flex items-center gap-2">
+      <UiToggle size="icon-sm" variant="outline"><UiIcon name="lucide:bold" /></UiToggle>
+      <UiToggle size="icon" variant="outline"><UiIcon name="lucide:bold" /></UiToggle>
     </div>
   </Section>
 
@@ -38,13 +49,13 @@ const underline = ref(false);
       <div
         class="flex gap-1 p-1 rounded-xl border border-muted-200 dark:border-muted-800 w-fit"
       >
-        <UiToggle v-model:pressed="bold" size="sm" aria-label="Bold">
+        <UiToggle v-model="bold" size="icon-sm" aria-label="Bold">
           <UiIcon name="lucide:bold" />
         </UiToggle>
-        <UiToggle v-model:pressed="italic" size="sm" aria-label="Italic">
+        <UiToggle v-model="italic" size="icon-sm" aria-label="Italic">
           <UiIcon name="lucide:italic" />
         </UiToggle>
-        <UiToggle v-model:pressed="underline" size="sm" aria-label="Underline">
+        <UiToggle v-model="underline" size="icon-sm" aria-label="Underline">
           <UiIcon name="lucide:underline" />
         </UiToggle>
       </div>

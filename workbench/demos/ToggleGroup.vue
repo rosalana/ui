@@ -17,7 +17,7 @@ const formats = ref(["bold"]);
         <p class="text-xs text-theme">
           Text Alignment: <strong class="text-foreground">{{ align }}</strong>
         </p>
-        <UiToggleGroup type="single" v-model="align">
+        <UiToggleGroup type="single" v-model="align" size="icon">
           <UiToggleGroupItem value="left" aria-label="Align left">
             <UiIcon name="lucide:align-left" />
           </UiToggleGroupItem>
@@ -63,7 +63,7 @@ const formats = ref(["bold"]);
           formats.join(", ") || "none"
         }}</strong>
       </p>
-      <UiToggleGroup type="multiple" v-model="formats">
+      <UiToggleGroup type="multiple" v-model="formats" size="icon-sm">
         <UiToggleGroupItem value="bold"
           ><UiIcon name="lucide:bold"
         /></UiToggleGroupItem>
@@ -91,6 +91,22 @@ const formats = ref(["bold"]);
         <UiToggleGroupItem value="a">Option A</UiToggleGroupItem>
         <UiToggleGroupItem value="b">Option B</UiToggleGroupItem>
         <UiToggleGroupItem value="c">Option C</UiToggleGroupItem>
+      </UiToggleGroup>
+    </div>
+  </Section>
+
+  <Section title="Sizes" class="max-w-md">
+    <div class="space-y-3">
+      <UiToggleGroup
+        v-for="size in (['xs', 'sm', 'default', 'lg'] as const)"
+        :key="size"
+        type="single"
+        default-value="a"
+        variant="outline"
+        :size="size"
+      >
+        <UiToggleGroupItem value="a">{{ size }}</UiToggleGroupItem>
+        <UiToggleGroupItem value="b">Option B</UiToggleGroupItem>
       </UiToggleGroup>
     </div>
   </Section>
