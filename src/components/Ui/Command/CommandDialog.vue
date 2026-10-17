@@ -1,38 +1,50 @@
 <script setup lang="ts">
 import type { DialogRootEmits, DialogRootProps } from "reka-ui";
 import {
-  DialogRoot,
-  DialogPortal,
-  DialogOverlay,
-  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  VisuallyHidden,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv , type ClassValue } from "tailwind-variants";
+import { reactiveOmit } from "@vueuse/core";
+import { type ClassValue } from "tailwind-variants";
+import UiDialog from "../Dialog/Dialog.vue";
+import UiDialogContent from "../Dialog/DialogContent.vue";
 import Command from "./Command.vue";
 
-const dialogOverlay = tv({
-  base: "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-});
+interface Props extends DialogRootProps {
+  class?: ClassValue;
+  title?: string;
+  description?: string;
+}
 
-const dialogContent = tv({
-  base: "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border bg-background shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+const props = withDefaults(defineProps<Props>(), {
+  title: "Command Palette",
+  description: "Search for a command to run.",
 });
-
-const props = defineProps<DialogRootProps>();
 const emit = defineEmits<DialogRootEmits>();
 
-const forwarded = useForwardPropsEmits(props, emit);
+const delegated = reactiveOmit(props, "class", "title", "description");
+const forwarded = useForwardPropsEmits(delegated, emit);
 </script>
 
 <template>
-  <DialogRoot data-slot="command-dialog" v-bind="forwarded">
-    <DialogPortal>
-      <DialogOverlay :class="dialogOverlay()" />
-      <DialogContent :class="dialogContent()">
-        <Command class="[&_[data-slot=command-input-wrapper]]:border-b">
-          <slot />
-        </Command>
-      </DialogContent>
-    </DialogPortal>
-  </DialogRoot>
+  <UiDialog data-slot="command-dialog" v-bind="forwarded">
+    <!-- Anchored near the top so the palette does not jump while results are filtered -->
+    <UiDialogContent
+      hide-close-button
+      :class="[
+        'top-[15vh] translate-y-0 gap-0 overflow-hidden p-0',
+        props.class,
+      ]"
+    >
+      <VisuallyHidden>
+        <DialogTitle>{{ title }}</DialogTitle>
+        <DialogDescription>{{ description }}</DialogDescription>
+      </VisuallyHidden>
+      <Command class="rounded-none border-0 shadow-none">
+        <slot />
+      </Command>
+    </UiDialogContent>
+  </UiDialog>
 </template>
