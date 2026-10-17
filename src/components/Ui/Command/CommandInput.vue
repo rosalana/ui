@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import type { ListboxFilterProps } from "reka-ui";
-import { ListboxFilter, useForwardProps } from "reka-ui";
-import { tv, type ClassValue } from "tailwind-variants";
+import type { ComboboxInputProps } from "reka-ui";
+import {
+  ComboboxInput,
+  injectComboboxRootContext,
+  useForwardProps,
+} from "reka-ui";
+import { tv , type ClassValue } from "tailwind-variants";
 import { AnimatePresence, motion } from "motion-v";
 import UiIcon from "../Icon/Icon.vue";
 import UiButton from "../Button/Button.vue";
-import { injectCommandContext } from "./context";
 
 const commandInput = tv({
   base: [
@@ -15,33 +18,50 @@ const commandInput = tv({
   ],
 });
 
-interface Props extends Omit<ListboxFilterProps, "modelValue"> {
+interface Props extends ComboboxInputProps {
   class?: ClassValue;
-  placeholder?: string;
 }
 
-const props = defineProps<Props>();
+// A command is not a select: never write the picked item's value into the search field.
+const props = withDefaults(defineProps<Props>(), {
+  displayValue: () => "",
+});
+
+// Attributes like `placeholder` belong to the input, not the wrapper.
+defineOptions({ inheritAttrs: false });
 const forwarded = useForwardProps(props);
 
-const { search } = injectCommandContext();
+const { filterSearch, inputElement } = injectComboboxRootContext();
+
+/**
+ * Clears through a real input event, so the input's own model, the filter and any `v-model`
+ * all reset. `ComboboxCancel` only resets the DOM value, which the next render puts back.
+ */
+function clear() {
+  const input = inputElement.value;
+  if (!input) return;
+
+  input.value = "";
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  input.focus();
+}
 </script>
 
 <template>
   <div
-    data-slot="command-input-wrapper"
     class="flex items-center gap-2 border-b px-3"
+    data-slot="command-input-wrapper"
   >
     <UiIcon name="lucide:search" class="size-4 shrink-0 text-theme" />
-    <ListboxFilter
-      v-model="search"
+    <ComboboxInput
       data-slot="command-input"
-      v-bind="forwarded"
+      v-bind="{ ...$attrs, ...forwarded }"
       :class="[commandInput({ class: props.class })]"
     />
 
     <AnimatePresence>
       <motion.div
-        v-if="search"
+        v-if="filterSearch"
         :initial="{ opacity: 0, scale: 0.5, rotate: -45 }"
         :animate="{ opacity: 1, scale: 1, rotate: 0 }"
         :exit="{ opacity: 0, scale: 0.5, rotate: 45 }"
@@ -53,7 +73,7 @@ const { search } = injectCommandContext();
           tabindex="-1"
           type="button"
           class="size-7 text-destructive"
-          @click="search = ''"
+          @click="clear"
         >
           <UiIcon name="lucide:x" class="size-4" />
           <span class="sr-only">Clear search</span>
