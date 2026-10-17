@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { ListboxContentProps } from "reka-ui";
-import { ListboxContent, useForwardProps } from "reka-ui";
+import type { ComboboxContentProps } from "reka-ui";
+import { ComboboxContent, useForwardProps } from "reka-ui";
 import { ref } from "vue";
 import { useResizeObserver } from "@vueuse/core";
-import { tv, type ClassValue } from "tailwind-variants";
+import { tv , type ClassValue } from "tailwind-variants";
 import { motion } from "motion-v";
 
 const commandList = tv({
   base: "max-h-[300px] scroll-py-1.5 overflow-y-auto overflow-x-hidden",
 });
 
-interface Props extends ListboxContentProps {
+interface Props extends ComboboxContentProps {
   class?: ClassValue;
 }
 
@@ -35,15 +35,11 @@ useResizeObserver(contentRef, ([entry]) => {
 </script>
 
 <template>
-  <ListboxContent
-    data-slot="command-list"
-    v-bind="forwarded"
-    :class="[commandList({ class: props.class })]"
-    as-child
-  >
-    <!-- layoutScroll keeps the sliding highlight in place while the list scrolls -->
+  <ComboboxContent data-slot="command-list" v-bind="forwarded">
+    <!-- The scroll container: layoutScroll keeps the sliding highlight in place while it scrolls -->
     <motion.div
       layout-scroll
+      :class="[commandList({ class: props.class })]"
       :initial="false"
       :animate="{ height }"
       :transition="{ type: 'spring', stiffness: 500, damping: 40 }"
@@ -53,5 +49,5 @@ useResizeObserver(contentRef, ([entry]) => {
         <slot />
       </div>
     </motion.div>
-  </ListboxContent>
+  </ComboboxContent>
 </template>
