@@ -164,7 +164,7 @@ reka-ui (headless, accessible)
 | Category | Components |
 |----------|------------|
 | **Form** | Input, Textarea, Label, Checkbox, RadioGroup, Switch, Select, Slider, PinInput |
-| **Feedback** | Alert, Badge, Progress, Skeleton |
+| **Feedback** | Alert, Badge, Chip, Progress, Skeleton |
 | **Overlay** | Dialog, Popover, Tooltip, Sheet, DropdownMenu, HoverCard, AlertDialog, ContextMenu |
 | **Navigation** | Tabs, Accordion, Breadcrumb, Pagination, NavigationMenu, Menubar |
 | **Layout** | Card, AspectRatio, Collapsible, ScrollArea, Separator, Resizable |

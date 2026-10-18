@@ -38,6 +38,9 @@ export { default as UiBadge } from "./Ui/Badge/Badge.vue";
 
 export { default as UiTag } from "./Ui/Tag/Tag.vue";
 
+// Chip
+export { default as UiChip } from "./Ui/Chip/Chip.vue";
+
 // Breadcrumb
 export { default as UiBreadcrumb } from "./Ui/Breadcrumb/Breadcrumb.vue";
 export { default as UiBreadcrumbList } from "./Ui/Breadcrumb/BreadcrumbList.vue";

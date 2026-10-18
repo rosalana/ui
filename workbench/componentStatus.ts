@@ -16,6 +16,7 @@ export const DONE: string[] = [
   "Button",
   "Card",
   "Checkbox",
+  "Chip",
   "ColorPicker",
   "Command",
   "Dialog",
