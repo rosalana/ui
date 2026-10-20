@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
       v-bind="props"
       :class="[separator({ orientation, class: props.class })]"
     />
-    <span class="absolute left-1/2 -translate-x-1/2 bg-background px-3 font-mono text-[10px] uppercase tracking-widest text-foreground/20">
+    <span class="absolute left-1/2 -translate-x-1/2 bg-background px-3 font-mono text-[10px] uppercase tracking-widest text-theme-500">
       {{ text }}
     </span>
   </div>
