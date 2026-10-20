@@ -1,3 +1,5 @@
+import { ClassValue } from "vue";
+
 export type WebNavItem = {
   title: string;
   href?: string;
@@ -9,4 +11,5 @@ export type WebNavItem = {
 
 export type WebNavProps = {
   menu?: WebNavItem[];
+  class?: ClassValue;
 };

@@ -37,7 +37,10 @@ const { isActive } = useActiveRoute();
       scrolled || mobileOpen ? 'border-b border-border/60 bg-background' : '',
     ]"
   >
-    <div class="mx-auto flex h-18 max-w-6xl items-center justify-between px-6">
+    <div
+      class="mx-auto flex h-18 max-w-6xl items-center justify-between px-6"
+      :class="props.class"
+    >
       <!-- Brand -->
       <slot name="brand">
         <span class="text-base font-semibold tracking-tight">Rosalana</span>
