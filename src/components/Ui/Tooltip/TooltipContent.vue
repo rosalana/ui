@@ -19,7 +19,7 @@ const tooltipContent = tv({
   },
 });
 
-type TooltipContentVariants = VariantProps<typeof tooltipContent>;
+export type TooltipContentVariants = VariantProps<typeof tooltipContent>;
 
 interface Props extends TooltipContentProps {
   class?: ClassValue;

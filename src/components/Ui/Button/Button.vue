@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PrimitiveProps } from "reka-ui";
+import type { PrimitiveProps, TooltipContentProps } from "reka-ui";
 import { computed, ref } from "vue";
 import { Primitive } from "reka-ui";
 import { AnimatePresence, motion } from "motion-v";
@@ -8,7 +8,7 @@ import { UiIcon } from "../../index";
 import { Link } from "@inertiajs/vue3";
 import Tooltip from "../Tooltip/Tooltip.vue";
 import TooltipTrigger from "../Tooltip/TooltipTrigger.vue";
-import TooltipContent from "../Tooltip/TooltipContent.vue";
+import TooltipContent, { TooltipContentVariants } from "../Tooltip/TooltipContent.vue";
 
 defineOptions({ inheritAttrs: false });
 
@@ -93,6 +93,7 @@ interface Props extends PrimitiveProps {
   arrowBack?: boolean;
   href?: string | MethodAndUrl;
   tooltip?: string | null;
+  tooltipVariant?: TooltipContentVariants['variant']
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -180,7 +181,7 @@ const isHovered = ref<boolean>(false);
         </Primitive>
       </div>
     </TooltipTrigger>
-    <TooltipContent v-if="props.tooltip">
+    <TooltipContent v-if="props.tooltip" :variant="props.tooltipVariant ?? 'default'" class="max-w-72">
       {{ props.tooltip }}
     </TooltipContent>
   </Tooltip>
