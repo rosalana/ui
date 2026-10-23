@@ -5,17 +5,21 @@ import { configure as configureSonner } from "../composables/useSonner/state";
 import { addCollection, IconifyJSON } from "@iconify/vue";
 import lucide from "@iconify-json/lucide/icons.json";
 import logos from "@iconify-json/logos/icons.json";
+import mdi from "@iconify-json/mdi/icons.json";
+import simpleIcons from "@iconify-json/simple-icons/icons.json";
 
 // Register icon sets locally — no CDN requests
 addCollection(lucide as IconifyJSON);
 addCollection(logos as IconifyJSON);
+addCollection(mdi as IconifyJSON);
+addCollection(simpleIcons as IconifyJSON);
 /**
  * Vue plugin to initialize Rosalana UI context.
  */
 export const createRosalanaApp = {
   install(
     app: any,
-    options?: CreateRosalanaUIOptions | (() => CreateRosalanaUIOptions)
+    options?: CreateRosalanaUIOptions | (() => CreateRosalanaUIOptions),
   ) {
     const resolved = typeof options === "function" ? options() : options || {};
     const context = createContext(resolved);
