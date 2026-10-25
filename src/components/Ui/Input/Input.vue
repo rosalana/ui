@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends string | number = string">
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import { useForwardExpose } from "reka-ui";
 import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
 import { UiButton, UiIcon } from "../../index";
@@ -34,7 +34,8 @@ const props = withDefaults(
     modelValue?: T;
     /**
      * Filled in by Vue from `v-model.lazy.number.trim`. Handled here because Vue only applies
-     * those modifiers to native elements on its own.
+     * those modifiers to native elements on its own. `.debounce` is our own and waits until the
+     * user stops typing.
      */
     modelModifiers?: ModelModifiers;
     type?: HTMLInputElement["type"];
@@ -81,11 +82,26 @@ function emitValue(raw: string) {
   emit("update:modelValue", applyModelModifiers(raw, props.modelModifiers) as T);
 }
 
+const DEBOUNCE_MS = 300;
+
+let debounceTimeout: ReturnType<typeof setTimeout> | undefined;
+
 function handleInput(event: Event) {
   if (props.modelModifiers?.lazy) return;
 
-  emitValue((event.target as HTMLInputElement).value);
+  const value = (event.target as HTMLInputElement).value;
+
+  clearTimeout(debounceTimeout);
+
+  if (props.modelModifiers?.debounce) {
+    debounceTimeout = setTimeout(() => emitValue(value), DEBOUNCE_MS);
+    return;
+  }
+
+  emitValue(value);
 }
+
+onBeforeUnmount(() => clearTimeout(debounceTimeout));
 
 function handleChange(event: Event) {
   if (!props.modelModifiers?.lazy) return;
@@ -113,6 +129,7 @@ const activeState = computed(() => {
       color: "text-destructive",
       clickable: true,
       action: () => {
+        clearTimeout(debounceTimeout);
         emit("update:modelValue", "" as T);
       },
     };

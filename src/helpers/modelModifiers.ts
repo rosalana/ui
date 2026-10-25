@@ -8,6 +8,8 @@
 export type ModelModifiers = {
   /** Emit on `change` — blur or Enter — instead of on every keystroke. */
   lazy?: boolean;
+  /** Emit once the user stops typing for a moment, while still in the field. */
+  debounce?: boolean;
   /** Emit a number once the value parses as one. */
   number?: boolean;
   /** Strip surrounding whitespace before emitting. */
