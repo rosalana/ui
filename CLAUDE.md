@@ -273,7 +273,6 @@ Semantic colors: `primary`, `secondary`, `muted`, `destructive`, `info`, `succes
 ## Build Output
 
 - ES Module: `dist/index.es.js`
-- CommonJS: `dist/index.cjs.js`
 - TypeScript declarations included
 - CSS: Import `@rosalana/ui/tailwind.css` in consuming apps
 

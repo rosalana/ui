@@ -22,20 +22,18 @@
   },
   "private": false,
   "type": "module",
-  "main": "./dist/index.cjs.js",
+  "main": "./dist/index.es.js",
   "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.cjs.js"
+      "import": "./dist/index.es.js"
     },
     "./tailwind.css": "./src/tailwind.css",
     "./helpers": {
       "types": "./dist/helpers/index.d.ts",
-      "import": "./dist/helpers.es.js",
-      "require": "./dist/helpers.cjs.js"
+      "import": "./dist/helpers.es.js"
     }
   },
   "files": [
