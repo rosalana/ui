@@ -1,6 +1,25 @@
 {
   "name": "@rosalana/ui",
   "version": "0.0.1",
+  "description": "Vue 3 UI library with shared theming, composables and components for Rosalana apps built on Inertia.js",
+  "keywords": [
+    "vue",
+    "vue3",
+    "inertia",
+    "ui",
+    "components",
+    "tailwindcss",
+    "reka-ui",
+    "rosalana"
+  ],
+  "homepage": "https://github.com/rosalana/ui#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosalana/ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rosalana/ui/issues"
+  },
   "private": false,
   "type": "module",
   "main": "./dist/index.cjs.js",
@@ -8,15 +27,15 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.cjs.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs.js"
     },
     "./tailwind.css": "./src/tailwind.css",
     "./helpers": {
+      "types": "./dist/helpers/index.d.ts",
       "import": "./dist/helpers.es.js",
-      "require": "./dist/helpers.cjs.js",
-      "types": "./dist/helpers/index.d.ts"
+      "require": "./dist/helpers.cjs.js"
     }
   },
   "files": [
@@ -32,10 +51,14 @@
     "typecheck": "vue-tsc --noEmit",
     "dev": "npm run build -- --watch",
     "build": "vite build && vue-tsc --declaration --emitDeclarationOnly",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "author": "michaelbany <mobany526@gmail.com>",
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@inertiajs/vue3": "^3.0.0",
     "@tailwindcss/vite": "^4.3.0",
