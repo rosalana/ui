@@ -27,7 +27,7 @@ const handleSelect = (color: string) => {
       Palettes
     </p>
     <div class="flex-1 p-2">
-      <div class="hide-scrollbar h-full overflow-y-auto max-h-70 divide-y">
+      <div class="h-full scrollbar-none [&::-webkit-scrollbar]:hidden overflow-y-auto max-h-70 divide-y">
         <div v-for="family in colorFamilies" :key="family.name">
           <div class="flex gap-0.5 my-1.5">
             <button
@@ -45,12 +45,3 @@ const handleSelect = (color: string) => {
     </div>
   </div>
 </template>
-<style scoped>
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-</style>
