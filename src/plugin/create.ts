@@ -3,10 +3,10 @@ import { afterAppCreated, createContext, provideContext } from "./context";
 import { mountVirtual } from "./virtual";
 import { configure as configureSonner } from "../composables/useSonner/state";
 import { addCollection, IconifyJSON } from "@iconify/vue";
-import lucide from "@iconify-json/lucide/icons.json";
-import logos from "@iconify-json/logos/icons.json";
-import mdi from "@iconify-json/mdi/icons.json";
-import simpleIcons from "@iconify-json/simple-icons/icons.json";
+import { icons as lucide } from "@iconify-json/lucide";
+import { icons as logos } from "@iconify-json/logos";
+import { icons as mdi } from "@iconify-json/mdi";
+import { icons as simpleIcons } from "@iconify-json/simple-icons";
 
 // Register icon sets locally — no CDN requests
 addCollection(lucide as IconifyJSON);
