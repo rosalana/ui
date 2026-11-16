@@ -13,7 +13,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-  <div class="relative w-full overflow-auto">
+  <div class="relative w-full overflow-auto border rounded-xl">
     <table data-slot="table" :class="[table({ class: props.class })]">
       <slot />
     </table>
