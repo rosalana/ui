@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import UiSlider from "../../src/components/Ui/Slider/Slider.vue";
+import UiButton from "../../src/components/Ui/Button/Button.vue";
 import Section from "workbench/components/Section.vue";
 
 const volume = ref([60]);
 const range = ref([20, 80]);
 const price = ref([150, 450]);
+const preset = ref([30]);
+const vertical = ref([40]);
 </script>
 
 <template>
@@ -62,7 +65,29 @@ const price = ref([150, 450]);
     </div>
   </Section>
 
+  <Section title="Set from outside" class="max-w-md">
+    <div class="space-y-3">
+      <UiSlider v-model="preset" />
+      <div class="flex gap-2">
+        <UiButton v-for="value in [0, 25, 50, 75, 100]" :key="value" size="xs" variant="outline" @click="preset = [value]">
+          {{ value }}
+        </UiButton>
+      </div>
+    </div>
+  </Section>
+
+  <Section title="Vertical" class="max-w-md">
+    <div class="flex h-40 items-center gap-6">
+      <UiSlider v-model="vertical" orientation="vertical" />
+      <UiSlider :default-value="[20, 70]" orientation="vertical" :step="10" />
+      <span class="text-xs text-theme">{{ vertical[0] }}</span>
+    </div>
+  </Section>
+
   <Section title="Disabled" class="max-w-md">
-    <UiSlider :default-value="[60]" disabled />
+    <div class="space-y-4">
+      <UiSlider :default-value="[60]" disabled />
+      <UiSlider :default-value="[20, 70]" disabled />
+    </div>
   </Section>
 </template>

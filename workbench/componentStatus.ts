@@ -32,6 +32,7 @@ export const DONE: string[] = [
   "Select",
   "Separator",
   "Skeleton",
+  "Slider",
   "SmallAlert",
   "Sonner",
   "Switch",
@@ -48,7 +49,6 @@ export const UNTOUCHED: string[] = [
   "Pagination",
   "Resizable",
   "Sheet",
-  "Slider",
   "Textarea",
 ];
 
