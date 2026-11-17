@@ -9,6 +9,12 @@ const range = ref([20, 80]);
 const price = ref([150, 450]);
 const preset = ref([30]);
 const vertical = ref([40]);
+const opacity = ref([70]);
+const budget = ref([200, 600]);
+const temperature = ref([18, 24]);
+
+const formatTime = (value: number) => `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
+const hours = ref([9 * 60, 17 * 60]);
 </script>
 
 <template>
@@ -72,6 +78,45 @@ const vertical = ref([40]);
         <UiButton v-for="value in [0, 25, 50, 75, 100]" :key="value" size="xs" variant="outline" @click="preset = [value]">
           {{ value }}
         </UiButton>
+      </div>
+    </div>
+  </Section>
+
+  <Section title="Tooltip" class="max-w-md">
+    <div class="space-y-8">
+      <div class="space-y-2">
+        <p class="text-xs text-theme">On hover, drag and keyboard focus</p>
+        <UiSlider v-model="volume" tooltip />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">Template: "{value} %"</p>
+        <UiSlider v-model="opacity" tooltip="{value} %" />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">One per thumb, by order</p>
+        <UiSlider v-model="budget" :max="1000" :step="10" :tooltip="['Min {value} Kč', 'Max {value} Kč']" />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">Function</p>
+        <UiSlider v-model="hours" :max="24 * 60" :step="15" :tooltip="(value) => formatTime(value)" />
+      </div>
+    </div>
+  </Section>
+
+  <Section title="Tooltip always visible" class="max-w-md">
+    <div class="space-y-12 pt-8">
+      <UiSlider v-model="range" tooltip-always />
+      <UiSlider v-model="temperature" :min="10" :max="30" :step="0.5" tooltip-always>
+        <template #tooltip="{ value, index }">
+          <span class="flex items-center gap-1">
+            <span class="text-theme">{{ index === 0 ? "from" : "to" }}</span>
+            {{ value }} °C
+          </span>
+        </template>
+      </UiSlider>
+      <div class="flex h-40 items-center gap-16">
+        <UiSlider :default-value="[30, 60]" orientation="vertical" tooltip-always />
+        <UiSlider :default-value="[50]" orientation="vertical" tooltip />
       </div>
     </div>
   </Section>

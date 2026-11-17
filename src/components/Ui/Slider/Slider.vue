@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import type { SliderRootEmits, SliderRootProps } from "reka-ui"
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack, useForwardPropsEmits } from "reka-ui"
-import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from "vue"
+import { computed, onBeforeUnmount, ref, useSlots, useTemplateRef, watch } from "vue"
 import { animate, motion, motionValue, type MotionValue } from "motion-v"
 import { useElementSize } from "@vueuse/core"
 import { tv, type ClassValue } from "tailwind-variants"
+import { useLocale } from "../../../composables/useLocale"
+import UiTooltip from "../Tooltip/Tooltip.vue"
+import UiTooltipTrigger from "../Tooltip/TooltipTrigger.vue"
+import UiTooltipContent from "../Tooltip/TooltipContent.vue"
 
 /** A step at least this wide is worth animating while dragging, so the thumb hops between steps. */
 const MIN_ANIMATED_STEP_PX = 12
@@ -99,9 +103,29 @@ const sliderThumbDot = tv({
   ],
 })
 
+/** Text of a thumb's tooltip, from its value and its order among the thumbs. */
+export type SliderTooltipFormat = (value: number, index: number) => string
+
+const sliderTooltip = tv({
+  // Never in the way of the pointer, and digits of one width so the bubble doesn't wobble while dragging
+  base: "pointer-events-none select-none tabular-nums font-medium",
+})
+
 interface Props extends SliderRootProps {
   class?: ClassValue
   transparent?: boolean
+  /**
+   * A tooltip over each thumb with its value, shown on hover, drag and keyboard focus.
+   * - `true` shows the value formatted in the app locale.
+   * - A string is a template for every thumb, `{value}` is replaced by the value (`"{value} %"`).
+   * - An array gives each thumb its own template by order: the first thumb gets the first one.
+   * - A function returns the text from the value and the thumb's order.
+   *
+   * The `tooltip` slot (`{ value, index, text }`) replaces the text with any content.
+   */
+  tooltip?: boolean | string | string[] | SliderTooltipFormat
+  /** Keeps the tooltips open all the time. Turns them on by itself. */
+  tooltipAlways?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -113,7 +137,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<SliderRootEmits>()
 
 const delegated = computed(() => {
-  const { class: _, transparent, ...rest } = props
+  const { class: _, transparent, tooltip, tooltipAlways, ...rest } = props
   return rest
 })
 
@@ -135,6 +159,25 @@ function onUpdate(value: number[] | undefined) {
 
 const thumbCount = computed(() => values.value.length)
 
+const slots = useSlots()
+const { locale } = useLocale()
+
+const numberFormat = computed(() => new Intl.NumberFormat(locale.value))
+
+const hasTooltip = computed(
+  () => (props.tooltip !== undefined && props.tooltip !== false) || props.tooltipAlways || !!slots.tooltip,
+)
+
+function tooltipText(index: number) {
+  const value = values.value[index] ?? props.min
+  const tooltip = props.tooltip
+  if (typeof tooltip === "function") return tooltip(value, index)
+
+  const formatted = numberFormat.value.format(value)
+  const template = Array.isArray(tooltip) ? tooltip[index] : typeof tooltip === "string" ? tooltip : undefined
+  return template === undefined ? formatted : template.replaceAll("{value}", formatted)
+}
+
 // The motion overrides and the split track only know the default left-to-right / bottom-to-top layout
 const animated = computed(() => !props.inverted && props.dir !== "rtl")
 
@@ -152,6 +195,7 @@ const pressing = ref(false)
 const dragging = ref(false)
 const hovered = ref<number | null>(null)
 const activeThumb = ref<number | null>(null)
+const focusedThumb = ref<number | null>(null)
 /** Cleared by the pointer, set again by the keyboard or once focus leaves the slider. */
 const keyboardFocus = ref(true)
 /** Only a press on a thumb drags. A press on the track is a click: one jump, then it's done. */
@@ -266,6 +310,18 @@ const segments = computed(() => {
   })
 })
 
+/** Open while the thumb is hovered, held or focused from the keyboard, or always with `tooltipAlways`. */
+function tooltipOpen(index: number) {
+  if (!hasTooltip.value) return false
+  if (props.tooltipAlways) return true
+  if (props.disabled) return false
+  return (
+    hovered.value === index ||
+    (pressing.value && activeThumb.value === index) ||
+    (keyboardFocus.value && focusedThumb.value === index)
+  )
+}
+
 /** Squeezed while held, springs past its size on release so it lands with a little bounce. */
 function dotScale(index: number) {
   if (pressing.value && activeThumb.value === index) return 0.82
@@ -311,22 +367,44 @@ function dotScale(index: number) {
         :class="sliderRange({ transparent: !!props.transparent })"
       />
     </SliderTrack>
-    <SliderThumb
+    <!-- Tooltips go to the thumbs by order, the first thumb gets the first one -->
+    <UiTooltip
       v-for="(_, index) in thumbCount"
       :key="index"
-      data-slot="slider-thumb"
-      :style="{ '--slider-thumb': rendered[index] ?? 0 }"
-      :class="sliderThumb({ animated, focusRing: keyboardFocus })"
-      @focus="activeThumb = index"
-      @pointerenter="hovered = index"
-      @pointerleave="hovered = null"
+      :open="tooltipOpen(index)"
+      :delay-duration="0"
     >
-      <motion.span
-        data-slot="slider-thumb-dot"
-        :class="sliderThumbDot()"
-        :animate="{ scale: dotScale(index) }"
-        :transition="{ type: 'spring', stiffness: 600, damping: 14 }"
-      />
-    </SliderThumb>
+      <UiTooltipTrigger as-child>
+        <SliderThumb
+          data-slot="slider-thumb"
+          :style="{ '--slider-thumb': rendered[index] ?? 0 }"
+          :class="sliderThumb({ animated, focusRing: keyboardFocus })"
+          @focus="activeThumb = index; focusedThumb = index"
+          @blur="focusedThumb = null"
+          @pointerenter="hovered = index"
+          @pointerleave="hovered = null"
+        >
+          <motion.span
+            data-slot="slider-thumb-dot"
+            :class="sliderThumbDot()"
+            :animate="{ scale: dotScale(index) }"
+            :transition="{ type: 'spring', stiffness: 600, damping: 14 }"
+          />
+        </SliderThumb>
+      </UiTooltipTrigger>
+      <!-- Follows the thumb frame by frame while it springs to a new value -->
+      <UiTooltipContent
+        v-if="hasTooltip"
+        data-slot="slider-tooltip"
+        :side="orientation === 'vertical' ? 'right' : 'top'"
+        :side-offset="6"
+        update-position-strategy="always"
+        :class="sliderTooltip()"
+      >
+        <slot name="tooltip" :value="values[index]" :index="index" :text="tooltipText(index)">
+          {{ tooltipText(index) }}
+        </slot>
+      </UiTooltipContent>
+    </UiTooltip>
   </SliderRoot>
 </template>
