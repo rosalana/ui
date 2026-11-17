@@ -20,8 +20,8 @@ const dialogOverlay = tv({
 const dialogContent = tv({
   base: [
     "fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
-    "w-full max-w-lg",
-    "grid gap-4 p-6",
+    "w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto",
+    "grid grid-cols-1 gap-4 p-6",
     "rounded-xl border bg-background",
     "shadow-xl shadow-theme/15",
   ],
