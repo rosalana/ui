@@ -26,6 +26,9 @@ interface Props extends TooltipContentProps {
   variant?: TooltipContentVariants["variant"];
 }
 
+// The root is a portal (teleport), so attributes like `data-slot` go to the content itself
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<Props>(), {
   sideOffset: 4,
   variant: "default",
@@ -38,7 +41,7 @@ const forwarded = useForwardProps(props);
   <TooltipPortal>
     <TooltipContent
       data-slot="tooltip-content"
-      v-bind="forwarded"
+      v-bind="{ ...forwarded, ...$attrs }"
       :class="[tooltipContent({ variant, class: props.class })]"
     >
       <slot />
