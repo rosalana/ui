@@ -93,7 +93,14 @@ export { default as UiComboboxGroup } from "./Ui/Combobox/ComboboxGroup.vue";
 export { default as UiComboboxSeparator } from "./Ui/Combobox/ComboboxSeparator.vue";
 export { default as UiComboboxEmpty } from "./Ui/Combobox/ComboboxEmpty.vue";
 export { default as UiComboboxLoading } from "./Ui/Combobox/ComboboxLoading.vue";
-export type { ComboboxFilter, ComboboxSearch } from "./Ui/Combobox/context";
+export { default as UiComboboxShortcut } from "./Ui/Combobox/ComboboxShortcut.vue";
+export type {
+  ComboboxItem,
+  ComboboxGroup,
+  ComboboxItems,
+  ComboboxFilter,
+  ComboboxSearch,
+} from "./Ui/Combobox/context";
 
 // Command
 export { default as UiCommand } from "./Ui/Command/Command.vue";

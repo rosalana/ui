@@ -8,7 +8,7 @@ import {
   injectListboxRootContext,
   useForwardProps,
 } from "reka-ui";
-import { computed, inject, nextTick, watch, type Ref } from "vue";
+import { computed, inject, nextTick, shallowRef, watch, type Ref } from "vue";
 import { tv, type ClassValue } from "tailwind-variants";
 import { AnimatePresence, motion } from "motion-v";
 import { useLocale } from "../../../composables/useLocale";
@@ -34,7 +34,7 @@ const comboboxInput = tv({
   ],
 });
 
-interface Props extends ComboboxInputProps {
+interface Props extends Omit<ComboboxInputProps, "modelValue"> {
   class?: ClassValue;
   placeholder?: string;
   /** An Iconify icon in front of the text, like `lucide:search`. */
@@ -44,6 +44,9 @@ interface Props extends ComboboxInputProps {
 }
 
 const props = defineProps<Props>();
+
+/** The text in the input: the search while typing, the picked value's label otherwise. */
+const text = defineModel<string>({ default: "" });
 
 // Attributes like `id` or `name` belong to the input, not the wrapper.
 defineOptions({ inheritAttrs: false });
@@ -59,25 +62,77 @@ const context = inject(COMBOBOX_CONTEXT)!;
 const root = injectComboboxRootContext();
 const listbox = injectListboxRootContext();
 
+function selectedValues(): unknown[] {
+  const value = root.modelValue.value;
+  if (Array.isArray(value)) return value;
+  return value === undefined || value === null ? [] : [value];
+}
+
 /**
- * What the input shows for the picked value: the app's `displayValue`, else the label of the
- * picked item. A value whose item hasn't been shown yet falls back to the value itself.
+ * Labels of what's picked right now, held on after the item leaves `items` (a new server search
+ * replaced the results). Only the current selection, so it never grows with the searches.
+ */
+const pickedLabels = shallowRef(new Map<PropertyKey, string>());
+
+watch(
+  [root.modelValue, context.options],
+  () => {
+    const next = new Map<PropertyKey, string>();
+    for (const value of selectedValues()) {
+      const key = context.keyOf(value);
+      const label = context.labelOf(value) ?? pickedLabels.value.get(key);
+      if (label !== undefined) next.set(key, label);
+    }
+    pickedLabels.value = next;
+  },
+  { immediate: true, deep: true },
+);
+
+/**
+ * What the input shows for the picked value, all from data, never from rendered items: the
+ * app's `displayValue`, else the label from `items`, else the value itself when it's plain.
  */
 function display(value: AcceptableValue) {
   if (props.displayValue) return props.displayValue(value);
   if (value === undefined || value === null || Array.isArray(value)) return "";
-  return context.labelOf(value) ?? (typeof value === "object" ? "" : String(value));
+  return (
+    context.labelOf(value) ??
+    pickedLabels.value.get(context.keyOf(value)) ??
+    (typeof value === "object" ? "" : String(value))
+  );
 }
+
+/**
+ * reka-ui writes the label only when the value changes or the input loses focus. A label that
+ * arrives later (items loaded after the value was set) goes in here, unless the user is typing.
+ */
+const pickedText = computed(() => display(root.modelValue.value));
+watch(pickedText, (label) => {
+  if (!root.open.value) text.value = label;
+});
 
 // Only while open: closing clears reka-ui's search, which must neither show every item during
 // the exit animation nor send a request. Filtering hides items without reka-ui noticing, so the
 // first one left gets highlighted here.
 watch([root.filterSearch, root.open], ([search, open]) => {
   if (!open) return;
-  context.search.value = search;
   context.setSearch(search);
   nextTick(() => listbox.highlightFirstItem());
 });
+
+/**
+ * New results replace the old ones without the list ever going empty (they stay while loading),
+ * so reka-ui doesn't move the highlight. Once the highlighted item is gone, the first one takes it.
+ */
+watch(
+  () => [...root.allItems.value.keys()],
+  () => {
+    if (!root.open.value) return;
+    nextTick(() => {
+      if (!root.highlightedElement.value?.isConnected) listbox.highlightFirstItem();
+    });
+  },
+);
 
 const hasValue = computed(() => {
   const value = root.modelValue.value;
@@ -101,6 +156,7 @@ function clear() {
     <ComboboxInput
       data-slot="combobox-input"
       v-bind="{ ...$attrs, ...forwarded }"
+      v-model="text"
       :display-value="display"
       :placeholder="placeholder ?? t('combobox.placeholder')"
       :class="comboboxInput()"

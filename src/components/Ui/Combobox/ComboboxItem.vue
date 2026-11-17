@@ -1,16 +1,15 @@
-<script setup lang="ts">
-import type { ComboboxItemProps } from "reka-ui";
+<script setup lang="ts" generic="T extends ComboboxItem">
 import {
-  ComboboxItem,
+  ComboboxItem as ComboboxItemPrimitive,
   ComboboxItemIndicator,
   injectComboboxRootContext,
-  useForwardProps,
 } from "reka-ui";
-import { computed, inject, onBeforeUnmount, onMounted, onUpdated, ref, useId, watchEffect } from "vue";
+import { computed, ref } from "vue";
 import { tv, type ClassValue } from "tailwind-variants";
 import { motion } from "motion-v";
 import UiIcon from "../Icon/Icon.vue";
-import { COMBOBOX_CONTEXT, COMBOBOX_GROUP_CONTEXT } from "./context";
+import UiComboboxShortcut from "./ComboboxShortcut.vue";
+import type { ComboboxItem } from "./context";
 
 const comboboxItem = tv({
   base: [
@@ -23,62 +22,33 @@ const comboboxItem = tv({
   ],
 });
 
-interface Props extends ComboboxItemProps {
+// Inline rather than a named interface, see Combobox.vue.
+const props = defineProps<{
+  /** The option. Everything about it comes from here, a custom look goes in the default slot. */
+  item: T;
   class?: ClassValue;
-}
+}>();
 
-const props = defineProps<Props>();
-const forwarded = useForwardProps(props);
+defineSlots<{
+  /** The inside of the option, in place of its icon, label and shortcut. */
+  default?(props: { item: T }): any;
+}>();
 
-const context = inject(COMBOBOX_CONTEXT)!;
-const group = inject(COMBOBOX_GROUP_CONTEXT, null);
 const { highlightedElement } = injectComboboxRootContext();
 
 const itemRef = ref<{ $el: HTMLElement } | null>(null);
-
-/** The rendered text, kept while the item is filtered out so it can come back. */
-const renderedText = ref<string>();
-
-function captureText() {
-  const text = itemRef.value?.$el?.textContent?.trim();
-  if (!text) return;
-  renderedText.value = text;
-  context.rememberLabel(props.value, text);
-}
-
-onMounted(captureText);
-onUpdated(captureText);
-
-/** What the filter matches against: `textValue`, else what the item shows, else the value. */
-const text = computed(() => {
-  if (props.textValue) return props.textValue;
-  if (renderedText.value) return renderedText.value;
-  const value = props.value;
-  return value === null || typeof value === "object" ? "" : String(value);
-});
-
-const visible = computed(() => {
-  const matches = context.matches.value;
-  const search = context.search.value.trim();
-  return !matches || !search || matches(text.value, search);
-});
-
-// Tells the group whether it still has something to show
-const id = useId();
-watchEffect(() => group?.set(id, visible.value));
-onBeforeUnmount(() => group?.delete(id));
-
 const isHighlighted = computed(
   () => !!itemRef.value?.$el && highlightedElement.value === itemRef.value.$el,
 );
 </script>
 
 <template>
-  <ComboboxItem
-    v-if="visible"
+  <ComboboxItemPrimitive
     ref="itemRef"
     data-slot="combobox-item"
-    v-bind="forwarded"
+    :value="item.value"
+    :text-value="item.label"
+    :disabled="item.disabled"
     :class="comboboxItem({ class: props.class })"
     as-child
   >
@@ -87,7 +57,7 @@ const isHighlighted = computed(
       :animate="{ opacity: 1 }"
       :transition="{ duration: 0.15 }"
     >
-      <!-- One highlight that slides between items (layoutId is scoped per combobox) -->
+      <!-- One highlight that slides between options (layoutId is scoped per combobox) -->
       <motion.div
         v-if="isHighlighted"
         layout-id="combobox-highlight"
@@ -95,7 +65,13 @@ const isHighlighted = computed(
         class="absolute inset-0 -z-10 rounded-lg border border-border/40 bg-accent"
         :transition="{ type: 'spring', stiffness: 500, damping: 35 }"
       />
-      <slot />
+
+      <slot :item="item">
+        <UiIcon v-if="item.icon" :name="item.icon" class="text-theme" />
+        <span class="truncate">{{ item.label }}</span>
+        <UiComboboxShortcut v-if="item.shortcut">{{ item.shortcut }}</UiComboboxShortcut>
+      </slot>
+
       <ComboboxItemIndicator as-child>
         <motion.span
           class="absolute right-2.5 flex text-primary"
@@ -107,5 +83,5 @@ const isHighlighted = computed(
         </motion.span>
       </ComboboxItemIndicator>
     </motion.div>
-  </ComboboxItem>
+  </ComboboxItemPrimitive>
 </template>

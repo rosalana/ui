@@ -64,7 +64,7 @@ useResizeObserver(contentRef, ([entry]) => {
               <div
                 ref="contentRef"
                 data-slot="combobox-list"
-                class="isolate p-1.5 [&:has([data-slot=combobox-group][data-empty])_[data-slot=combobox-separator]]:hidden"
+                class="isolate p-1.5"
               >
                 <slot />
               </div>
