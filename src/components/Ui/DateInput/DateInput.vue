@@ -54,6 +54,15 @@ const dateInput = tv({
     disabled: {
       true: "cursor-not-allowed opacity-50",
     },
+    // Without typing the whole field is the trigger, so it looks and presses like UiSelect's
+    pickOnly: {
+      true: [
+        "cursor-pointer hover:bg-muted active:scale-[0.99] transition-all",
+        // Segments can't be edited, so no caret look and no edit highlight on them
+        "[&_[data-reka-date-field-segment]]:cursor-pointer [&_[data-reka-time-field-segment]]:cursor-pointer",
+        "[&_[data-reka-date-field-segment]:focus]:bg-transparent [&_[data-reka-time-field-segment]:focus]:bg-transparent",
+      ],
+    },
   },
   defaultVariants: {
     variant: "default",
@@ -105,6 +114,11 @@ interface Props {
   id?: string;
   variant?: DateInputVariants["variant"];
   showClear?: boolean;
+  /**
+   * Typing into the field. Off, the value is only picked in the popover, which opens on a click
+   * anywhere in the field (or Enter / Space / ↓).
+   */
+  manual?: boolean;
   class?: ClassValue;
 }
 
@@ -119,6 +133,7 @@ const props = withDefaults(defineProps<Props>(), {
   required: false,
   variant: "default",
   showClear: false,
+  manual: true,
 });
 
 const emit = defineEmits<{
@@ -337,11 +352,37 @@ function clear() {
 
 /* ---------------------------------------------------------------- shared */
 
+const pickOnly = computed(() => !props.manual && !props.disabled && !props.readonly);
+
+/*
+ * Clicking the field while the popover is open first closes it (outside pointerdown), then the
+ * click would open it again. Remembering the state from before the pointerdown makes it a toggle.
+ */
+let openBeforePress = false;
+
+function onFieldPointerDown() {
+  openBeforePress = open.value;
+}
+
+function onFieldClick(event: MouseEvent) {
+  if (!pickOnly.value) return;
+  // The buttons inside do their own thing
+  if ((event.target as HTMLElement).closest("button")) return;
+  open.value = !openBeforePress;
+}
+
+function onFieldKeydown(event: KeyboardEvent) {
+  if (!pickOnly.value || !["Enter", " ", "ArrowDown"].includes(event.key)) return;
+  event.preventDefault();
+  open.value = true;
+}
+
 const fieldProps = computed(() => ({
   locale: locale.value,
   granularity: granularity.value,
   disabled: props.disabled,
-  readonly: props.readonly,
+  // Without manual typing the segments stay focusable but take no input
+  readonly: props.readonly || !props.manual,
   required: props.required,
   id: props.id,
 }));
@@ -365,7 +406,10 @@ const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
     <PopoverAnchor as-child>
       <div
         data-slot="date-input"
-        :class="dateInput({ variant, disabled, class: props.class })"
+        :class="dateInput({ variant, disabled, pickOnly, class: props.class })"
+        @pointerdown="onFieldPointerDown"
+        @click="onFieldClick"
+        @keydown="onFieldKeydown"
       >
         <!-- Date / date-time -->
         <DateFieldRoot

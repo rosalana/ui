@@ -23,6 +23,11 @@ const booking = ref<string | null>(null);
 const noWeekends = (value: DateValue) => isWeekend(value, "cs-CZ");
 
 const birthday = ref<string | null>(null);
+
+const pickedDate = ref<string | null>("2026-11-16");
+const pickedDateTime = ref<string | null>(null);
+const pickedRange = ref<DateInputRange | null>(null);
+const pickedTime = ref<string | null>("09:30");
 </script>
 
 <template>
@@ -101,6 +106,32 @@ const birthday = ref<string | null>(null);
     <div class="space-y-2">
       <UiLabel>Birthday</UiLabel>
       <UiDateInput v-model="birthday" locale="cs-CZ" max="2026-11-16" />
+    </div>
+  </Section>
+
+  <Section title="Picker only (no typing)" class="max-w-md space-y-4">
+    <p class="text-xs text-theme">
+      <code class="text-foreground">:manual="false"</code> — the field can't be typed into, a click anywhere in it opens the popover (Enter / Space / ↓ from the keyboard).
+    </p>
+    <div class="space-y-2">
+      <UiLabel>Date</UiLabel>
+      <UiDateInput v-model="pickedDate" :manual="false" locale="cs-CZ" show-clear />
+      <p class="text-xs text-theme">v-model: <code class="text-foreground">{{ JSON.stringify(pickedDate) }}</code></p>
+    </div>
+    <div class="space-y-2">
+      <UiLabel>Date & time</UiLabel>
+      <UiDateInput v-model="pickedDateTime" :manual="false" time locale="cs-CZ" show-clear />
+      <p class="text-xs text-theme">v-model: <code class="text-foreground">{{ JSON.stringify(pickedDateTime) }}</code></p>
+    </div>
+    <div class="space-y-2">
+      <UiLabel>Range</UiLabel>
+      <UiDateInput v-model="pickedRange" :manual="false" range locale="cs-CZ" show-clear />
+      <p class="text-xs text-theme">v-model: <code class="text-foreground">{{ JSON.stringify(pickedRange) }}</code></p>
+    </div>
+    <div class="space-y-2">
+      <UiLabel>Time</UiLabel>
+      <UiDateInput v-model="pickedTime" :manual="false" :date="false" time locale="cs-CZ" />
+      <p class="text-xs text-theme">v-model: <code class="text-foreground">{{ JSON.stringify(pickedTime) }}</code></p>
     </div>
   </Section>
 
