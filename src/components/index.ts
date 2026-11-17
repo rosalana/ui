@@ -84,6 +84,17 @@ export { default as UiCollapsible } from "./Ui/Collapsible/Collapsible.vue";
 export { default as UiCollapsibleTrigger } from "./Ui/Collapsible/CollapsibleTrigger.vue";
 export { default as UiCollapsibleContent } from "./Ui/Collapsible/CollapsibleContent.vue";
 
+// Combobox
+export { default as UiCombobox } from "./Ui/Combobox/Combobox.vue";
+export { default as UiComboboxInput } from "./Ui/Combobox/ComboboxInput.vue";
+export { default as UiComboboxContent } from "./Ui/Combobox/ComboboxContent.vue";
+export { default as UiComboboxItem } from "./Ui/Combobox/ComboboxItem.vue";
+export { default as UiComboboxGroup } from "./Ui/Combobox/ComboboxGroup.vue";
+export { default as UiComboboxSeparator } from "./Ui/Combobox/ComboboxSeparator.vue";
+export { default as UiComboboxEmpty } from "./Ui/Combobox/ComboboxEmpty.vue";
+export { default as UiComboboxLoading } from "./Ui/Combobox/ComboboxLoading.vue";
+export type { ComboboxFilter, ComboboxSearch } from "./Ui/Combobox/context";
+
 // Command
 export { default as UiCommand } from "./Ui/Command/Command.vue";
 export { default as UiCommandInput } from "./Ui/Command/CommandInput.vue";

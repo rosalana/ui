@@ -20,6 +20,12 @@ const en = {
 
   "command.clear": "Clear search",
 
+  "combobox.placeholder": "Search...",
+  "combobox.empty": "No results found.",
+  "combobox.loading": "Searching...",
+  "combobox.clear": "Clear selection",
+  "combobox.toggle": "Show options",
+
   "pagination.more": "More pages",
   "pagination.first": "Go to first page",
   "pagination.previous": "Go to previous page",
@@ -147,6 +153,12 @@ const cs: UiMessages = {
   "notifications.close": "Zavřít oznámení",
 
   "command.clear": "Vymazat hledání",
+
+  "combobox.placeholder": "Hledat...",
+  "combobox.empty": "Nic nenalezeno.",
+  "combobox.loading": "Hledám...",
+  "combobox.clear": "Zrušit výběr",
+  "combobox.toggle": "Zobrazit možnosti",
 
   "pagination.more": "Další stránky",
   "pagination.first": "Na první stránku",
