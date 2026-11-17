@@ -232,6 +232,19 @@ Key patterns:
 - Accept `class` prop for custom styling
 - Use `tv()` for variants with sensible defaults
 
+### Texts, Locale and SSR
+
+Every component must render the same on the server and in the browser, in the language the app sets.
+
+- **Every user-facing text goes through `t()`**, including placeholders, empty states, button labels, `aria-label`s and `sr-only` texts. Never hard-code a string in a template or a default prop. Get `t` from `useLocale()`.
+- **Add every new text to `src/plugin/messages.ts`** under a namespaced key (`table.search`, `dateInput.clear`), in **every** language there (`en` and `cs`). `messages.default` names the language every missing text falls back to. A text with a `{name}` placeholder gets its value through `t(key, { name })`. Plural forms are split by `|` in the language's `Intl.PluralRules` order (`one|other` in English, `one|few|many|other` in Czech) and picked by a `count` param.
+- **Words that depend on a number** (outside the catalog) use the `plural(count, forms)` helper, which follows the app locale by itself, never a hand-made `count === 1 ? … : …`.
+- **Anything that formats by language uses the app locale from `useLocale()`**: `Intl.*`, `toLocale*`, `@internationalized/date` and every reka-ui component with a `locale` prop (pass `:locale="locale"` explicitly). A component with its own `locale` prop passes it to `useLocale(() => props.locale)` as the override.
+- **Never read the browser** to decide what to render: no `navigator.language`, no `Intl.DateTimeFormat().resolvedOptions()` defaults, no `Date.now()`, `new Date()` or `window`/`document` during render. The server has none of them and the hydration breaks. Do that only in `onMounted` or in event handlers, and render a server-safe state until then.
+- **Prop defaults that are texts** stay `undefined` and resolve in the component (`props.placeholder ?? t("colorPicker.placeholder")`), so an app can still pass `""` to hide a text.
+
+The app sets the locale once at startup (`createRosalanaApp(..., { locale, messages })`, Laravel style codes like `cs_CZ` are fine) and changes it with `setLocale()`. Its own texts for the components go in `messages` or `setMessages()`. Locale code helpers (`normalizeLocale`, `localeLanguage`, `matchLocale`) are in `src/helpers/locale.ts`.
+
 ## Color Configuration
 
 ```typescript
