@@ -1,8 +1,30 @@
+import { currentLocale } from "../plugin/locale";
+
 export function initials(name: string) {
   return name
     .split(/[.:\-_ ]/)
     .map((word) => word.charAt(0).toUpperCase())
     .join("");
+}
+
+/**
+ * Forms of a word by plural category of `Intl.PluralRules`. Every language has `other`, the rest
+ * depends on the language: English `one`, Czech `one`, `few` (2–4) and `many` (decimals).
+ */
+export type PluralForms = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
+
+/**
+ * The form of a word for a count in the locale the app set. A category the forms leave out
+ * falls back to `other`.
+ *
+ * ```ts
+ * plural(3, { one: "soubor", few: "soubory", other: "souborů" }) // "soubory" in Czech
+ * ```
+ */
+export function plural(count: number, forms: PluralForms): string {
+  const category = new Intl.PluralRules(currentLocale()).select(count);
+
+  return forms[category] ?? forms.other;
 }
 
 export function truncate(text: string, maxLength: number) {
