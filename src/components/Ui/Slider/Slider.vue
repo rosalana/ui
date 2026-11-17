@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SliderRootEmits, SliderRootProps } from "reka-ui"
-import { SliderRange, SliderRoot, SliderThumb, SliderTrack, useForwardPropsEmits } from "reka-ui"
+import { SliderRoot, SliderThumb, SliderTrack, useForwardPropsEmits } from "reka-ui"
 import { computed, onBeforeUnmount, ref, useSlots, useTemplateRef, watch } from "vue"
 import { animate, motion, motionValue, type MotionValue } from "motion-v"
 import { useElementSize } from "@vueuse/core"
@@ -43,15 +43,10 @@ const sliderRoot = tv({
 
 const sliderTrack = tv({
   base: [
-    "relative h-2 w-full grow rounded-full transition-colors duration-150",
+    // The track is drawn by its pieces, the element itself only takes clicks
+    "relative h-2 w-full grow rounded-full bg-transparent",
     "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2",
   ],
-  variants: {
-    transparent: { true: "bg-transparent", false: "bg-primary/20" },
-    // The track is drawn by its pieces, the element itself only takes clicks
-    split: { true: "bg-transparent" },
-  },
-  defaultVariants: { transparent: false },
 })
 
 /** One piece of the split track, between the edges and the thumbs. */
@@ -64,16 +59,6 @@ const sliderSegment = tv({
     filled: { true: "bg-primary", false: "bg-primary/20" },
     transparent: { true: "bg-transparent" },
   },
-})
-
-const sliderRange = tv({
-  base: [
-    "absolute h-full rounded-full data-[orientation=vertical]:h-auto data-[orientation=vertical]:w-full",
-  ],
-  variants: {
-    transparent: { true: "bg-transparent", false: "bg-primary" },
-  },
-  defaultVariants: { transparent: false },
 })
 
 const sliderThumb = tv({
@@ -173,18 +158,28 @@ interface Props extends SliderRootProps {
   marks?: boolean | number | SliderMark[]
   /** Labels every mark with its value formatted in the app locale. Marks with their own `label` keep it. */
   markLabels?: boolean
+  /**
+   * Which pieces of the track are filled. The thumbs split the track into pieces numbered by value:
+   * `0` runs from `min` to the first thumb, `1` from the first thumb to the second… and the last
+   * one from the last thumb to `max`. A negative number counts from the end, `-1` is the last piece.
+   * - `true` (default): up to the thumb for one thumb, between the first and the last for more.
+   * - `false`: nothing filled.
+   * - An array: exactly the listed pieces (`[0, 2]`, `[-1]`).
+   */
+  fill?: boolean | number[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
   min: 0,
   max: 100,
+  fill: true,
   step: 1,
   orientation: "horizontal",
 })
 const emit = defineEmits<SliderRootEmits>()
 
 const delegated = computed(() => {
-  const { class: _, transparent, tooltip, tooltipAlways, marks, markLabels, ...rest } = props
+  const { class: _, transparent, tooltip, tooltipAlways, marks, markLabels, fill, ...rest } = props
   return rest
 })
 
@@ -225,7 +220,7 @@ function tooltipText(index: number) {
   return template === undefined ? formatted : template.replaceAll("{value}", formatted)
 }
 
-// The motion overrides and the split track only know the default left-to-right / bottom-to-top layout
+// The motion overrides only know the default left-to-right / bottom-to-top layout
 const animated = computed(() => !props.inverted && props.dir !== "rtl")
 
 const track = useTemplateRef<InstanceType<typeof SliderTrack>>("track")
@@ -335,15 +330,26 @@ function thumbCenter(percent: number, shiftPx = 0) {
 
 const edge = THUMB_PX / 2 + GAP_PX
 
+/** Indexes of the filled pieces of the track, see the `fill` prop. */
+const filledPieces = computed(() => {
+  const thumbs = thumbCount.value
+  const pieces = thumbs + 1
+  if (props.fill === false || !thumbs) return new Set<number>()
+  if (props.fill === true) {
+    if (thumbs === 1) return new Set([0])
+    return new Set(Array.from({ length: thumbs - 1 }, (_, index) => index + 1))
+  }
+  return new Set(props.fill.map((index) => (index < 0 ? pieces + index : index)))
+})
+
 /**
  * The split track: a piece from each edge or thumb to the next one, kept clear of the thumbs.
- * A single thumb fills the piece before it, a range fills the pieces between its thumbs.
- * A piece squeezed below zero length (a thumb at the very end) simply disappears.
+ * Filled as `fill` says. A piece squeezed below zero length (a thumb at the very end) simply disappears.
  */
 const segments = computed(() => {
-  const thumbs = rendered.value
-  const vertical = props.orientation === "vertical"
-  const [start, end] = vertical ? ["bottom", "top"] : ["left", "right"]
+  const thumbs = thumbPercents.value
+  const start = startSide.value
+  const end = { left: "right", right: "left", bottom: "top", top: "bottom" }[start]
 
   return Array.from({ length: thumbs.length + 1 }, (_, index) => {
     const from = thumbs[index - 1]
@@ -352,8 +358,7 @@ const segments = computed(() => {
       [start]: from === undefined ? "0px" : thumbCenter(from, edge),
       [end]: to === undefined ? "0px" : `calc(100% - ${thumbCenter(to, -edge)})`,
     }
-    const filled = thumbs.length === 1 ? index === 0 : index > 0 && index < thumbs.length
-    return { style, filled }
+    return { style, filled: filledPieces.value.has(index) }
   })
 })
 
@@ -420,12 +425,10 @@ const marksDense = computed(() => {
 
 const hasMarkLabels = computed(() => markItems.value.some((mark) => mark.label !== undefined))
 
-/** Whether a point at `percent` lies on the filled part of the track. */
+/** Whether a point at `percent` lies on a filled piece of the track. */
 function isFilled(percent: number) {
-  const thumbs = thumbPercents.value
-  if (!thumbs.length) return false
-  if (thumbs.length === 1) return percent <= thumbs[0]
-  return percent >= Math.min(...thumbs) && percent <= Math.max(...thumbs)
+  const piece = thumbPercents.value.filter((thumb) => percent > thumb).length
+  return filledPieces.value.has(piece)
 }
 
 /** Marks under a thumb, or in the gap kept clear around it, would peek out from behind it. */
@@ -526,23 +529,16 @@ function dotScale(index: number) {
     <SliderTrack
       ref="track"
       data-slot="slider-track"
-      :class="sliderTrack({ transparent: !!props.transparent, split: animated })"
+      :class="sliderTrack()"
     >
-      <template v-if="animated">
-        <span
-          v-for="(segment, index) in segments"
-          :key="index"
-          data-slot="slider-segment"
-          :data-orientation="orientation"
-          :style="segment.style"
-          :class="sliderSegment({ filled: segment.filled, transparent: !!props.transparent })"
-        />
-      </template>
-      <!-- reka-ui's own range, for the right-to-left and inverted layouts the split track doesn't cover -->
-      <SliderRange
-        v-else
-        data-slot="slider-range"
-        :class="sliderRange({ transparent: !!props.transparent })"
+      <span
+        v-for="(segment, index) in segments"
+        :key="index"
+        data-slot="slider-segment"
+        :data-orientation="orientation"
+        :data-filled="segment.filled || undefined"
+        :style="segment.style"
+        :class="sliderSegment({ filled: segment.filled, transparent: !!props.transparent })"
       />
       <template v-if="!marksDense">
         <span

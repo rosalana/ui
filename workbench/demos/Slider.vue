@@ -162,6 +162,31 @@ const team = ref([4, 12]);
     </div>
   </Section>
 
+  <Section title="Fill" class="max-w-md">
+    <div class="space-y-8">
+      <div class="space-y-2">
+        <p class="text-xs text-theme">No fill: :fill="false"</p>
+        <UiSlider :default-value="[40]" :fill="false" :marks="20" />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">From the thumb to the end: :fill="[-1]"</p>
+        <UiSlider :default-value="[40]" :fill="[-1]" />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">Outside the range: :fill="[0, -1]"</p>
+        <UiSlider :default-value="[30, 70]" :fill="[0, -1]" :marks="10" />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">Three thumbs, every other piece: :fill="[0, 2]"</p>
+        <UiSlider :default-value="[20, 50, 80]" :fill="[0, 2]" tooltip />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">Inverted, default fill</p>
+        <UiSlider :default-value="[30]" inverted :marks="25" mark-labels />
+      </div>
+    </div>
+  </Section>
+
   <Section title="Vertical" class="max-w-md">
     <div class="flex h-40 items-center gap-6">
       <UiSlider v-model="vertical" orientation="vertical" />
