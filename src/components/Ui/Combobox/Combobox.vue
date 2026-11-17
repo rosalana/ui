@@ -56,6 +56,8 @@ const props = withDefaults(
       icon?: string;
       /** A button in the input that clears the picked value. */
       clearable?: boolean;
+      /** The id of the input element. */
+      id?: string;
     }
   >(),
   {
@@ -96,7 +98,8 @@ defineSlots<{
 }>();
 
 const delegated = computed(() => {
-  const { filter, search, debounce, loading, items, placeholder, icon, clearable, ...rest } = props;
+  // `id` belongs to the input alone, on the root too it would be a duplicate
+  const { filter, search, debounce, loading, items, placeholder, icon, clearable, id, ...rest } = props;
   return rest;
 });
 const forwarded = useForwardPropsEmits(delegated, emit);
@@ -292,7 +295,7 @@ const layoutGroupId = useId();
       <LayoutGroup :id="layoutGroupId">
         <slot :open="open" :model-value="modelValue" :groups="visibleGroups" :options="visibleOptions">
           <slot name="input">
-            <UiComboboxInput :placeholder="placeholder" :icon="icon" :clearable="clearable" />
+            <UiComboboxInput :placeholder="placeholder" :icon="icon" :clearable="clearable" :id="id" />
           </slot>
 
           <UiComboboxContent>

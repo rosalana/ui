@@ -106,8 +106,8 @@ async function searchUsers(search: string, signal: AbortSignal) {
 <template>
   <Section title="Basic" class="w-72">
     <div class="space-y-1.5">
-      <UiLabel>Country</UiLabel>
-      <UiCombobox v-model="country" :items="countries" placeholder="Pick a country..." clearable />
+      <UiLabel for="country">Country</UiLabel>
+      <UiCombobox id="country" v-model="country" :items="countries" placeholder="Pick a country..." clearable />
       <p class="text-xs text-theme">
         Value: <code class="text-foreground">{{ country ?? "–" }}</code>. Prefilled, the name shows
         without opening. Try "cesko", "SPAN" or the code "uk". Maďarsko is disabled.
