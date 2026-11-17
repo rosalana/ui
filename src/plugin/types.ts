@@ -1,5 +1,6 @@
 import { ComputedRef, Ref } from "vue";
 import type { SonnerConfig } from "../composables/useSonner/state";
+import type { UiMessagesConfig } from "./messages";
 
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -131,6 +132,14 @@ export type CreateRosalanaUIOptions = {
   // theme?: ThemeMode; // removed [NOT USING PROBABLY] -> mohlo by to být používané v useTheme ale tam je fallback na system a to asi stačí 
   /** Configuration for colors used in the UI */
   colors?: ColorsConfig;
+  /**
+   * Locale of every component: date and number formats, calendars, texts. A Laravel style code
+   * works too (`cs_CZ`). Defaults to `en`, never to the browser language, so the server and the
+   * browser render the same. Change it at runtime with `setLocale()` or `useLocale().set()`.
+   */
+  locale?: string;
+  /** Texts of the components by locale (`cs`, `cs_CZ`), on top of the built-in English. */
+  messages?: UiMessagesConfig;
   /** Default configuration of toasts shown via `useSonner()` */
   sonner?: Partial<SonnerConfig>;
   // motion?: {
@@ -153,6 +162,9 @@ export type CreateRosalanaUIOptions = {
 };
 
 export type RosalanaUIContext = CreateRosalanaUIOptions & {
+  /** BCP 47 tag, always set. */
+  locale: string;
+  messages: UiMessagesConfig;
   preferences: Preferences | null;
   user: User | null;
   permissions: Permissions | null;

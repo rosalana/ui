@@ -1,4 +1,5 @@
 import { mergeConfigColors } from "./colors";
+import { normalizeLocale } from "../helpers/locale";
 import { CreateRosalanaUIOptions, RosalanaUIContext } from "./types";
 
 export default function buildContext(config: CreateRosalanaUIOptions) {
@@ -6,6 +7,8 @@ export default function buildContext(config: CreateRosalanaUIOptions) {
     name,
     env,
     colors,
+    locale,
+    messages,
     // motion,
     adapters,
     preferences,
@@ -36,6 +39,14 @@ function env(config: CreateRosalanaUIOptions): RosalanaUIContext["env"] {
 
 function colors(config: CreateRosalanaUIOptions): RosalanaUIContext["colors"] {
   return mergeConfigColors(config.colors);
+}
+
+function locale(config: CreateRosalanaUIOptions): RosalanaUIContext["locale"] {
+  return normalizeLocale(config.locale);
+}
+
+function messages(config: CreateRosalanaUIOptions): RosalanaUIContext["messages"] {
+  return config.messages || {};
 }
 
 // function motion(config: CreateRosalanaUIOptions): RosalanaUIContext["motion"] {
