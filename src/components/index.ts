@@ -184,6 +184,12 @@ export { default as UiNavigationMenuContent } from "./Ui/NavigationMenu/Navigati
 export { default as UiNavigationMenuLink } from "./Ui/NavigationMenu/NavigationMenuLink.vue";
 export { default as UiNavigationMenuIndicator } from "./Ui/NavigationMenu/NavigationMenuIndicator.vue";
 
+// NumberField
+export { default as UiNumberField } from "./Ui/NumberField/NumberField.vue";
+export { default as UiNumberFieldInput } from "./Ui/NumberField/NumberFieldInput.vue";
+export { default as UiNumberFieldDecrement } from "./Ui/NumberField/NumberFieldDecrement.vue";
+export { default as UiNumberFieldIncrement } from "./Ui/NumberField/NumberFieldIncrement.vue";
+
 // Pagination
 export { default as UiPagination } from "./Ui/Pagination/Pagination.vue";
 export { default as UiPaginationList } from "./Ui/Pagination/PaginationList.vue";

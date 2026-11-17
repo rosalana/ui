@@ -28,6 +28,7 @@ export const DONE: string[] = [
   "Input",
   "Label",
   "NavigationMenu",
+  "NumberField",
   "PinInput",
   "Popover",
   "ScrollArea",
