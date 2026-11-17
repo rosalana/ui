@@ -15,6 +15,18 @@ export function currentLocale(): string {
 }
 
 /**
+ * The texts the app set for the components, or none before the plugin is installed. Works
+ * anywhere, also outside components.
+ */
+export function currentMessages(): UiMessagesConfig {
+  try {
+    return useAppContext().messages;
+  } catch {
+    return {};
+  }
+}
+
+/**
  * Switches the locale of every component at runtime, e.g. after the user picks a language.
  * Takes a Laravel style code too (`cs_CZ`).
  *
