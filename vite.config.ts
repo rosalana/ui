@@ -20,12 +20,15 @@ export default defineConfig({
       entry: {
         index: path.resolve(__dirname, "src/index.ts"),
         helpers: path.resolve(__dirname, "src/helpers/index.ts"),
+        // Vite plugin for apps linking the package locally, runs in Node
+        local: path.resolve(__dirname, "src/local/index.ts"),
       },
       formats: ["es"],
       fileName: (_format, entryName) => `${entryName}.es.js`,
     },
     rollupOptions: {
       external: (id) =>
+        id.startsWith("node:") ||
         externals.some((dep) => id === dep || id.startsWith(`${dep}/`)),
       output: {
         globals: {

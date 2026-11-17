@@ -305,6 +305,18 @@ Every Ui component has an implementation status tracked in `workbench/componentS
 
 When you finish implementing a component to Rosalana standards, add its name to the `DONE` array in `workbench/componentStatus.ts`. Remove it from `UNTOUCHED` if it was there.
 
+## Using the Package Locally
+
+Apps link a local checkout with `"@rosalana/ui": "file:../../Rosalana/ui"` while `npm run dev` rebuilds `dist`. The link brings this repo's own `node_modules`, Vue included, which breaks SSR with `Cannot read properties of null (reading 'ce')`. Apps add the `@rosalana/ui/local` Vite plugin (`src/local/index.ts`) to share their Vue with it:
+
+```ts
+import rosalanaLocal from "@rosalana/ui/local";
+
+export default defineConfig({ plugins: [rosalanaLocal(), /* ... */] });
+```
+
+It finds the Vue-based dependencies on its own and does nothing once the package is installed from the registry, so it can stay in the config.
+
 ## Common Tasks
 
 ```bash
