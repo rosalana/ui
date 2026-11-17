@@ -75,7 +75,7 @@ const { t } = useLocale();
           size="icon-sm"
           tabindex="-1"
           type="button"
-          class="size-7 text-destructive"
+          class="size-7 text-theme hover:text-destructive"
           @click="clear"
         >
           <UiIcon name="lucide:x" class="size-4" />

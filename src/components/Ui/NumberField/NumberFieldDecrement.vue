@@ -8,7 +8,7 @@ import { UiIcon } from "../../index";
 // A ghost icon button inside the field, like the ghost UiButton
 const numberFieldDecrement = tv({
   base: [
-    "cursor-pointer inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-foreground",
+    "cursor-pointer inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-theme hover:text-foreground",
     "border border-transparent transition-all duration-200 ease-out",
     "hover:bg-muted hover:border-border/40 active:scale-[0.92]",
     "outline-none focus-visible:ring-2 focus-visible:ring-ring/30",

@@ -31,7 +31,7 @@ const forwarded = useForwardProps(props);
   >
     <slot />
     <SelectIcon as-child>
-      <UiIcon name="lucide:chevron-down" class="size-4 opacity-50" />
+      <UiIcon name="lucide:chevron-down" class="size-4 text-theme" />
     </SelectIcon>
   </SelectTrigger>
 </template>

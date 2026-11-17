@@ -115,7 +115,7 @@ const activeState = computed(() => {
   if (props.type === "password" && props.passwordToggle) {
     return {
       icon: passwordShow.value ? "lucide:eye-off" : "lucide:eye",
-      color: "text-primary",
+      color: "text-theme hover:text-foreground",
       clickable: true,
       action: () => {
         passwordShow.value = !passwordShow.value;
@@ -126,7 +126,7 @@ const activeState = computed(() => {
   if (props.showClear && props.modelValue) {
     return {
       icon: "lucide:x",
-      color: "text-destructive",
+      color: "text-theme hover:text-destructive",
       clickable: true,
       action: () => {
         clearTimeout(debounceTimeout);
@@ -138,7 +138,7 @@ const activeState = computed(() => {
   if (props.icon) {
     return {
       icon: props.icon,
-      color: "text-primary",
+      color: "text-theme",
       clickable: false,
       action: () => {},
     };

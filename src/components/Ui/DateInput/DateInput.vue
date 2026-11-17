@@ -524,7 +524,7 @@ const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
                 type="button"
                 tabindex="-1"
                 :aria-label="t('dateInput.clear')"
-                class="size-7 text-destructive"
+                class="size-7 text-theme hover:text-destructive"
                 @click="clear"
               >
                 <UiIcon name="lucide:x" class="size-4" />
@@ -538,7 +538,7 @@ const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
               size="icon-sm"
               type="button"
               :aria-label="t(hasCalendar ? 'dateInput.openCalendar' : 'dateInput.openTimePicker')"
-              class="size-7 text-primary"
+              class="size-7 text-theme hover:text-foreground"
               :disabled="disabled || readonly"
             >
               <UiIcon :name="hasCalendar ? 'lucide:calendar' : 'lucide:clock'" class="size-4" />

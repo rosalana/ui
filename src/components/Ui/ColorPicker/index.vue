@@ -150,7 +150,7 @@ const { t } = useLocale();
         <UiButton
           variant="clear"
           size="icon-sm"
-          class="w-5 mr-3 active:scale-85"
+          class="w-5 mr-3 active:scale-85 text-theme hover:text-foreground"
           @click="showPalette = !showPalette"
         >
           <motion.span
