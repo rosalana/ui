@@ -19,6 +19,7 @@ import { computed, shallowRef, watch } from "vue";
 import { getLocalTimeZone, today, type DateValue } from "@internationalized/date";
 import type { ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
+import { useLocale } from "../../../composables/useLocale";
 import CalendarMonthPicker from "./CalendarMonthPicker.vue";
 import CalendarMonthTrack from "./CalendarMonthTrack.vue";
 import {
@@ -50,6 +51,9 @@ const delegated = computed(() => {
 
 const forwarded = useForwardPropsEmits(delegated, emit);
 
+// The app locale unless the `locale` prop overrides it
+const { locale } = useLocale(() => props.locale);
+
 
 /** The month in view, kept here so the month / year picker can move it. */
 const placeholder = shallowRef<DateValue>(
@@ -79,6 +83,7 @@ function jumpTo(value: DateValue) {
     data-slot="range-calendar"
     v-bind="forwarded"
     :class="calendarRoot({ class: props.class })"
+    :locale="locale"
     :placeholder="placeholder"
     @update:placeholder="setPlaceholder"
   >

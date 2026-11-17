@@ -19,6 +19,7 @@ import { computed, shallowRef, watch } from "vue";
 import { getLocalTimeZone, today, type DateValue } from "@internationalized/date";
 import type { ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
+import { useLocale } from "../../../composables/useLocale";
 import CalendarMonthPicker from "./CalendarMonthPicker.vue";
 import CalendarMonthTrack from "./CalendarMonthTrack.vue";
 import {
@@ -48,6 +49,9 @@ const delegated = computed(() => {
 });
 
 const forwarded = useForwardPropsEmits(delegated, emit);
+
+// The app locale unless the `locale` prop overrides it
+const { locale } = useLocale(() => props.locale);
 
 
 const firstDay = (value: DateValue | DateValue[] | undefined) =>
@@ -81,6 +85,7 @@ function jumpTo(value: DateValue) {
     data-slot="calendar"
     v-bind="forwarded"
     :class="calendarRoot({ class: props.class })"
+    :locale="locale"
     :placeholder="placeholder"
     @update:placeholder="setPlaceholder"
   >

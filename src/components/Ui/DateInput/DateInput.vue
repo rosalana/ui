@@ -22,7 +22,7 @@ import PopoverContent from "../Popover/PopoverContent.vue";
 import Calendar from "../Calendar/Calendar.vue";
 import RangeCalendar from "../Calendar/RangeCalendar.vue";
 import TimePicker from "../TimePicker/TimePicker.vue";
-import { usePreferences } from "../../../composables/usePreferences";
+import { useLocale } from "../../../composables/useLocale";
 import {
   parseValue,
   serializeValue,
@@ -104,7 +104,7 @@ interface Props {
   max?: string;
   /** Days that can't be picked, e.g. weekends. */
   isDateUnavailable?: (date: DateValue) => boolean;
-  /** Defaults to the user's `locale` preference, then the browser language. */
+  /** Overrides the app locale (`useLocale()`) for this input. */
   locale?: string;
   disabled?: boolean;
   readonly?: boolean;
@@ -151,14 +151,7 @@ const granularity = computed(() => {
   return props.seconds ? ("second" as const) : ("minute" as const);
 });
 
-const preferences = usePreferences();
-const locale = computed(
-  () =>
-    props.locale ??
-    (preferences.get("locale") as string | null) ??
-    (typeof navigator !== "undefined" ? navigator.language : undefined) ??
-    "en",
-);
+const { locale, t } = useLocale(() => props.locale);
 
 const parse = (value: string | null | undefined) => parseValue(value, kind.value);
 const serialize = (value: DateValue | Time | null | undefined) =>
@@ -398,6 +391,12 @@ const isPlaceholder = (item: { part: string; value: string }) =>
 const segmentClass = (item: { part: string; value: string }) =>
   segment({ literal: item.part === "literal", placeholder: isPlaceholder(item) });
 
+/*
+ * Node's ICU puts a narrow no-break space before AM / PM where browsers put a plain one, so the
+ * server and the browser would render different text. Both get the plain space.
+ */
+const segmentText = (item: { value: string }) => item.value.replace(/\u202F/g, " ");
+
 const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
 </script>
 
@@ -429,7 +428,7 @@ const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
             :class="segmentClass(item)"
             @beforeinput.prevent
           >
-            {{ item.value }}
+            {{ segmentText(item) }}
           </DateFieldInput>
         </DateFieldRoot>
 
@@ -451,7 +450,7 @@ const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
             :class="segmentClass(item)"
             @beforeinput.prevent
           >
-            {{ item.value }}
+            {{ segmentText(item) }}
           </TimeFieldInput>
         </TimeFieldRoot>
 
@@ -477,7 +476,7 @@ const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
               :class="segmentClass(item)"
             @beforeinput.prevent
             >
-              {{ item.value }}
+              {{ segmentText(item) }}
             </DateRangeFieldInput>
           </template>
         </DateRangeFieldRoot>
@@ -504,7 +503,7 @@ const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
               :class="segmentClass(item)"
             @beforeinput.prevent
             >
-              {{ item.value }}
+              {{ segmentText(item) }}
             </TimeRangeFieldInput>
           </template>
         </TimeRangeFieldRoot>
@@ -524,7 +523,7 @@ const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
                 size="icon-sm"
                 type="button"
                 tabindex="-1"
-                aria-label="Clear"
+                :aria-label="t('dateInput.clear')"
                 class="size-7 text-destructive"
                 @click="clear"
               >
@@ -538,7 +537,7 @@ const fieldClass = "flex min-w-0 flex-1 items-center whitespace-nowrap";
               variant="clear"
               size="icon-sm"
               type="button"
-              :aria-label="hasCalendar ? 'Open calendar' : 'Open time picker'"
+              :aria-label="t(hasCalendar ? 'dateInput.openCalendar' : 'dateInput.openTimePicker')"
               class="size-7 text-primary"
               :disabled="disabled || readonly"
             >

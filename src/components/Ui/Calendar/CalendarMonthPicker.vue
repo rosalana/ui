@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "motion-v";
 import { onClickOutside, unrefElement } from "@vueuse/core";
 import UiIcon from "../Icon/Icon.vue";
 import { calendarHeadingButton, calendarNavButton, pickerOption } from "./calendar";
+import { useLocale } from "../../../composables/useLocale";
 
 /**
  * Quick jump for the calendar heading: the year switches with the arrows, the month is picked
@@ -53,8 +54,10 @@ function close() {
 
 const now = today(getLocalTimeZone());
 
+const { locale, t } = useLocale(() => props.locale);
+
 const monthNames = computed(() => {
-  const format = new Intl.DateTimeFormat(props.locale, { month: "short" });
+  const format = new Intl.DateTimeFormat(locale.value, { month: "short" });
   return Array.from({ length: 12 }, (_, index) => format.format(new Date(2000, index, 1)));
 });
 
@@ -118,7 +121,7 @@ function pick(month: number) {
       @keydown.esc.stop.prevent="close"
     >
       <div class="flex items-center justify-between pb-2">
-        <button type="button" :class="calendarNavButton()" :disabled="!canGoBack" aria-label="Previous year" @click="shiftYear(-1)">
+        <button type="button" :class="calendarNavButton()" :disabled="!canGoBack" :aria-label="t('calendar.previousYear')" @click="shiftYear(-1)">
           <UiIcon name="lucide:chevron-left" />
         </button>
         <div class="relative h-6 w-16 overflow-hidden text-center text-sm font-semibold tabular-nums">
@@ -136,7 +139,7 @@ function pick(month: number) {
             </motion.span>
           </AnimatePresence>
         </div>
-        <button type="button" :class="calendarNavButton()" :disabled="!canGoForward" aria-label="Next year" @click="shiftYear(1)">
+        <button type="button" :class="calendarNavButton()" :disabled="!canGoForward" :aria-label="t('calendar.nextYear')" @click="shiftYear(1)">
           <UiIcon name="lucide:chevron-right" />
         </button>
       </div>

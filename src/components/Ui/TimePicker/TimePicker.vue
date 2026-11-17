@@ -3,6 +3,7 @@ import { Time } from "@internationalized/date";
 import { computed } from "vue";
 import { tv, type ClassValue } from "tailwind-variants";
 import TimePickerColumn from "./TimePickerColumn.vue";
+import { useLocale } from "../../../composables/useLocale";
 
 const timePicker = tv({
   base: "relative inline-flex items-center gap-1 p-2 select-none",
@@ -26,6 +27,7 @@ interface Props {
   minuteStep?: number;
   /** 12 or 24 hours. Defaults to what the locale uses. */
   hourCycle?: 12 | 24;
+  /** Overrides the app locale (`useLocale()`). */
   locale?: string;
   /** Visible rows of each wheel, odd. */
   rows?: number;
@@ -51,9 +53,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: Time];
 }>();
 
-const resolvedLocale = computed(
-  () => props.locale ?? (typeof navigator !== "undefined" ? navigator.language : "en"),
-);
+const { locale: resolvedLocale, t } = useLocale(() => props.locale);
 
 const twelveHour = computed(() => {
   if (props.hourCycle) return props.hourCycle === 12;
@@ -137,12 +137,12 @@ function update(change: Partial<{ hour: number; minute: number; second: number }
   >
     <div :class="timePickerBand()" />
 
-    <TimePickerColumn v-model="hour" :options="hourOptions" :rows="rows" :loop="loop" :scroll="scroll" :disabled="disabled" label="Hours" />
+    <TimePickerColumn v-model="hour" :options="hourOptions" :rows="rows" :loop="loop" :scroll="scroll" :disabled="disabled" :label="t('timePicker.hours')" />
     <span class="relative z-10 text-sm font-semibold text-theme">:</span>
-    <TimePickerColumn v-model="minute" :options="minuteOptions" :rows="rows" :loop="loop" :scroll="scroll" :disabled="disabled" label="Minutes" />
+    <TimePickerColumn v-model="minute" :options="minuteOptions" :rows="rows" :loop="loop" :scroll="scroll" :disabled="disabled" :label="t('timePicker.minutes')" />
     <template v-if="seconds">
       <span class="relative z-10 text-sm font-semibold text-theme">:</span>
-      <TimePickerColumn v-model="second" :options="secondOptions" :rows="rows" :loop="loop" :scroll="scroll" :disabled="disabled" label="Seconds" />
+      <TimePickerColumn v-model="second" :options="secondOptions" :rows="rows" :loop="loop" :scroll="scroll" :disabled="disabled" :label="t('timePicker.seconds')" />
     </template>
     <TimePickerColumn
       v-if="twelveHour"
@@ -150,7 +150,7 @@ function update(change: Partial<{ hour: number; minute: number; second: number }
       :options="periodOptions"
       :rows="rows"
       :disabled="disabled"
-      label="AM / PM"
+      :label="t('timePicker.period')"
     />
   </div>
 </template>
