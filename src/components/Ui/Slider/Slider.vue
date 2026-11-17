@@ -35,6 +35,10 @@ const sliderRoot = tv({
     // Dimmed like UiButton and other form controls, and fully inert
     "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
   ],
+  variants: {
+    // Room for the mark labels under the track, or beside it when vertical
+    labels: { true: "data-[orientation=horizontal]:pb-6 data-[orientation=vertical]:pr-10" },
+  },
 })
 
 const sliderTrack = tv({
@@ -103,6 +107,38 @@ const sliderThumbDot = tv({
   ],
 })
 
+/** A mark on the track: a value, or a value with its own label under the track. */
+export type SliderMark = number | { value: number; label?: string }
+
+/** Marks closer than this to each other are too dense to draw, the track would turn into a dotted line. */
+const MIN_MARK_SPACING_PX = 8
+
+/** Most marks `marks` / `:marks="n"` generate, so a tiny step over a huge range can't flood the track. */
+const MAX_GENERATED_MARKS = 200
+
+const sliderMark = tv({
+  base: [
+    "pointer-events-none absolute size-1 rounded-full",
+    "transition-[background-color,opacity,scale] duration-200",
+  ],
+  variants: {
+    filled: { true: "bg-primary-foreground/80", false: "bg-primary/60" },
+    // Under a thumb or in the gap around it
+    hidden: { true: "opacity-0 scale-0" },
+  },
+})
+
+const sliderMarkLabel = tv({
+  base: [
+    "absolute whitespace-nowrap text-xs leading-none tabular-nums",
+    "transition-colors duration-200 cursor-pointer",
+  ],
+  variants: {
+    // A thumb sits right on the mark
+    current: { true: "text-foreground font-medium", false: "text-theme hover:text-foreground" },
+  },
+})
+
 /** Text of a thumb's tooltip, from its value and its order among the thumbs. */
 export type SliderTooltipFormat = (value: number, index: number) => string
 
@@ -126,6 +162,17 @@ interface Props extends SliderRootProps {
   tooltip?: boolean | string | string[] | SliderTooltipFormat
   /** Keeps the tooltips open all the time. Turns them on by itself. */
   tooltipAlways?: boolean
+  /**
+   * Marks on the track.
+   * - `true` puts a mark on every step.
+   * - A number puts a mark every that many units from `min` (`:marks="25"` → 0, 25, 50…).
+   * - An array places marks on given values. An item `{ value, label }` also gets a label under the track.
+   *
+   * Marks too dense to tell apart aren't drawn. A click on a label moves the nearest thumb there.
+   */
+  marks?: boolean | number | SliderMark[]
+  /** Labels every mark with its value formatted in the app locale. Marks with their own `label` keep it. */
+  markLabels?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -137,7 +184,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<SliderRootEmits>()
 
 const delegated = computed(() => {
-  const { class: _, transparent, tooltip, tooltipAlways, ...rest } = props
+  const { class: _, transparent, tooltip, tooltipAlways, marks, markLabels, ...rest } = props
   return rest
 })
 
@@ -322,6 +369,135 @@ function tooltipOpen(index: number) {
   )
 }
 
+/** Where each thumb is drawn, in percent. Follows the spring only in the layout it animates in. */
+const thumbPercents = computed(() => (animated.value ? rendered.value : values.value.map(toPercent)))
+
+/** Values every `every` units from `min`, rounded to the step's precision so 0.1 steps stay clean. */
+function generateMarks(every: number): number[] {
+  if (!(every > 0)) return []
+  const count = Math.floor((props.max - props.min) / every + 1e-9) + 1
+  if (count > MAX_GENERATED_MARKS) return []
+  const decimals = (String(every).split(".")[1] ?? "").length
+  return Array.from({ length: count }, (_, index) => Number((props.min + index * every).toFixed(decimals)))
+}
+
+const trackLength = computed(() => (props.orientation === "vertical" ? trackHeight.value : trackWidth.value))
+
+/** The side of the track the values grow from, the same one reka-ui positions the thumbs from. */
+const startSide = computed(() => {
+  if (props.orientation === "vertical") return props.inverted ? "top" : "bottom"
+  const fromLeft = (props.dir !== "rtl") !== !!props.inverted
+  return fromLeft ? "left" : "right"
+})
+
+const markItems = computed(() => {
+  const marks = props.marks
+  if (marks === undefined || marks === false) return []
+
+  const items =
+    marks === true
+      ? generateMarks(props.step).map((value) => ({ value, label: undefined as string | undefined }))
+      : typeof marks === "number"
+        ? generateMarks(marks).map((value) => ({ value, label: undefined as string | undefined }))
+        : marks.map((mark) => (typeof mark === "number" ? { value: mark, label: undefined } : mark))
+
+  return items
+    .filter((mark) => mark.value >= props.min && mark.value <= props.max)
+    .map((mark) => ({
+      ...mark,
+      percent: toPercent(mark.value),
+      label: mark.label ?? (props.markLabels ? numberFormat.value.format(mark.value) : undefined),
+    }))
+})
+
+/** Space between neighbouring marks in px, to tell if they're too dense to draw. */
+const marksDense = computed(() => {
+  const usable = trackLength.value - THUMB_PX
+  if (usable <= 0) return false
+  const percents = markItems.value.map((mark) => mark.percent).sort((a, b) => a - b)
+  return percents.some((percent, index) => index > 0 && ((percent - percents[index - 1]) / 100) * usable < MIN_MARK_SPACING_PX)
+})
+
+const hasMarkLabels = computed(() => markItems.value.some((mark) => mark.label !== undefined))
+
+/** Whether a point at `percent` lies on the filled part of the track. */
+function isFilled(percent: number) {
+  const thumbs = thumbPercents.value
+  if (!thumbs.length) return false
+  if (thumbs.length === 1) return percent <= thumbs[0]
+  return percent >= Math.min(...thumbs) && percent <= Math.max(...thumbs)
+}
+
+/** Marks under a thumb, or in the gap kept clear around it, would peek out from behind it. */
+function isCovered(percent: number) {
+  const usable = trackLength.value - THUMB_PX
+  return thumbPercents.value.some((thumb) => (Math.abs(percent - thumb) / 100) * usable < edge)
+}
+
+const markList = computed(() => {
+  const side = startSide.value
+  const vertical = props.orientation === "vertical"
+  // Centers the mark on its point, whichever side it's measured from
+  const along = side === "left" || side === "bottom" ? "-50%" : "50%"
+
+  return markItems.value.map((mark) => {
+    const position = thumbCenter(mark.percent)
+    const dot = vertical
+      ? { [side]: position, left: "50%", transform: `translate(-50%, ${side === "bottom" ? "50%" : "-50%"})` }
+      : { [side]: position, top: "50%", transform: `translate(${along}, -50%)` }
+    const label = vertical
+      ? { [side]: position, left: "calc(100% + 12px)", transform: `translateY(${side === "bottom" ? "50%" : "-50%"})` }
+      : { [side]: position, top: "calc(100% + 12px)", transform: `translateX(${along})` }
+
+    return {
+      ...mark,
+      dotStyle: dot,
+      labelStyle: label,
+      filled: isFilled(mark.percent),
+      hidden: isCovered(mark.percent),
+      current: values.value.includes(mark.value),
+    }
+  })
+})
+
+const root = useTemplateRef<InstanceType<typeof SliderRoot>>("root")
+
+/**
+ * A press on a label moves the nearest thumb exactly onto the mark's value. reka-ui would read
+ * the pointer position instead and land a step or two off, so the press never reaches it.
+ */
+function onMarkPress(event: PointerEvent, value: number) {
+  event.stopPropagation()
+  event.preventDefault()
+  if (props.disabled || !values.value.length) return
+
+  // Nearest thumb. Of thumbs on one spot, the one on the mark's side, so a range can still open up.
+  let index = 0
+  values.value.forEach((current, i) => {
+    const best = Math.abs(values.value[index] - value)
+    const distance = Math.abs(current - value)
+    if (distance < best || (distance === best && value > current)) index = i
+  })
+
+  // Keeps `minStepsBetweenThumbs` from the neighbours
+  const gap = (props.minStepsBetweenThumbs ?? 0) * props.step
+  const lower = index > 0 ? values.value[index - 1] + gap : props.min
+  const upper = index < values.value.length - 1 ? values.value[index + 1] - gap : props.max
+  const target = Math.min(Math.max(value, lower), upper)
+
+  // Ready to go on with the keyboard, without the keyboard focus ring
+  keyboardFocus.value = false
+  const thumbs = (root.value?.$el as HTMLElement | undefined)?.querySelectorAll<HTMLElement>("[data-slot=slider-thumb]")
+  thumbs?.[index]?.focus({ preventScroll: true })
+
+  if (values.value[index] === target) return
+  const next = [...values.value]
+  next[index] = target
+  values.value = next
+  emit("update:modelValue", next)
+  emit("valueCommit", next)
+}
+
 /** Squeezed while held, springs past its size on release so it lands with a little bounce. */
 function dotScale(index: number) {
   if (pressing.value && activeThumb.value === index) return 0.82
@@ -333,8 +509,10 @@ function dotScale(index: number) {
 <template>
   <SliderRoot
     data-slot="slider"
+    ref="root"
     v-bind="forwarded"
-    :class="sliderRoot({ class: props.class })"
+    :model-value="values"
+    :class="sliderRoot({ labels: hasMarkLabels || !!$slots.mark, class: props.class })"
     @update:model-value="onUpdate"
     @pointerdown="onPointerDown"
     @pointermove.capture="blockTrackDrag"
@@ -366,6 +544,31 @@ function dotScale(index: number) {
         data-slot="slider-range"
         :class="sliderRange({ transparent: !!props.transparent })"
       />
+      <template v-if="!marksDense">
+        <span
+          v-for="mark in markList"
+          :key="`mark-${mark.value}`"
+          data-slot="slider-mark"
+          :data-filled="mark.filled || undefined"
+          :style="mark.dotStyle"
+          :class="sliderMark({ filled: mark.filled, hidden: mark.hidden })"
+        />
+      </template>
+      <!-- A press on a label moves the nearest thumb exactly onto the mark -->
+      <template v-for="mark in markList" :key="`label-${mark.value}`">
+        <span
+          v-if="mark.label !== undefined || $slots.mark"
+          data-slot="slider-mark-label"
+          @pointerdown="onMarkPress($event, mark.value)"
+          :data-current="mark.current || undefined"
+          :style="mark.labelStyle"
+          :class="sliderMarkLabel({ current: mark.current })"
+        >
+          <slot name="mark" :value="mark.value" :label="mark.label" :current="mark.current" :filled="mark.filled">
+            {{ mark.label }}
+          </slot>
+        </span>
+      </template>
     </SliderTrack>
     <!-- Tooltips go to the thumbs by order, the first thumb gets the first one -->
     <UiTooltip

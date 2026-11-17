@@ -15,6 +15,18 @@ const temperature = ref([18, 24]);
 
 const formatTime = (value: number) => `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
 const hours = ref([9 * 60, 17 * 60]);
+
+const rating = ref([3]);
+const quality = ref([50]);
+const size = ref([2]);
+const sizes = [
+  { value: 0, label: "XS" },
+  { value: 1, label: "S" },
+  { value: 2, label: "M" },
+  { value: 3, label: "L" },
+  { value: 4, label: "XL" },
+];
+const team = ref([4, 12]);
 </script>
 
 <template>
@@ -117,6 +129,35 @@ const hours = ref([9 * 60, 17 * 60]);
       <div class="flex h-40 items-center gap-16">
         <UiSlider :default-value="[30, 60]" orientation="vertical" tooltip-always />
         <UiSlider :default-value="[50]" orientation="vertical" tooltip />
+      </div>
+    </div>
+  </Section>
+
+  <Section title="Marks" class="max-w-md">
+    <div class="space-y-8">
+      <div class="space-y-2">
+        <p class="text-xs text-theme">On every step</p>
+        <UiSlider v-model="rating" :min="1" :max="5" marks />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">Every 25, with labels</p>
+        <UiSlider v-model="quality" :marks="25" mark-labels />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">Own labels</p>
+        <UiSlider v-model="size" :max="4" :marks="sizes" />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">Range, a few chosen values</p>
+        <UiSlider v-model="team" :min="1" :max="20" :marks="[1, 5, 10, 15, 20]" mark-labels tooltip />
+      </div>
+      <div class="space-y-2">
+        <p class="text-xs text-theme">Steps too dense to draw (1 over 0–1000), nothing shows</p>
+        <UiSlider :default-value="[300]" :max="1000" marks />
+      </div>
+      <div class="flex h-48 items-center gap-10">
+        <UiSlider :default-value="[40]" orientation="vertical" :marks="20" mark-labels />
+        <UiSlider :default-value="[1, 3]" orientation="vertical" :max="4" :marks="sizes" />
       </div>
     </div>
   </Section>
