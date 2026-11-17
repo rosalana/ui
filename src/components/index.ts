@@ -55,6 +55,14 @@ export { default as UiButton } from "./Ui/Button/Button.vue";
 
 // Calendar
 export { default as UiCalendar } from "./Ui/Calendar/Calendar.vue";
+export { default as UiRangeCalendar } from "./Ui/Calendar/RangeCalendar.vue";
+
+// TimePicker
+export { default as UiTimePicker } from "./Ui/TimePicker/TimePicker.vue";
+
+// DateInput
+export { default as UiDateInput } from "./Ui/DateInput/DateInput.vue";
+export type { DateInputRange } from "./Ui/DateInput/value";
 
 // ColorPicker
 export { default as UiColorPicker } from "./Ui/ColorPicker/index.vue";

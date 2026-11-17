@@ -163,12 +163,12 @@ reka-ui (headless, accessible)
 
 | Category | Components |
 |----------|------------|
-| **Form** | Input, Textarea, Label, Checkbox, RadioGroup, Switch, Select, Slider, PinInput |
+| **Form** | Input, DateInput, TimePicker, Textarea, Label, Checkbox, RadioGroup, Switch, Select, Slider, PinInput |
 | **Feedback** | Alert, Badge, Chip, Progress, Skeleton |
 | **Overlay** | Dialog, Popover, Tooltip, Sheet, DropdownMenu, HoverCard, AlertDialog, ContextMenu |
 | **Navigation** | Tabs, Accordion, Breadcrumb, Pagination, NavigationMenu, Menubar |
 | **Layout** | Card, AspectRatio, Collapsible, ScrollArea, Separator, Resizable |
-| **Data** | Avatar, Table, Command (combobox/command palette), Calendar |
+| **Data** | Avatar, Table, Command (combobox/command palette), Calendar, RangeCalendar |
 | **Utility** | Button, Icon, Toggle, ToggleGroup |
 
 ## Key Files

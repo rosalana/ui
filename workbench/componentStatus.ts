@@ -14,11 +14,13 @@ export const DONE: string[] = [
   "Avatar",
   "Badge",
   "Button",
+  "Calendar",
   "Card",
   "Checkbox",
   "Chip",
   "ColorPicker",
   "Command",
+  "DateInput",
   "Dialog",
   "DropdownMenu",
   "DropFile",
@@ -37,6 +39,7 @@ export const DONE: string[] = [
   "Sonner",
   "Switch",
   "Table",
+  "TimePicker",
   "Tooltip",
   "Tag",
   "UploadFiles",
@@ -53,5 +56,5 @@ export const UNTOUCHED: string[] = [
 ];
 
 // Everything else is NOT implemented:
-// Calendar, Collapsible, ContextMenu, HoverCard,
+// Collapsible, ContextMenu, HoverCard,
 // Menubar, Progress, RadioGroup, Tabs, Toggle, ToggleGroup

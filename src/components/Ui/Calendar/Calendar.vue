@@ -15,71 +15,97 @@ import {
   CalendarRoot,
   useForwardPropsEmits,
 } from "reka-ui";
-import { tv , type ClassValue } from "tailwind-variants";
+import { computed, shallowRef, watch } from "vue";
+import { getLocalTimeZone, today, type DateValue } from "@internationalized/date";
+import type { ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
-
-const calendarRoot = tv({
-  base: "p-3",
-});
-
-const calendarHeader = tv({
-  base: "flex items-center justify-between pt-1 relative",
-});
-
-const calendarHeading = tv({
-  base: "text-sm font-medium",
-});
-
-const calendarNavButton = tv({
-  base: "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input hover:bg-accent hover:text-accent-foreground size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
-});
-
-const calendarGrid = tv({
-  base: "w-full border-collapse space-y-1",
-});
-
-const calendarHeadCell = tv({
-  base: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
-});
-
-const calendarCell = tv({
-  base: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected].day-range-end)]:rounded-r-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md",
-});
-
-const calendarCellTrigger = tv({
-  base: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground size-8 p-0 aria-selected:opacity-100 data-[outside-month]:text-muted-foreground data-[outside-month]:opacity-50 data-[today]:bg-accent data-[today]:text-accent-foreground data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:hover:bg-primary data-[selected]:hover:text-primary-foreground data-[selected]:focus:bg-primary data-[selected]:focus:text-primary-foreground data-[disabled]:text-muted-foreground data-[disabled]:opacity-50 data-[unavailable]:text-muted-foreground data-[unavailable]:line-through",
-});
+import CalendarMonthPicker from "./CalendarMonthPicker.vue";
+import CalendarMonthTrack from "./CalendarMonthTrack.vue";
+import {
+  calendarCell,
+  calendarCellTrigger,
+  calendarGrid,
+  calendarHeadCell,
+  calendarHeader,
+  calendarHeading,
+  calendarNavButton,
+  calendarRoot,
+} from "./calendar";
 
 interface Props extends CalendarRootProps {
   class?: ClassValue;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  fixedWeeks: true,
+  weekdayFormat: "short",
+});
 const emit = defineEmits<CalendarRootEmits>();
 
-const forwarded = useForwardPropsEmits(props, emit);
+const delegated = computed(() => {
+  const { class: _, placeholder: __, defaultPlaceholder: ___, ...rest } = props;
+  return rest;
+});
+
+const forwarded = useForwardPropsEmits(delegated, emit);
+
+
+const firstDay = (value: DateValue | DateValue[] | undefined) =>
+  Array.isArray(value) ? value[0] : value;
+
+/** The month in view, kept here so the month / year picker can move it. */
+const placeholder = shallowRef<DateValue>(
+  props.placeholder ?? props.defaultPlaceholder ?? firstDay(props.modelValue) ?? today(getLocalTimeZone()),
+);
+
+watch(
+  () => props.placeholder,
+  (value) => {
+    if (value) placeholder.value = value;
+  },
+);
+
+function setPlaceholder(value: DateValue) {
+  placeholder.value = value;
+}
+
+function jumpTo(value: DateValue) {
+  setPlaceholder(value);
+  emit("update:placeholder", value);
+}
 </script>
 
 <template>
   <CalendarRoot
-    data-slot="calendar"
     v-slot="{ grid, weekDays }"
+    data-slot="calendar"
     v-bind="forwarded"
-    :class="[calendarRoot({ class: props.class })]"
+    :class="calendarRoot({ class: props.class })"
+    :placeholder="placeholder"
+    @update:placeholder="setPlaceholder"
   >
     <CalendarHeader :class="calendarHeader()">
       <CalendarPrev :class="calendarNavButton()">
-        <UiIcon name="lucide:chevron-left" class="size-4" />
+        <UiIcon name="lucide:chevron-left" />
       </CalendarPrev>
-      <CalendarHeading :class="calendarHeading()" />
+      <CalendarMonthPicker
+        :placeholder="placeholder"
+        :locale="locale"
+        :min-value="minValue"
+        :max-value="maxValue"
+        :disabled="disabled"
+        @select="jumpTo"
+      >
+        <CalendarHeading :class="calendarHeading()" />
+      </CalendarMonthPicker>
       <CalendarNext :class="calendarNavButton()">
-        <UiIcon name="lucide:chevron-right" class="size-4" />
+        <UiIcon name="lucide:chevron-right" />
       </CalendarNext>
     </CalendarHeader>
 
-    <div class="flex flex-col gap-y-4 mt-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
+    <CalendarMonthTrack v-slot="{ months }" :grid="grid">
       <CalendarGrid
-        v-for="month in grid"
+        v-for="month in months"
         :key="month.value.toString()"
         :class="calendarGrid()"
       >
@@ -97,8 +123,8 @@ const forwarded = useForwardPropsEmits(props, emit);
         <CalendarGridBody>
           <CalendarGridRow
             v-for="(weekDates, index) in month.rows"
-            :key="`weekDate-${index}`"
-            class="flex w-full mt-2"
+            :key="`week-${index}`"
+            class="flex w-full"
           >
             <CalendarCell
               v-for="weekDate in weekDates"
@@ -115,6 +141,6 @@ const forwarded = useForwardPropsEmits(props, emit);
           </CalendarGridRow>
         </CalendarGridBody>
       </CalendarGrid>
-    </div>
+    </CalendarMonthTrack>
   </CalendarRoot>
 </template>
