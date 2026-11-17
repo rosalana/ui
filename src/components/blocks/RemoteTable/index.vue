@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T">
+import { useLocale } from "../../../composables/useLocale";
 import { h, onMounted, ref, watch } from "vue";
 import { tv } from "tailwind-variants";
 import {
@@ -145,6 +146,8 @@ onMounted(() => {
     });
   }
 });
+
+const { t } = useLocale();
 </script>
 
 <template>
@@ -216,7 +219,7 @@ onMounted(() => {
               :colspan="table.columns.visible.length"
               class="h-24 text-center text-theme"
             >
-              <slot name="empty-state">No data to display.</slot>
+              <slot name="empty-state">{{ t('table.empty') }}</slot>
             </UiTableCell>
           </UiTableRow>
 

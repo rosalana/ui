@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import { computed, isRef, onMounted, useModel } from "vue";
 import { ActionItem, ActionsEmits, ActionsProps } from "./types";
 import {
@@ -47,6 +48,8 @@ onMounted(() => {
     open.value = true;
   }
 });
+
+const { t } = useLocale();
 </script>
 <template>
   <UiDropdownMenu
@@ -88,7 +91,7 @@ onMounted(() => {
       </template>
       <!-- empty state -->
       <template v-if="!visible.length">
-        <div class="p-2 text-sm text-theme">No actions available</div>
+        <div class="p-2 text-sm text-theme">{{ t('actions.empty') }}</div>
       </template>
 
       <template v-else v-for="item in visible" :key="item.label">

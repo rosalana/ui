@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import { computed, onBeforeUnmount, reactive, ref, shallowRef, useId, watch } from "vue";
 import { useResizeObserver } from "@vueuse/core";
 import { AnimatePresence, motion } from "motion-v";
@@ -42,11 +43,12 @@ const props = withDefaults(defineProps<UploadImageProps>(), {
   presets: true,
   disabled: false,
   skipEditor: false,
-  title: "Click to upload or drag & drop an image.",
   icon: "lucide:image-up",
 });
 
 const emit = defineEmits<UploadImageEmits>();
+
+const { locale, t } = useLocale();
 
 const model = defineModel<File | null>({ default: null });
 
@@ -270,9 +272,15 @@ async function autoCrop(file: File) {
 const previewRatio = computed(() => resultRatio.value ?? props.aspectRatio ?? 1);
 
 function formatSize(bytes: number): string {
+  const format = (value: number, digits: number) =>
+    new Intl.NumberFormat(locale.value, {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(value);
+
   if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024) return `${format(bytes / 1024, 0)} KB`;
+  return `${format(bytes / 1024 / 1024, 1)} MB`;
 }
 
 function edit() {
@@ -393,30 +401,30 @@ const previewCard = `${surface} border border-border`;
 
             <div class="flex items-center gap-0.5">
               <template v-if="rotate">
-                <UiButton variant="ghost" size="icon-sm" tooltip="Rotate left" @click="cropper?.rotate(-90)">
+                <UiButton variant="ghost" size="icon-sm" :tooltip="t('uploadImage.rotateLeft')" @click="cropper?.rotate(-90)">
                   <UiIcon name="lucide:rotate-ccw" />
                 </UiButton>
-                <UiButton variant="ghost" size="icon-sm" tooltip="Rotate right" @click="cropper?.rotate(90)">
+                <UiButton variant="ghost" size="icon-sm" :tooltip="t('uploadImage.rotateRight')" @click="cropper?.rotate(90)">
                   <UiIcon name="lucide:rotate-cw" />
                 </UiButton>
               </template>
               <template v-if="flip">
-                <UiButton variant="ghost" size="icon-sm" tooltip="Flip horizontally" @click="cropper?.flip(true, false)">
+                <UiButton variant="ghost" size="icon-sm" :tooltip="t('uploadImage.flipHorizontal')" @click="cropper?.flip(true, false)">
                   <UiIcon name="lucide:flip-horizontal-2" />
                 </UiButton>
-                <UiButton variant="ghost" size="icon-sm" tooltip="Flip vertically" @click="cropper?.flip(false, true)">
+                <UiButton variant="ghost" size="icon-sm" :tooltip="t('uploadImage.flipVertical')" @click="cropper?.flip(false, true)">
                   <UiIcon name="lucide:flip-vertical-2" />
                 </UiButton>
               </template>
               <template v-if="zoom">
-                <UiButton variant="ghost" size="icon-sm" tooltip="Zoom out" @click="cropper?.zoom(0.8)">
+                <UiButton variant="ghost" size="icon-sm" :tooltip="t('uploadImage.zoomOut')" @click="cropper?.zoom(0.8)">
                   <UiIcon name="lucide:zoom-out" />
                 </UiButton>
-                <UiButton variant="ghost" size="icon-sm" tooltip="Zoom in" @click="cropper?.zoom(1.25)">
+                <UiButton variant="ghost" size="icon-sm" :tooltip="t('uploadImage.zoomIn')" @click="cropper?.zoom(1.25)">
                   <UiIcon name="lucide:zoom-in" />
                 </UiButton>
               </template>
-              <UiButton variant="ghost" size="icon-sm" tooltip="Reset" @click="cropper?.reset()">
+              <UiButton variant="ghost" size="icon-sm" :tooltip="t('uploadImage.reset')" @click="cropper?.reset()">
                 <UiIcon name="lucide:undo-2" />
               </UiButton>
             </div>
@@ -431,7 +439,7 @@ const previewCard = `${surface} border border-border`;
             <div class="flex items-center justify-between">
               <span class="flex items-center gap-1.5 text-xs font-medium">
                 <UiIcon name="lucide:wand-sparkles" class="text-primary size-3.5" />
-                Adjustments
+                {{ t("uploadImage.adjustments") }}
               </span>
               <AnimatePresence>
                 <motion.div
@@ -447,7 +455,7 @@ const previewCard = `${surface} border border-border`;
                     class="text-theme"
                     @click="Object.assign(adjustments, neutralAdjustments())"
                   >
-                    Reset
+                    {{ t("uploadImage.reset") }}
                   </UiButton>
                 </motion.div>
               </AnimatePresence>
@@ -495,7 +503,7 @@ const previewCard = `${surface} border border-border`;
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-theme flex items-center gap-1.5">
                     <UiIcon :name="FILTERS[name].icon" class="size-3.5" />
-                    {{ FILTERS[name].label }}
+                    {{ t(`uploadImage.filter.${name}`) }}
                   </span>
                   <span class="tabular-nums">{{ formatAdjustment(name) }}</span>
                 </div>
@@ -504,7 +512,7 @@ const previewCard = `${surface} border border-border`;
                   :min="FILTERS[name].min"
                   :max="FILTERS[name].max"
                   :step="FILTERS[name].step"
-                  :aria-label="FILTERS[name].label"
+                  :aria-label="t(`uploadImage.filter.${name}`)"
                   @update:model-value="(value) => value && (adjustments[name] = value[0])"
                 />
               </div>
@@ -514,11 +522,11 @@ const previewCard = `${surface} border border-border`;
           <!-- Footer -->
           <div class="flex items-center justify-end gap-2">
             <UiButton variant="ghost" size="sm" :disabled="saving" @click="cancel">
-              Cancel
+              {{ t("uploadImage.cancel") }}
             </UiButton>
             <UiButton size="sm" :loading="saving" @click="save">
               <UiIcon name="lucide:check" />
-              Apply
+              {{ t("uploadImage.apply") }}
             </UiButton>
           </div>
         </motion.div>
@@ -544,7 +552,7 @@ const previewCard = `${surface} border border-border`;
             :while-hover="disabled ? undefined : { scale: 1.04 }"
             :while-press="disabled ? undefined : { scale: 0.97 }"
             :transition="spring"
-            aria-label="Change image"
+            :aria-label="t('uploadImage.change')"
             @click="openDialog()"
           >
             <img :src="previewUrl" alt="" class="size-full object-cover" />
@@ -557,11 +565,11 @@ const previewCard = `${surface} border border-border`;
 
           <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-medium">
-              {{ model?.name ?? "Current image" }}
+              {{ model?.name ?? t("uploadImage.current") }}
             </p>
             <p class="text-theme text-xs">
               <template v-if="model">{{ formatSize(model.size) }}</template>
-              <template v-else>Click the image to replace it</template>
+              <template v-else>{{ t("uploadImage.replaceHint") }}</template>
             </p>
           </div>
 
@@ -570,18 +578,18 @@ const previewCard = `${surface} border border-border`;
               v-if="source"
               variant="ghost"
               size="icon-sm"
-              tooltip="Edit crop"
+              :tooltip="t('uploadImage.editCrop')"
               @click="edit"
             >
               <UiIcon name="lucide:crop" />
             </UiButton>
-            <UiButton variant="ghost" size="icon-sm" tooltip="Replace" @click="openDialog()">
+            <UiButton variant="ghost" size="icon-sm" :tooltip="t('uploadImage.replace')" @click="openDialog()">
               <UiIcon name="lucide:refresh-cw" />
             </UiButton>
             <UiButton
               variant="ghost"
               size="icon-sm"
-              tooltip="Remove"
+              :tooltip="t('uploadImage.remove')"
               class="hover:text-destructive"
               @click="remove"
             >
@@ -617,12 +625,12 @@ const previewCard = `${surface} border border-border`;
             >
               <UiIcon :name="icon" class="size-6" />
             </motion.div>
-            <p v-if="title" class="mt-4 text-sm font-medium" v-html="title" />
+            <p v-if="title !== ''" class="mt-4 text-sm font-medium" v-html="title ?? t('uploadImage.title')" />
             <p
               class="text-theme mt-1 text-xs"
               v-html="
                 subtext ??
-                (maxSize ? `Images up to ${formatSize(maxSize)}` : 'PNG, JPG, WEBP or GIF')
+                (maxSize ? t('uploadImage.maxSize', { size: formatSize(maxSize) }) : t('uploadImage.subtext'))
               "
             />
           </div>
@@ -645,7 +653,7 @@ const previewCard = `${surface} border border-border`;
           :transition="spring"
         >
           <UiIcon name="lucide:image-up" class="text-primary size-5" />
-          Drop to replace
+          {{ t("uploadImage.dropToReplace") }}
         </motion.div>
       </AnimatePresence>
     </UiDropFile>

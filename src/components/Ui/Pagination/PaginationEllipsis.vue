@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import { tv , type ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 
@@ -11,6 +12,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const { t } = useLocale();
 </script>
 
 <template>
@@ -20,6 +23,6 @@ const props = defineProps<Props>();
     :class="[paginationEllipsis({ class: props.class })]"
   >
     <UiIcon name="lucide:more-horizontal" class="size-4" />
-    <span class="sr-only">More pages</span>
+    <span class="sr-only">{{ t('pagination.more') }}</span>
   </span>
 </template>

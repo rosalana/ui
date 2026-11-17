@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { AnimatePresence, motion } from "motion-v";
 import type { PanInfo } from "motion-v";
@@ -130,6 +131,8 @@ function onAction(event: MouseEvent) {
 function onDragEnd(_event: PointerEvent, info: PanInfo) {
   if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) close();
 }
+
+const { t } = useLocale();
 </script>
 
 <template>
@@ -207,7 +210,7 @@ function onDragEnd(_event: PointerEvent, info: PanInfo) {
     <button
       v-if="dismissible"
       type="button"
-      aria-label="Close notification"
+      :aria-label="t('notifications.close')"
       data-slot="sonner-close"
       :class="[
         'absolute -top-2 -left-2 flex size-5 cursor-pointer items-center justify-center',

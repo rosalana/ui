@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T">
+import { useLocale } from "../../../composables/useLocale";
 import { tv } from "tailwind-variants";
 import { ColumnRender, HeaderRender, useTable } from "../../../composables";
 import { TableEvents } from "../../../composables/useTable/types";
@@ -138,6 +139,8 @@ onMounted(() => {
     });
   }
 });
+
+const { t } = useLocale();
 </script>
 <template>
   <div data-slot="data-table" :class="[styles(), props.class]">
@@ -193,7 +196,7 @@ onMounted(() => {
               "
               class="h-24 text-center text-theme"
             >
-              <slot name="empty-state"> No data to display. </slot>
+              <slot name="empty-state">{{ t('table.empty') }}</slot>
             </UiTableCell>
           </UiTableRow>
 

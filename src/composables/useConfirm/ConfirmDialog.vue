@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../useLocale";
 import { state, respond, VerifyConfirmOptions } from "./state";
 import UiAlertDialog from "../../components/Ui/AlertDialog/AlertDialog.vue";
 import UiAlertDialogContent from "../../components/Ui/AlertDialog/AlertDialogContent.vue";
@@ -39,6 +40,8 @@ const onCancel = () => {
   input.value = "";
   error.value = false;
 };
+
+const { t } = useLocale();
 </script>
 
 <template>
@@ -46,15 +49,15 @@ const onCancel = () => {
     <UiAlertDialogContent class="max-w-sm sm:max-w-md">
       <UiAlertDialogHeader>
         <UiAlertDialogTitle>
-          {{ state.options.title ?? "Are you sure?" }}
+          {{ state.options.title ?? t('confirm.title') }}
         </UiAlertDialogTitle>
         <UiAlertDialogDescription>
           {{
             state.options.description
               ? state.options.description
               : state.variant === "confirm"
-                ? "This action may have consequences."
-                : "Please verify the action by providing the required information."
+                ? t('confirm.description')
+                : t('confirm.verify')
           }}
         </UiAlertDialogDescription>
       </UiAlertDialogHeader>
@@ -65,13 +68,13 @@ const onCancel = () => {
         :type="(state.options as VerifyConfirmOptions).password ? 'password' : 'text'"
         :placeholder="
           (state.options as VerifyConfirmOptions).placeholder ??
-          'Type to verify...'
+          t('confirm.verifyPlaceholder')
         "
         @keyup.enter="onConfirm"
       />
       <UiAlertDialogFooter>
         <UiAlertDialogCancel @click="onCancel">
-          {{ state.options.cancel ?? "Cancel" }}
+          {{ state.options.cancel ?? t('confirm.cancel') }}
         </UiAlertDialogCancel>
         <UiButton
           :variant="state.options.danger === true ? 'destructive' : 'default'"
@@ -79,7 +82,7 @@ const onCancel = () => {
           @click="onConfirm"
         >
           <UiIcon v-if="state.options.icon" :name="state.options.icon" />
-          {{ state.options.confirm ?? "Confirm" }}
+          {{ state.options.confirm ?? t('confirm.confirm') }}
         </UiButton>
       </UiAlertDialogFooter>
     </UiAlertDialogContent>

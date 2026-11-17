@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T">
+import { useLocale } from "../../../composables/useLocale";
 import {
   UiButton,
   UiDropdownMenu,
@@ -14,6 +15,8 @@ import { HeaderRender, TableInstance } from "../../../composables";
 const props = defineProps<{
   table: TableInstance<T>;
 }>();
+
+const { t } = useLocale();
 </script>
 <template>
   <div>
@@ -21,12 +24,12 @@ const props = defineProps<{
       <UiDropdownMenuTrigger as-child>
         <UiButton variant="outline" size="sm">
           <UiIcon name="lucide:settings-2" class="size-4" />
-          <span class="hidden sm:inline">Columns</span>
+          <span class="hidden sm:inline">{{ t('table.columns') }}</span>
         </UiButton>
       </UiDropdownMenuTrigger>
 
       <UiDropdownMenuContent align="end" class="w-48">
-        <UiDropdownMenuLabel>Toggle Columns</UiDropdownMenuLabel>
+        <UiDropdownMenuLabel>{{ t('table.toggleColumns') }}</UiDropdownMenuLabel>
         <UiDropdownMenuSeparator />
         <UiDropdownMenuCheckboxItem
           v-if="table.columns.toggleable.length"
@@ -38,7 +41,7 @@ const props = defineProps<{
           <HeaderRender :column="column" :context="null" />
         </UiDropdownMenuCheckboxItem>
         <div v-else class="p-2 text-sm text-muted-foreground">
-          All columns are fixed
+          {{ t('table.allColumnsFixed') }}
         </div>
       </UiDropdownMenuContent>
     </UiDropdownMenu>

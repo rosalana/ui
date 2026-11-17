@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import { useDropZone, useFileDialog } from "@vueuse/core";
 import { motion } from "motion-v";
 import { tv, type ClassValue } from "tailwind-variants";
@@ -67,8 +68,6 @@ const props = withDefaults(
     class?: ClassValue;
   }>(),
   {
-    title: "Click to upload or drag & drop files.",
-    subtext: "All file types accepted",
     icon: "lucide:cloud-upload",
     multiple: true,
     accept: "*",
@@ -128,6 +127,8 @@ const { isOverDropZone } = useDropZone(dropZoneEl, {
 const spring = { type: "spring", stiffness: 400, damping: 25 } as const;
 
 defineExpose({ dropZoneRef, open: openDialog });
+
+const { t } = useLocale();
 </script>
 
 <template>
@@ -174,18 +175,18 @@ defineExpose({ dropZoneRef, open: openDialog });
           </slot>
           <slot name="title" :is-over-drop-zone="isOverDropZone">
             <p
-              v-if="title"
+              v-if="title !== ''"
               data-slot="dropfile-title"
               class="mt-4 text-sm font-medium"
-              v-html="title"
+              v-html="title ?? t('dropFile.title')"
             />
           </slot>
           <slot name="subtext" :is-over-drop-zone="isOverDropZone">
             <p
-              v-if="subtext"
+              v-if="subtext !== ''"
               data-slot="dropfile-subtext"
               class="text-theme mt-1 text-xs"
-              v-html="subtext"
+              v-html="subtext ?? t('dropFile.subtext')"
             />
           </slot>
         </div>

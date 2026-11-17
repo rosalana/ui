@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 // implemented
 import type { DialogContentEmits, DialogContentProps } from "reka-ui";
 import {
@@ -73,6 +74,8 @@ const panelInitial = computed(() => {
   if (props.side === "bottom") return { y: "100%" };
   return { x: "100%" };
 });
+
+const { t } = useLocale();
 </script>
 
 <template>
@@ -104,10 +107,9 @@ const panelInitial = computed(() => {
             :transition="{ type: 'spring', stiffness: 380, damping: 38 }"
             :class="[sheetContent({ side: props.side, class: props.class })]"
           >
-            <DialogTitle class="sr-only"> Sheet Content </DialogTitle>
+            <DialogTitle class="sr-only">{{ t('sheet.title') }}</DialogTitle>
             <DialogDescription class="sr-only">
-              This is the content of the sheet. It can be used to display
-              information or actions related to the current page.
+              {{ t('sheet.description') }}
             </DialogDescription>
             <slot />
             <DialogClose
@@ -115,7 +117,7 @@ const panelInitial = computed(() => {
               class="absolute right-4 top-4 flex items-center justify-center size-8 rounded-lg text-foreground/60 hover:text-foreground hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring/30 disabled:pointer-events-none active:scale-[0.97]"
             >
               <UiIcon name="lucide:x" class="size-4" />
-              <span class="sr-only">Close</span>
+              <span class="sr-only">{{ t('close') }}</span>
             </DialogClose>
           </motion.div>
         </DialogContent>

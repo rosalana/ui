@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import { computed, onBeforeUnmount, shallowReactive } from "vue";
 import { AnimatePresence, motion } from "motion-v";
 import { UiButton, UiIcon } from "../../index";
@@ -18,6 +19,8 @@ const props = withDefaults(defineProps<UploadFilesProps>(), {
 
 const emit = defineEmits<UploadFilesEmits>();
 
+const { locale, t } = useLocale();
+
 const files = defineModel<File[]>({ default: () => [] });
 
 const spring = { type: "spring", stiffness: 400, damping: 25 } as const;
@@ -35,10 +38,10 @@ const subtext = computed(() => {
 
   const parts: string[] = [];
   if (props.accept && props.accept !== "*") parts.push(props.accept.split(",").join(", "));
-  if (props.maxSize) parts.push(`up to ${formatSize(props.maxSize)}`);
-  if (props.maxFiles && props.multiple) parts.push(`max ${props.maxFiles} files`);
+  if (props.maxSize) parts.push(t("uploadFiles.maxSize", { size: formatSize(props.maxSize) }));
+  if (props.maxFiles && props.multiple) parts.push(t("uploadFiles.maxFiles", { count: props.maxFiles }));
 
-  return parts.length ? parts.join(" · ") : "All file types accepted";
+  return parts.length ? parts.join(" · ") : t("dropFile.subtext");
 });
 
 function add(incoming: File[]) {
@@ -140,7 +143,13 @@ function formatSize(bytes: number): string {
     unit++;
   }
 
-  return `${size.toFixed(size < 10 ? 1 : 0)} ${units[unit]}`;
+  const digits = size < 10 ? 1 : 0;
+  const number = new Intl.NumberFormat(locale.value, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(size);
+
+  return `${number} ${units[unit]}`;
 }
 
 const totalSize = computed(() => files.value.reduce((sum, file) => sum + file.size, 0));
@@ -170,7 +179,7 @@ const totalSize = computed(() => files.value.reduce((sum, file) => sum + file.si
         :transition="spring"
       >
         <span class="text-theme">
-          {{ files.length }} {{ files.length === 1 ? "file" : "files" }}
+          {{ t("uploadFiles.count", { count: files.length }) }}
           · {{ formatSize(totalSize) }}
         </span>
         <UiButton
@@ -180,7 +189,7 @@ const totalSize = computed(() => files.value.reduce((sum, file) => sum + file.si
           class="text-theme hover:text-destructive"
           @click="clear"
         >
-          Clear all
+          {{ t("uploadFiles.clear") }}
         </UiButton>
       </motion.div>
     </AnimatePresence>
@@ -232,7 +241,7 @@ const totalSize = computed(() => files.value.reduce((sum, file) => sum + file.si
             size="icon-sm"
             type="button"
             class="text-theme hover:text-destructive"
-            :aria-label="`Remove ${file.name}`"
+            :aria-label="t('uploadFiles.remove', { name: file.name })"
             @click="remove(file)"
           >
             <UiIcon name="lucide:x" />

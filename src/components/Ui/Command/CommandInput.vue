@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import type { ComboboxInputProps } from "reka-ui";
 import {
   ComboboxInput,
@@ -45,6 +46,8 @@ function clear() {
   input.dispatchEvent(new Event("input", { bubbles: true }));
   input.focus();
 }
+
+const { t } = useLocale();
 </script>
 
 <template>
@@ -76,7 +79,7 @@ function clear() {
           @click="clear"
         >
           <UiIcon name="lucide:x" class="size-4" />
-          <span class="sr-only">Clear search</span>
+          <span class="sr-only">{{ t('command.clear') }}</span>
         </UiButton>
       </motion.div>
     </AnimatePresence>

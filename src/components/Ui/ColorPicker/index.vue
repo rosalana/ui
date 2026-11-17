@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import { computed, ref, watch } from "vue";
 import {
   UiButton,
@@ -23,7 +24,6 @@ import { UiInput } from "../..";
 import { motion, AnimatePresence } from "motion-v";
 
 const props = withDefaults(defineProps<ColorPickerProps>(), {
-  placeholder: "Pick a color",
   format: "hex",
   palette: false,
   input: true,
@@ -106,13 +106,15 @@ function onInputCommit() {
   }
   color.value = rgbaToHsva(parsed);
 }
+
+const { t } = useLocale();
 </script>
 
 <template>
   <UiPopover>
     <UiPopoverTrigger as-child>
       <ColorPickerTrigger
-        :placeholder="props.placeholder"
+        :placeholder="props.placeholder ?? t('colorPicker.placeholder')"
         :value="preview"
         :text="formatted"
       />
@@ -136,7 +138,7 @@ function onInputCommit() {
 
           <UiInput
             v-model="inputValue"
-            :placeholder="props.placeholder"
+            :placeholder="props.placeholder ?? t('colorPicker.placeholder')"
             @focus="onInputFocus"
             @blur="onInputBlur"
             @keydown.enter.prevent="onInputCommit"

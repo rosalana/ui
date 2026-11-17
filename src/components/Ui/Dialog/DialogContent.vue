@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import type { DialogContentEmits, DialogContentProps } from "reka-ui";
 import {
   DialogClose,
@@ -36,6 +37,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<DialogContentEmits>();
 const forwarded = useForwardPropsEmits(props, emit);
+
+const { t } = useLocale();
 </script>
 
 <template>
@@ -92,7 +95,7 @@ const forwarded = useForwardPropsEmits(props, emit);
           >
             <Button variant="ghost" size="icon-sm">
               <UiIcon name="lucide:x" class="size-4" />
-              <span class="sr-only">Close</span>
+              <span class="sr-only">{{ t('close') }}</span>
             </Button>
           </DialogClose>
         </motion.div>

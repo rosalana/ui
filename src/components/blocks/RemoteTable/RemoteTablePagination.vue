@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T">
+import { useLocale } from "../../../composables/useLocale";
 import {
   UiButton,
   UiIcon,
@@ -13,6 +14,8 @@ const props = defineProps<{
   table: RemoteTableInstance<T>;
   pageSizeOptions: number[];
 }>();
+
+const { t } = useLocale();
 </script>
 <template>
   <div class="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
@@ -22,12 +25,12 @@ const props = defineProps<{
       <!-- Info -->
       <p class="text-sm text-theme">
         <span class="font-medium text-foreground">{{ table.data.total }}</span>
-        rows total
+        {{ t('table.total') }}
       </p>
 
       <!-- Rows per page — visible on mobile inline, hidden on desktop (shown in row 2) -->
       <div class="flex items-center gap-2 sm:hidden">
-        <span class="text-sm text-theme">Per page</span>
+        <span class="text-sm text-theme">{{ t('pagination.perPage') }}</span>
         <UiSelect v-model="table.paginator.size" name="paginator">
           <UiSelectTrigger class="h-8 w-16 text-sm">
             {{ table.paginator.size }}
@@ -50,7 +53,7 @@ const props = defineProps<{
 
       <!-- Rows per page — hidden on mobile (shown above), visible on desktop -->
       <div class="hidden items-center gap-2 sm:flex">
-        <span class="text-sm text-theme whitespace-nowrap">Rows per page</span>
+        <span class="text-sm text-theme whitespace-nowrap">{{ t('pagination.rowsPerPage') }}</span>
         <UiSelect v-model="table.paginator.size" name="paginator">
           <UiSelectTrigger class="h-8 w-16">
             {{ table.paginator.size }}
@@ -79,7 +82,7 @@ const props = defineProps<{
             @click="table.paginator.current = 1"
           >
             <UiIcon name="lucide:chevrons-left" class="size-4" />
-            <span class="sr-only">Go to first page</span>
+            <span class="sr-only">{{ t('pagination.first') }}</span>
           </UiButton>
           <UiButton
             variant="outline"
@@ -89,7 +92,7 @@ const props = defineProps<{
             @click="table.paginator.prev()"
           >
             <UiIcon name="lucide:chevron-left" class="size-4" />
-            <span class="sr-only">Go to previous page</span>
+            <span class="sr-only">{{ t('pagination.previous') }}</span>
           </UiButton>
         </div>
 
@@ -110,7 +113,7 @@ const props = defineProps<{
             @click="table.paginator.next()"
           >
             <UiIcon name="lucide:chevron-right" class="size-4" />
-            <span class="sr-only">Go to next page</span>
+            <span class="sr-only">{{ t('pagination.next') }}</span>
           </UiButton>
           <UiButton
             variant="outline"
@@ -120,7 +123,7 @@ const props = defineProps<{
             @click="table.paginator.current = table.paginator.total"
           >
             <UiIcon name="lucide:chevrons-right" class="size-4" />
-            <span class="sr-only">Go to last page</span>
+            <span class="sr-only">{{ t('pagination.last') }}</span>
           </UiButton>
         </div>
       </div>

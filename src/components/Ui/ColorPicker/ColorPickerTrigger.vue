@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import { Primitive, useForwardProps, type PrimitiveProps } from "reka-ui";
 import { type ClassValue, tv } from "tailwind-variants";
 import { UiIcon } from "../..";
@@ -22,12 +23,13 @@ interface Props extends PrimitiveProps {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: "Pick a color...",
   value: "",
   text: "",
   as: "button",
 });
 const forwarded = useForwardProps(props);
+
+const { t } = useLocale();
 </script>
 <template>
   <Primitive
@@ -48,7 +50,7 @@ const forwarded = useForwardProps(props);
       {{ props.text || props.value }}
     </span>
     <span v-else class="flex-1 truncate text-left text-xs text-theme">
-      {{ props.placeholder }}
+      {{ props.placeholder ?? t('colorPicker.placeholder') }}
     </span>
 
     <UiIcon name="lucide:swatch-book" class="size-4 text-theme" />

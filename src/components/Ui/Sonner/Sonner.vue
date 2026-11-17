@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import { computed, reactive, ref, watch } from "vue";
 import { AnimatePresence } from "motion-v";
 import { tv } from "tailwind-variants";
@@ -79,10 +80,12 @@ watch(
     }
   },
 );
+
+const { t } = useLocale();
 </script>
 
 <template>
-  <section aria-label="Notifications" tabindex="-1" aria-live="polite">
+  <section :aria-label="t('notifications.label')" tabindex="-1" aria-live="polite">
     <ol
       data-slot="sonner"
       :data-position="state.config.position"

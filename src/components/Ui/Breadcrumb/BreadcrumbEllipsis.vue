@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from "../../../composables/useLocale";
 import type { PrimitiveProps } from "reka-ui";
 import { Primitive } from "reka-ui";
 import { tv , type ClassValue } from "tailwind-variants";
@@ -13,6 +14,8 @@ interface Props extends PrimitiveProps {
 }
 
 const props = defineProps<Props>();
+
+const { t } = useLocale();
 </script>
 
 <template>
@@ -27,6 +30,6 @@ const props = defineProps<Props>();
     <slot>
       <UiIcon name="lucide:more-horizontal" class="size-4" />
     </slot>
-    <span class="sr-only">More</span>
+    <span class="sr-only">{{ t('more') }}</span>
   </Primitive>
 </template>
