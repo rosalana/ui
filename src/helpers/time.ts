@@ -84,6 +84,54 @@ export function formatDate(
   return new Intl.DateTimeFormat(currentLocale(), options).format(new Date(date));
 }
 
+/**
+ * A moment as the clock time in a time zone, the value a date and time input holds:
+ * `2026-12-12T18:00`, without seconds. The way back is `zonedToUtc()`.
+ *
+ * Keep moments in UTC and turn them into clock time only for an input. The time zone is given,
+ * never taken from the browser, so the server and the browser get the same text.
+ *
+ * ```ts
+ * utcToZoned("2026-12-12T17:00:00Z", "Europe/Prague") // "2026-12-12T18:00"
+ * ```
+ */
+export function utcToZoned(date: DateLike, timeZone: string): string {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(new Date(date))
+      .map((part) => [part.type, part.value]),
+  );
+
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
+}
+
+/**
+ * Clock time in a time zone, like the value of a date and time input, as the UTC moment it is:
+ * `2026-12-12T17:00:00.000Z`. The way back is `utcToZoned()`.
+ *
+ * The zone's offset is read from how the zone prints the moment, twice, so a time next to a
+ * daylight saving change lands right as well. A time that happens twice when the clocks go back
+ * takes the first one.
+ *
+ * ```ts
+ * zonedToUtc("2026-12-12T18:00", "Europe/Prague") // "2026-12-12T17:00:00.000Z"
+ * ```
+ */
+export function zonedToUtc(value: string, timeZone: string): string {
+  const clock = Date.parse(`${value}Z`);
+  const offset = (moment: number) => Date.parse(`${utcToZoned(moment, timeZone)}Z`) - moment;
+
+  return new Date(clock - offset(clock - offset(clock))).toISOString();
+}
+
 /** The whole units of a number of seconds, the largest first. */
 function duration(
   seconds: number,
