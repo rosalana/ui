@@ -142,6 +142,11 @@ export type CreateRosalanaUIOptions = {
   messages?: UiMessagesConfig;
   /** Default configuration of toasts shown via `useSonner()` */
   sonner?: Partial<SonnerConfig>;
+  /**
+   * The app's own icons by name, each the markup of an SVG file. `UiIcon` shows them as
+   * `local:{name}`, see `addLocalIcons()`.
+   */
+  icons?: Record<string, string>;
   // motion?: {
   //   reduce?: boolean;
   //   disable?: boolean;

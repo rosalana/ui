@@ -5,6 +5,7 @@ export { createAdapter } from "./adapter";
 export { useAppContext, useAppDefaults } from "./context";
 export { createColor, useColorCSS } from "./colors";
 export { accessGlobal } from "./virtual";
+export { addLocalIcons, LOCAL_ICON_PREFIX } from "./icons";
 export { currentLocale, currentMessages, setLocale, setMessages } from "./locale";
 export { messages, translate } from "./messages";
 export type { UiMessages, UiMessageKey, UiMessagesConfig, UiMessageParams } from "./messages";

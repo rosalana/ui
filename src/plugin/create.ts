@@ -1,6 +1,7 @@
 import type { CreateRosalanaUIOptions } from "./types";
 import { afterAppCreated, createContext, provideContext } from "./context";
 import { mountVirtual } from "./virtual";
+import { addLocalIcons } from "./icons";
 import { configure as configureSonner } from "../composables/useSonner/state";
 import { addCollection, IconifyJSON } from "@iconify/vue";
 import { icons as lucide } from "@iconify-json/lucide";
@@ -27,6 +28,7 @@ export const createRosalanaApp = {
     afterAppCreated(app, context);
 
     if (resolved.sonner) configureSonner(resolved.sonner);
+    if (resolved.icons) addLocalIcons(resolved.icons);
 
     /** virtual layer */
     mountVirtual(app);
