@@ -166,9 +166,9 @@ reka-ui (headless, accessible)
 | **Form** | Input, NumberField, DateInput, TimePicker, Textarea, Label, Checkbox, RadioGroup, Switch, Select, Combobox, Slider, PinInput |
 | **Feedback** | Alert, Badge, Chip, Progress, Skeleton |
 | **Overlay** | Dialog, Popover, Tooltip, Sheet, DropdownMenu, HoverCard, AlertDialog, ContextMenu |
-| **Navigation** | Tabs, Accordion, Breadcrumb, Pagination, NavigationMenu, Menubar |
+| **Navigation** | Tabs, Accordion, Breadcrumb, Pagination, NavigationMenu, Menubar, Toc (list or floating island) |
 | **Layout** | Card, AspectRatio, Collapsible, ScrollArea, Separator, Resizable |
-| **Data** | Avatar, Table, Command (combobox/command palette), Calendar, RangeCalendar |
+| **Data** | Avatar, Table, Command (combobox/command palette), Calendar, RangeCalendar, CodeBlock (highlighted code, groups with a preview) |
 | **Utility** | Button, Icon, Toggle, ToggleGroup |
 
 ## Key Files
@@ -241,6 +241,7 @@ Every component must render the same on the server and in the browser, in the la
 - **Words that depend on a number** (outside the catalog) use the `plural(count, forms)` helper, which follows the app locale by itself, never a hand-made `count === 1 ? … : …`.
 - **Anything that formats by language uses the app locale from `useLocale()`**: `Intl.*`, `toLocale*`, `@internationalized/date` and every reka-ui component with a `locale` prop (pass `:locale="locale"` explicitly). A component with its own `locale` prop passes it to `useLocale(() => props.locale)` as the override.
 - **Never read the browser** to decide what to render: no `navigator.language`, no `Intl.DateTimeFormat().resolvedOptions()` defaults, no `Date.now()`, `new Date()` or `window`/`document` during render. The server has none of them and the hydration breaks. Do that only in `onMounted` or in event handlers, and render a server-safe state until then.
+- **Dates go through `useDate()`**: moments stay in UTC (from the server, in state, back to the server) and turn into local time only to show them, in the app's time zone (`createRosalanaApp(..., { timeZone })`, `setTimeZone()`). Format with `useDate().format` / `diffForHumans`, convert for inputs with `toZoned` / `toUtc`, and take today and now from `useDate().today` / `now` (undefined on the server, known once mounted). Never `getLocalTimeZone()`, `today()` or `new Date()` for the current moment in a component.
 - **Prop defaults that are texts** stay `undefined` and resolve in the component (`props.placeholder ?? t("colorPicker.placeholder")`), so an app can still pass `""` to hide a text.
 
 The app sets the locale once at startup (`createRosalanaApp(..., { locale, messages })`, Laravel style codes like `cs_CZ` are fine) and changes it with `setLocale()`. Its own texts for the components go in `messages` or `setMessages()`. Locale code helpers (`normalizeLocale`, `localeLanguage`, `matchLocale`) are in `src/helpers/locale.ts`.
@@ -291,30 +292,50 @@ Semantic colors: `primary`, `secondary`, `muted`, `destructive`, `info`, `succes
 
 ## Workbench
 
-The workbench is a local development sandbox for previewing and testing all UI components.
+The workbench is the complete, page-based documentation and interactive development environment for the library. It includes a home page, installation/design/integration guides, categorized Ui primitives and Blocks, composables, helpers, the local Vite plugin and Sandbox exports. Navigation is split into Guides, Components, Blocks, Composables and Helpers; SideNav shows only the current section.
 
 ```bash
-npm run workbench   # Start workbench on http://localhost:4000
+npm run workbench            # http://localhost:4000
+npm run workbench:build      # Static documentation build
+npm run workbench:typecheck  # Library + documentation TypeScript
+npm run workbench:check      # Public API and content coverage
 ```
 
-It auto-discovers every file in `workbench/demos/` — adding a new demo is as simple as creating `workbench/demos/{ComponentName}.vue`. No registration needed.
+### Documentation structure
 
-### Adding a Demo
+- `workbench/content/components/{Name}.ts`: one readable authored article per component family.
+- `workbench/content/guides/` and `workbench/content/tools/`: one file per guide or tool article.
+- `workbench/examples/{Page}/{Example}.vue`: runnable examples, one file each, listed in the page's article.
+- `workbench/docs/registry.ts`: categories, pages and public export coverage.
+- `workbench/docs/search.ts`: global Command search (click or ⌘K / Ctrl+K); name matches must always precede content matches.
+- `workbench/tooling/catalog.ts`: generates API references from source types and public entry points.
+- `workbench/components/`: shared documentation layout, code, preview and API presentation.
 
-When working on any Ui component, always check whether a demo file exists in `workbench/demos/`. If it does not, create one. The demo should cover:
-- All variants and sizes
-- Interactive states (disabled, loading, error…)
-- A realistic usage example
+Use actual Rosalana UI components for the documentation interface wherever appropriate. Keep layout CSS and syntax colors workbench-only; use the library semantic tokens for the surrounding UI. Do not create a competing button/input/card design system.
+
+### Adding Examples
+
+Every example is one self-contained SFC in `workbench/examples/{Page}/{Example}.vue`. The page renders the file as the live preview and shows the whole file (with its `<script setup>`) as the code, so it must be complete, copy-paste ready app code that imports only from `@rosalana/ui` (and `vue`, `@inertiajs/vue3`, …). When the preview has to simulate something the docs can't run (a request, an Inertia visit, a form submit), the real code goes into `{Example}.code.vue` next to it and the Code tab shows that file instead.
+
+The page's article (`workbench/content/components/{Name}.ts` or `workbench/content/tools/{name}.ts`) lists the examples (`file`, `title`, `description`, `preview: "center" | "fill" | "flush"`, `overflow`) and holds the prose: the Usage text and `sections` that explain how the component works in more detail. A page shows Usage, the sections, the examples and the generated API reference. Every preview is centered by default and has a Reset button that mounts the example again.
+
+What examples must do:
+- Show exactly the behavior of the component, in all its variants and sizes (`workbench:check` enforces every `variant`/`size` value), and its important props, slots and states.
+- Never add functionality beyond what the component does.
+- Show interaction with other components when it matters (a Label with an Input, toasts next to a dock).
+- Be prepared demos of real use cases, not playgrounds where the reader simulates the use case by hand.
+- Keep live state readouts inside the example they belong to — never a separate "State" example.
+- Prefer fewer, meaningful examples over one per prop.
 
 ### Component Status
 
-Every Ui component has an implementation status tracked in `workbench/componentStatus.ts`. The workbench sidebar shows a colored dot next to each component name.
+Every Ui component has an implementation status tracked in `workbench/componentStatus.ts`. Component pages and catalog cards show the implementation status. All previews remain live regardless of status; the status is informational in the workbench.
 
 | Status | Dot | Meaning |
 |--------|-----|---------|
 | **Done** | 🟢 green | Fully implemented according to Rosalana UI standards. Safe to use in any app. |
 | **Untouched** | 🟠 orange | Usable but either has a known minor issue or was never reviewed against UI standards. Warn the developer and double-check before relying on it. |
-| **Not implemented** | — none | Copied from shadcn/reka-ui without Rosalana styling. **Do not use.** If a developer asks to use this component, block the request and explain it must be implemented to standard first. |
+| **Not implemented** | hollow dot | Copied from shadcn/reka-ui without Rosalana styling. **Do not use.** If a developer asks to use this component, block the request and explain it must be implemented to standard first. |
 
 When you finish implementing a component to Rosalana standards, add its name to the `DONE` array in `workbench/componentStatus.ts`. Remove it from `UNTOUCHED` if it was there.
 
