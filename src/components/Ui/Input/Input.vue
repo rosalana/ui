@@ -6,6 +6,11 @@ import { UiButton, UiIcon } from "../../index";
 import { AnimatePresence, motion } from "motion-v";
 import { applyModelModifiers, type ModelModifiers } from "../../../helpers";
 
+// `class` sizes and places the whole field, so it goes on the wrapper that also holds the icon.
+const root = tv({
+  base: "relative w-full",
+});
+
 const input = tv({
   base: [
     "flex h-9 w-full rounded-xl border border-border bg-background text-foreground px-3 py-1 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-theme focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
@@ -149,7 +154,7 @@ const activeState = computed(() => {
 </script>
 
 <template>
-  <div class="relative w-full">
+  <div :class="root({ class: props.class })">
     <input
       v-bind="$attrs"
       :ref="forwardRef"
@@ -174,7 +179,7 @@ const activeState = computed(() => {
       :max="max"
       :step="step"
       :pattern="pattern"
-      :class="[input({ variant, class: props.class })]"
+      :class="[input({ variant })]"
       @input="handleInput"
       @change="handleChange"
     />
