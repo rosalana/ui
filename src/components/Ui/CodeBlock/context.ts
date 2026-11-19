@@ -1,10 +1,12 @@
-import type { ComputedRef, InjectionKey } from "vue";
+import type { ComputedRef, InjectionKey, Slot } from "vue";
 
 export interface CodeBlockGroupItem {
   value: string;
   label: string;
   /** Code to copy while the item is shown, none for a preview. */
   code?: () => string;
+  /** Actions of a preview, shown in the header while it is the shown item. */
+  actions?: () => Slot | undefined;
 }
 
 export interface CodeBlockGroupContext {

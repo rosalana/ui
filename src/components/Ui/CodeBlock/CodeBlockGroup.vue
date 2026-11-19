@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, provide, ref } from "vue";
+import { computed, provide, ref, type FunctionalComponent, type Slot } from "vue";
 import { tv, type ClassValue } from "tailwind-variants";
 import { useVModel } from "@vueuse/core";
 import UiToggleGroup from "../ToggleGroup/ToggleGroup.vue";
@@ -49,9 +49,14 @@ const current = computed(() =>
 
 provide(codeBlockGroupKey, { current, items, register });
 
-const activeCode = computed(() =>
-  items.value.find((i) => i.value === current.value)?.code?.(),
+const activeItem = computed(() =>
+  items.value.find((i) => i.value === current.value),
 );
+const activeCode = computed(() => activeItem.value?.code?.());
+const activeActions = computed(() => activeItem.value?.actions?.());
+
+/** Renders a preview's actions slot here in the header, in the preview's own scope. */
+const Actions: FunctionalComponent<{ slot: Slot }> = (props) => props.slot();
 </script>
 
 <template>
@@ -78,7 +83,10 @@ const activeCode = computed(() =>
         </UiToggleGroupItem>
       </UiToggleGroup>
 
-      <CodeBlockCopy v-if="activeCode !== undefined" :code="activeCode" />
+      <div class="flex items-center gap-1">
+        <Actions v-if="activeActions" :slot="activeActions" />
+        <CodeBlockCopy v-if="activeCode !== undefined" :code="activeCode" />
+      </div>
     </div>
 
     <slot />

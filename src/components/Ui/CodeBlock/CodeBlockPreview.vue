@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, provide } from "vue";
+import { computed, inject, onBeforeUnmount, provide, useSlots } from "vue";
 import { tv, type ClassValue } from "tailwind-variants";
 import { useLocale } from "../../../composables/useLocale";
 import { codeBlockGroupKey } from "./context";
 
 const preview = tv({
-  base: "flex min-h-32 flex-wrap items-center justify-center gap-4 p-6",
+  base: "relative flex min-h-32 flex-wrap items-center justify-center gap-4 p-6",
 });
 
 interface Props {
@@ -20,6 +20,13 @@ const props = withDefaults(defineProps<Props>(), {
   value: "preview",
 });
 
+defineSlots<{
+  default?: () => unknown;
+  /** Buttons for the preview, e.g. a reset. In a group they sit in the header next to the copy button. */
+  actions?: () => unknown;
+}>();
+const slots = useSlots();
+
 const { t } = useLocale();
 
 const group = inject(codeBlockGroupKey, null);
@@ -28,6 +35,7 @@ if (group) {
   const unregister = group.register({
     value: props.value,
     label: props.label ?? t("codeBlock.preview"),
+    actions: () => slots.actions,
   });
   onBeforeUnmount(unregister);
 }
@@ -46,5 +54,12 @@ provide(codeBlockGroupKey, null);
     :class="preview({ class: props.class })"
   >
     <slot />
+    <div
+      v-if="!group && $slots.actions"
+      data-slot="code-block-preview-actions"
+      class="absolute top-2 right-2 flex items-center gap-1"
+    >
+      <slot name="actions" />
+    </div>
   </div>
 </template>
