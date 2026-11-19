@@ -13,7 +13,7 @@ const textarea = tv({
   variants: {
     variant: {
       default: "",
-      error: "border-destructive focus-visible:ring-destructive",
+      destructive: "border-destructive focus-visible:ring-destructive",
     },
   },
   defaultVariants: {
