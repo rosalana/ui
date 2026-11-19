@@ -23,6 +23,7 @@ export const DONE: string[] = [
   "Command",
   "DateInput",
   "Dialog",
+  "Dock",
   "DropdownMenu",
   "DropFile",
   "Icon",
