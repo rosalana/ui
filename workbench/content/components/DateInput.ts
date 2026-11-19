@@ -9,7 +9,7 @@ export default {
     section(
       "model",
       "The model",
-      "The v-model is always an ISO string, or null while the field is empty, so it goes to and from a backend as is. The shape follows the props: date alone gives 2026-11-21, date with time gives 2026-11-21T14:30, time with :date=\"false\" gives 14:30, and seconds adds :ss. With range the model is { start, end }, each end a string or null. Strings with a zone, like 2026-11-21T14:30:00Z, are read and shown in the user's local time; the field writes back local times without a zone, so convert at the application boundary if your backend wants UTC.",
+      "The v-model is always an ISO string, or null while the field is empty, so it goes to and from a backend as is. The shape follows the props: date alone gives 2026-11-21, date with time gives 2026-11-21T14:30, time with :date=\"false\" gives 14:30, and seconds adds :ss. With range the model is { start, end }, each end a string or null. A date and time with a zone, like the UTC 2026-11-21T14:30:00Z a backend sends, shows as clock time in the app's time zone (see useDate) and goes back as UTC, 2026-11-21T15:30:00.000Z: what comes from the server in UTC returns in UTC. The same value written differently (microseconds, no milliseconds) is not reported as a change. A value without a zone stays clock time.",
       `const kickoff = ref<string | null>("2026-11-21T14:30");
 // <UiDateInput v-model="kickoff" time />
 
