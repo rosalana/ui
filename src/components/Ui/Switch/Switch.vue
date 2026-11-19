@@ -32,26 +32,27 @@ interface Props extends SwitchRootProps {
   class?: ClassValue;
 }
 
-const props = defineProps<Props>();
+// `modelValue: undefined`, or Vue would cast a missing value to `false` and the switch
+// would no longer toggle on its own.
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: undefined,
+});
 const emit = defineEmits<SwitchRootEmits>();
 
 const forwarded = useForwardPropsEmits(props, emit);
-
-const checked = defineModel<boolean>();
 </script>
 
 <template>
   <SwitchRoot
+    v-slot="{ modelValue }"
     data-slot="switch"
     v-bind="forwarded"
     :class="[switchRoot({ class: props.class })]"
-    @update:model-value="(v) => (checked = v)"
-    :model-value="checked"
   >
     <SwitchThumb :class="switchThumb()" as-child>
       <motion.div
         :animate="
-          checked
+          modelValue === (props.trueValue ?? true)
             ? { transform: 'translateX(16px)' }
             : { transform: 'translateX(2px)' }
         "
