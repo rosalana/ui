@@ -307,6 +307,9 @@ export { default as UiTextarea } from "./Ui/Textarea/Textarea.vue";
 export { default as UiToggle } from "./Ui/Toggle/Toggle.vue";
 
 // ToggleGroup
+export { default as UiCodeBlock } from "./Ui/CodeBlock/CodeBlock.vue";
+export { default as UiCodeBlockGroup } from "./Ui/CodeBlock/CodeBlockGroup.vue";
+export { default as UiCodeBlockPreview } from "./Ui/CodeBlock/CodeBlockPreview.vue";
 export { default as UiToggleGroup } from "./Ui/ToggleGroup/ToggleGroup.vue";
 export { default as UiToggleGroupItem } from "./Ui/ToggleGroup/ToggleGroupItem.vue";
 

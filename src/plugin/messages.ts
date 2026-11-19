@@ -8,6 +8,11 @@ import { localeLanguage, matchLocale, normalizeLocale } from "../helpers/locale"
  * the language uses: English `one|other`, Czech `one|few|many|other`. A missing form uses the last.
  */
 const en = {
+  "codeBlock.copy": "Copy code",
+  "codeBlock.copied": "Copied",
+  "codeBlock.preview": "Preview",
+  "codeBlock.code": "Code",
+
   "command.title": "Command palette",
   "command.description": "Search for an action and select a result.",
   close: "Close",
@@ -144,6 +149,11 @@ const en = {
 
 /** Czech texts of the components. Plural forms go `one|few|many|other`. */
 const cs: UiMessages = {
+  "codeBlock.copy": "Kopírovat kód",
+  "codeBlock.copied": "Zkopírováno",
+  "codeBlock.preview": "Náhled",
+  "codeBlock.code": "Kód",
+
   "command.title": "Paleta příkazů",
   "command.description": "Vyhledejte akci a vyberte výsledek.",
   close: "Zavřít",
