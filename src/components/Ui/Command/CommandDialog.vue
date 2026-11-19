@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useEventListener } from "@vueuse/core";
+import { useEventListener, useVModel } from "@vueuse/core";
 import type { DialogRootEmits, DialogRootProps } from "reka-ui";
-import { useForwardPropsEmits } from "reka-ui";
 import { useLocale } from "../../../composables/useLocale";
+import { defineShortcuts } from "../../../composables/useShortcuts";
 import UiDialog from "../Dialog/Dialog.vue";
 import UiDialogContent from "../Dialog/DialogContent.vue";
 import UiDialogTitle from "../Dialog/DialogTitle.vue";
@@ -16,15 +15,29 @@ interface Props extends DialogRootProps {
   title?: string;
   description?: string;
 }
-const props = defineProps<Props>();
+// `open: undefined`, or Vue would cast a missing `open` to `false` and `defaultOpen` would never apply.
+const props = withDefaults(defineProps<Props>(), {
+  open: undefined,
+  defaultOpen: false,
+  modal: true,
+});
 const emit = defineEmits<DialogRootEmits>();
-const rootProps = computed(() => ({
-  open: props.open,
-  defaultOpen: props.defaultOpen,
-  modal: props.modal,
-}));
-const forwarded = useForwardPropsEmits(rootProps, emit);
 const { t } = useLocale();
+
+// Works with `v-model:open` as well as with `defaultOpen` only.
+const open = useVModel(props, "open", emit, {
+  passive: true,
+  defaultValue: props.defaultOpen,
+});
+
+// The list's own dismissable layer catches Escape before the dialog does.
+defineShortcuts({
+  escape: {
+    usingInput: true,
+    whenever: [() => !!open.value],
+    handler: () => (open.value = false),
+  },
+});
 /**
  * Reka focus scopes of the dialog and of the list take the focus on their own
  * container (`tabindex="-1"`), e.g. when the results change while typing. In a
@@ -57,7 +70,12 @@ useEventListener("focusin", (event) => {
 });
 </script>
 <template>
-  <UiDialog data-slot="command-dialog" v-bind="forwarded">
+  <UiDialog
+    data-slot="command-dialog"
+    :open="open"
+    :modal="modal"
+    @update:open="open = $event"
+  >
     <!-- Anchored near the top so the palette does not jump while results are filtered -->
     <UiDialogContent
       @open-auto-focus="onOpenAutoFocus"
