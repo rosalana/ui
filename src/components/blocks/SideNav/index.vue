@@ -46,6 +46,7 @@ const mobileOpen = ref(false);
   <aside
     data-slot="side-nav"
     class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-border/60 bg-background md:flex"
+    :class="props.class"
   >
     <div class="flex h-16 shrink-0 items-center border-b border-border/60 px-4">
       <slot name="brand" />
