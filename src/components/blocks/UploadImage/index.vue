@@ -625,14 +625,18 @@ const previewCard = `${surface} border border-border`;
             >
               <UiIcon :name="icon" class="size-6" />
             </motion.div>
-            <p v-if="title !== ''" class="mt-4 text-sm font-medium" v-html="title ?? t('uploadImage.title')" />
-            <p
-              class="text-theme mt-1 text-xs"
-              v-html="
+            <!-- Plain text, never HTML: a title may come from user input. -->
+            <p v-if="title !== ''" class="mt-4 text-sm font-medium">
+              {{ title ?? t("uploadImage.title") }}
+            </p>
+            <p class="text-theme mt-1 text-xs">
+              {{
                 subtext ??
-                (maxSize ? t('uploadImage.maxSize', { size: formatSize(maxSize) }) : t('uploadImage.subtext'))
-              "
-            />
+                (maxSize
+                  ? t("uploadImage.maxSize", { size: formatSize(maxSize) })
+                  : t("uploadImage.subtext"))
+              }}
+            </p>
           </div>
         </motion.div>
       </AnimatePresence>

@@ -173,21 +173,24 @@ const { t } = useLocale();
               <Icon data-slot="dropfile-icon" :name="icon" class="size-6" />
             </motion.div>
           </slot>
+          <!-- Plain text, never HTML: a title may come from user input. Markup goes in the slot. -->
           <slot name="title" :is-over-drop-zone="isOverDropZone">
             <p
               v-if="title !== ''"
               data-slot="dropfile-title"
               class="mt-4 text-sm font-medium"
-              v-html="title ?? t('dropFile.title')"
-            />
+            >
+              {{ title ?? t("dropFile.title") }}
+            </p>
           </slot>
           <slot name="subtext" :is-over-drop-zone="isOverDropZone">
             <p
               v-if="subtext !== ''"
               data-slot="dropfile-subtext"
               class="text-theme mt-1 text-xs"
-              v-html="subtext ?? t('dropFile.subtext')"
-            />
+            >
+              {{ subtext ?? t("dropFile.subtext") }}
+            </p>
           </slot>
         </div>
       </slot>
