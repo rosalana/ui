@@ -9,7 +9,6 @@ import type {
 import Sonner from "../../components/Ui/Sonner/Sonner.vue";
 
 export type {
-  SonnerAction,
   SonnerConfig,
   SonnerId,
   SonnerMessage,

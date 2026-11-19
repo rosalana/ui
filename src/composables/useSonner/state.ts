@@ -25,13 +25,6 @@ export type SonnerPosition =
 
 export type SonnerId = string | number;
 
-export interface SonnerAction {
-  /** Text of the action button. */
-  label: string;
-  /** Called when the action is clicked. The toast is dismissed afterwards. */
-  onClick?: (event: MouseEvent) => void;
-}
-
 export interface SonnerOptions {
   /** Custom id. Showing a toast with an existing id updates it in place. */
   id?: SonnerId;
@@ -43,8 +36,6 @@ export interface SonnerOptions {
   duration?: number;
   /** Whether the user can close the toast (close button, swipe). Defaults to `true`. */
   dismissible?: boolean;
-  /** Optional action button. */
-  action?: SonnerAction;
   /** Called when the toast is closed by the user or by `dismiss()`. */
   onDismiss?: (toast: SonnerToast) => void;
   /** Called when the toast closes after its duration ran out. */

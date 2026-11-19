@@ -78,16 +78,6 @@ function savePromise(fail: boolean) {
     <Section title="Options" class="flex flex-wrap gap-2">
       <UiButton
         variant="outline"
-        @click="
-          sonner.default('Message archived', {
-            action: { label: 'Undo', onClick: () => sonner.success('Restored') },
-          })
-        "
-      >
-        With action
-      </UiButton>
-      <UiButton
-        variant="outline"
         @click="sonner.info({ title: 'Stays until closed', duration: Infinity })"
       >
         Persistent

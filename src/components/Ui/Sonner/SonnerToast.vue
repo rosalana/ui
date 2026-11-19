@@ -8,7 +8,6 @@ import { useResizeObserver } from "@vueuse/core";
 import { autoClose, dismiss, state } from "../../../composables/useSonner/state";
 import type { SonnerToast } from "../../../composables/useSonner/state";
 import UiIcon from "../Icon/Icon.vue";
-import UiButton from "../Button/Button.vue";
 
 /** Horizontal drag distance after which the toast is dismissed. */
 const SWIPE_THRESHOLD = 80;
@@ -123,11 +122,6 @@ function close() {
   if (dismissible.value) dismiss(props.toast.id);
 }
 
-function onAction(event: MouseEvent) {
-  props.toast.action?.onClick?.(event);
-  dismiss(props.toast.id);
-}
-
 function onDragEnd(_event: PointerEvent, info: PanInfo) {
   if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) close();
 }
@@ -196,15 +190,6 @@ const { t } = useLocale();
           {{ toast.description }}
         </p>
       </div>
-
-      <UiButton
-        v-if="toast.action"
-        size="xs"
-        class="shrink-0"
-        @click="onAction"
-      >
-        {{ toast.action.label }}
-      </UiButton>
     </div>
 
     <button
