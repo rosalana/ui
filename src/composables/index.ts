@@ -14,4 +14,4 @@ export * from "./useAuth";
 export * from "./useShortcuts";
 export * from "./useColorConverter";
 export * from "./useSelect";
-export * from "./useLocale";
+export * from "./useLocale";export * from "./useDate";

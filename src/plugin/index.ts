@@ -7,5 +7,6 @@ export { createColor, useColorCSS } from "./colors";
 export { accessGlobal } from "./virtual";
 export { addLocalIcons, LOCAL_ICON_PREFIX } from "./icons";
 export { currentLocale, currentMessages, setLocale, setMessages } from "./locale";
+export { currentTimeZone, setTimeZone } from "./timeZone";
 export { messages, translate } from "./messages";
 export type { UiMessages, UiMessageKey, UiMessagesConfig, UiMessageParams } from "./messages";

@@ -9,6 +9,7 @@ export default function buildContext(config: CreateRosalanaUIOptions) {
     colors,
     locale,
     messages,
+    timeZone,
     // motion,
     adapters,
     preferences,
@@ -47,6 +48,10 @@ function locale(config: CreateRosalanaUIOptions): RosalanaUIContext["locale"] {
 
 function messages(config: CreateRosalanaUIOptions): RosalanaUIContext["messages"] {
   return config.messages || {};
+}
+
+function timeZone(config: CreateRosalanaUIOptions): RosalanaUIContext["timeZone"] {
+  return config.timeZone || null;
 }
 
 // function motion(config: CreateRosalanaUIOptions): RosalanaUIContext["motion"] {

@@ -140,6 +140,13 @@ export type CreateRosalanaUIOptions = {
   locale?: string;
   /** Texts of the components by locale (`cs`, `cs_CZ`), on top of the built-in English. */
   messages?: UiMessagesConfig;
+  /**
+   * Time zone dates show in, an IANA name (`Europe/Prague`), usually the user's from the backend.
+   * Set, the server and the browser format dates the same. Without it dates show in the browser's
+   * zone, known only in the browser: the server and the first render use UTC until mounted.
+   * Values sent to the server stay in UTC. Change it at runtime with `setTimeZone()`.
+   */
+  timeZone?: string;
   /** Default configuration of toasts shown via `useSonner()` */
   sonner?: Partial<SonnerConfig>;
   /**
@@ -166,10 +173,12 @@ export type CreateRosalanaUIOptions = {
   } & Record<string, Adapter<any>["update"]>;
 };
 
-export type RosalanaUIContext = CreateRosalanaUIOptions & {
+export type RosalanaUIContext = Omit<CreateRosalanaUIOptions, "timeZone"> & {
   /** BCP 47 tag, always set. */
   locale: string;
   messages: UiMessagesConfig;
+  /** The time zone the app set, `null` for the browser's. */
+  timeZone: string | null;
   preferences: Preferences | null;
   user: User | null;
   permissions: Permissions | null;
