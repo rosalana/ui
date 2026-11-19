@@ -25,7 +25,7 @@ export function useConfirm() {
         state.resolve = resolve;
       });
     },
-    match(options: string | MatchConfirmOptions, matchWord?: string) {
+    match(options: string | MatchConfirmOptions, matchWord?: string): Promise<boolean> {
       return new Promise((resolve) => {
         if (typeof options === "string") {
           state.options = {
@@ -48,7 +48,7 @@ export function useConfirm() {
     verify(
       options: string | VerifyConfirmOptions,
       verifyCallback?: VerifyConfirmOptions["callback"],
-    ) {
+    ): Promise<boolean> {
       return new Promise((resolve) => {
         if (typeof options === "string") {
           state.options = {
