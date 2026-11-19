@@ -1,6 +1,48 @@
 import { useLocale } from "../../src/composables/useLocale";
 // Documentation chrome lives in the workbench; it does not ship in the library.
 const en = {
+  overviewGuidesDescription:
+    "Set up the library, shape your theme and connect it to your application.",
+  overviewComponentsDescription:
+    "The building blocks of your interface. Explore every variant, interaction and API.",
+  overviewBlocksDescription:
+    "Complete patterns for everyday application screens, composed from our primitives.",
+  overviewComposablesDescription:
+    "Shared Vue behavior for tables, application state, localization and feedback.",
+  overviewHelpersDescription:
+    "Focused utilities for text, locale codes and input values. Small tools, ready to use.",
+  overviewPages: "Pages",
+  overviewCategories: "Categories",
+  overviewResults: "Results",
+  overviewFilter: "Filter this section…",
+  overviewFilterLabel: "Filter pages in this section",
+  overviewJumpTo: "Browse categories",
+  overviewStartWith: "A good place to start",
+  overviewReadPage: "Read documentation",
+  overviewEmptyTitle: "No pages found",
+  overviewEmptyDescription:
+    "Try a different name or clear the filter to see this section again.",
+  overviewBrowseDescription: "Find the right piece for what you’re building.",
+  overviewShowcaseTitle: "One shared visual language.",
+  overviewShowcaseDescription:
+    "Real components, working together. The same ones you’ll use in your app.",
+  overviewWorkspaceTitle: "Your creative space",
+  overviewWorkspaceDescription: "A home for your next idea.",
+  overviewWorkspaceName: "Workspace name",
+  overviewWorkspaceDefault: "A little room for big ideas",
+  overviewNotifications: "Keep me in the loop",
+  overviewNotificationsDescription: "A little update when something changes.",
+  overviewPersonal: "Personal",
+  overviewSave: "Save workspace",
+  overviewSaved: "Workspace saved",
+  overviewReset: "Reset",
+  overviewThemeLink: "Explore theming",
+  overviewPackageDescription:
+    "Vue components. Shared behavior. Your application’s identity.",
+  overviewFoundationTitle: "Make it yours from the start.",
+  overviewFoundationDescription:
+    "Choose a palette, connect your app and build with a consistent foundation.",
+  overviewTechnology: "Built with Vue 3, Tailwind CSS, Reka UI and Motion.",
   documentation: "Documentation",
   blocksSection: "Blocks",
   composables: "Composables",
@@ -107,6 +149,48 @@ const en = {
   locale: "Documentation language",
 } as const;
 const cs: Record<keyof typeof en, string> = {
+  overviewGuidesDescription:
+    "Nainstaluj knihovnu, nastav vzhled a propoj ji se svou aplikací.",
+  overviewComponentsDescription:
+    "Základní stavební prvky rozhraní. Prozkoumej varianty, chování a API.",
+  overviewBlocksDescription:
+    "Hotové vzory pro běžné obrazovky aplikací, složené z našich komponent.",
+  overviewComposablesDescription:
+    "Sdílená Vue logika pro tabulky, stav aplikace, lokalizaci a zpětnou vazbu.",
+  overviewHelpersDescription:
+    "Drobné nástroje pro text, kódy jazyků a vstupní hodnoty. Připravené k použití.",
+  overviewPages: "Stránky",
+  overviewCategories: "Kategorie",
+  overviewResults: "Výsledky",
+  overviewFilter: "Filtrovat v této sekci…",
+  overviewFilterLabel: "Filtrovat stránky v této sekci",
+  overviewJumpTo: "Procházet kategorie",
+  overviewStartWith: "Začni třeba tady",
+  overviewReadPage: "Otevřít dokumentaci",
+  overviewEmptyTitle: "Žádná stránka nenalezena",
+  overviewEmptyDescription:
+    "Zkus jiný název nebo vymaž filtr a zobraz celou sekci.",
+  overviewBrowseDescription: "Najdi správný nástroj pro to, co právě tvoříš.",
+  overviewShowcaseTitle: "Jeden společný vizuální jazyk.",
+  overviewShowcaseDescription:
+    "Skutečné komponenty, které spolu fungují. Stejné, jaké použiješ ve své aplikaci.",
+  overviewWorkspaceTitle: "Tvůj kreativní prostor",
+  overviewWorkspaceDescription: "Místo pro tvůj další nápad.",
+  overviewWorkspaceName: "Název prostoru",
+  overviewWorkspaceDefault: "Malý prostor pro velké nápady",
+  overviewNotifications: "Chci zůstat v obraze",
+  overviewNotificationsDescription: "Krátká zpráva, když se něco změní.",
+  overviewPersonal: "Osobní",
+  overviewSave: "Uložit prostor",
+  overviewSaved: "Prostor uložen",
+  overviewReset: "Obnovit",
+  overviewThemeLink: "Prozkoumat témata",
+  overviewPackageDescription:
+    "Vue komponenty. Sdílené chování. Osobnost tvé aplikace.",
+  overviewFoundationTitle: "Od začátku podle tebe.",
+  overviewFoundationDescription:
+    "Vyber paletu, propoj aplikaci a tvoř na společném základu.",
+  overviewTechnology: "Postaveno na Vue 3, Tailwind CSS, Reka UI a Motion.",
   documentation: "Dokumentace",
   blocksSection: "Bloky",
   composables: "Composables",
