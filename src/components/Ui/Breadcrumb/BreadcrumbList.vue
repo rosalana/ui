@@ -4,7 +4,7 @@ import { Primitive } from "reka-ui";
 import { tv , type ClassValue } from "tailwind-variants";
 
 const breadcrumbList = tv({
-  base: "flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5",
+  base: "flex flex-wrap items-center gap-1.5 break-words text-sm text-theme sm:gap-2.5",
 });
 
 interface Props extends PrimitiveProps {

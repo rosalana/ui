@@ -4,7 +4,7 @@ import { Primitive } from "reka-ui";
 import { tv , type ClassValue } from "tailwind-variants";
 
 const cardDescription = tv({
-  base: "text-sm text-muted-foreground",
+  base: "text-sm text-theme",
 });
 
 interface Props extends PrimitiveProps {

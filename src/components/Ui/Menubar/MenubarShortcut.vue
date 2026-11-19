@@ -2,7 +2,7 @@
 import { tv , type ClassValue } from "tailwind-variants";
 
 const menubarShortcut = tv({
-  base: "ml-auto text-xs tracking-widest text-muted-foreground",
+  base: "ml-auto text-xs tracking-widest text-theme",
 });
 
 interface Props {

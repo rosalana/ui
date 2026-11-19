@@ -77,7 +77,7 @@ const mobileOpen = ref(false);
               <motion.span
                 :animate="{ rotate: (openSections[item.title] ?? sectionHasActive(item.children)) ? 180 : 0 }"
                 :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
-                class="inline-flex text-muted-foreground"
+                class="inline-flex text-theme"
               >
                 <UiIcon name="lucide:chevron-down" class="size-4" />
               </motion.span>
@@ -107,7 +107,7 @@ const mobileOpen = ref(false);
                     {{ child.tag }}
                   </span>
                 </div>
-                <p v-if="child.description" class="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                <p v-if="child.description" class="mt-0.5 line-clamp-2 text-xs text-theme">
                   {{ child.description }}
                 </p>
               </Link>
@@ -207,7 +207,7 @@ const mobileOpen = ref(false);
                   <motion.span
                     :animate="{ rotate: (openSections[item.title] ?? sectionHasActive(item.children)) ? 180 : 0 }"
                     :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
-                    class="inline-flex text-muted-foreground"
+                    class="inline-flex text-theme"
                   >
                     <UiIcon name="lucide:chevron-down" class="size-4" />
                   </motion.span>
@@ -238,7 +238,7 @@ const mobileOpen = ref(false);
                         {{ child.tag }}
                       </span>
                     </div>
-                    <p v-if="child.description" class="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                    <p v-if="child.description" class="mt-0.5 line-clamp-2 text-xs text-theme">
                       {{ child.description }}
                     </p>
                   </Link>

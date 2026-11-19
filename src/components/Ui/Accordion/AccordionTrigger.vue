@@ -44,7 +44,7 @@ const isOpen = computed(() => itemContext.open.value);
       <motion.span
         :animate="{ rotate: isOpen ? 180 : 0 }"
         :transition="{ type: 'spring', stiffness: 400, damping: 25 }"
-        class="inline-flex shrink-0 text-muted-foreground"
+        class="inline-flex shrink-0 text-theme"
       >
         <UiIcon name="lucide:chevron-down" class="size-4" />
       </motion.span>

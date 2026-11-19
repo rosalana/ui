@@ -40,7 +40,7 @@ const { t } = useLocale();
         >
           <HeaderRender :column="column" :context="null" />
         </UiDropdownMenuCheckboxItem>
-        <div v-else class="p-2 text-sm text-muted-foreground">
+        <div v-else class="p-2 text-sm text-theme">
           {{ t('table.allColumnsFixed') }}
         </div>
       </UiDropdownMenuContent>

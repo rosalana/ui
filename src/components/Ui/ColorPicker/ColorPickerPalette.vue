@@ -25,7 +25,7 @@ const { t } = useLocale();
 <template>
   <div class="flex shrink-0 flex-col">
     <p
-      class="shrink-0 border-b border-border px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
+      class="shrink-0 border-b border-border px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-theme"
     >
       {{ t('colorPicker.palettes') }}
     </p>

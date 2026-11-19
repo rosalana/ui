@@ -4,7 +4,7 @@ import { TabsList, useForwardProps } from "reka-ui";
 import { tv , type ClassValue } from "tailwind-variants";
 
 const tabsList = tv({
-  base: "inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+  base: "inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-theme",
 });
 
 interface Props extends TabsListProps {

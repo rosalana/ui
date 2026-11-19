@@ -81,7 +81,7 @@ const { isActive } = useActiveRoute();
                         </div>
                         <p
                           v-if="child.description"
-                          class="line-clamp-2 text-xs leading-relaxed text-muted-foreground"
+                          class="line-clamp-2 text-xs leading-relaxed text-theme"
                         >
                           {{ child.description }}
                         </p>
@@ -176,7 +176,7 @@ const { isActive } = useActiveRoute();
                       stiffness: 400,
                       damping: 25,
                     }"
-                    class="inline-flex text-muted-foreground"
+                    class="inline-flex text-theme"
                   >
                     <UiIcon name="lucide:chevron-down" class="size-4" />
                   </motion.span>

@@ -2,7 +2,7 @@
 import { tv , type ClassValue } from "tailwind-variants";
 
 const tableCaption = tv({
-  base: "mt-4 text-sm text-muted-foreground",
+  base: "mt-4 text-sm text-theme",
 });
 
 interface Props {
