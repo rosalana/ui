@@ -8,6 +8,8 @@ import { localeLanguage, matchLocale, normalizeLocale } from "../helpers/locale"
  * the language uses: English `one|other`, Czech `one|few|many|other`. A missing form uses the last.
  */
 const en = {
+  "command.title": "Command palette",
+  "command.description": "Search for an action and select a result.",
   close: "Close",
   more: "More",
 
@@ -142,6 +144,8 @@ const en = {
 
 /** Czech texts of the components. Plural forms go `one|few|many|other`. */
 const cs: UiMessages = {
+  "command.title": "Paleta příkazů",
+  "command.description": "Vyhledejte akci a vyberte výsledek.",
   close: "Zavřít",
   more: "Více",
 
