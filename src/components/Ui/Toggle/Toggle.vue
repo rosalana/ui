@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ToggleProps } from "reka-ui";
-import { Toggle, useForwardProps } from "reka-ui";
-import { tv, type VariantProps , type ClassValue } from "tailwind-variants";
+import type { ToggleEmits, ToggleProps } from "reka-ui";
+import { Toggle, useForwardPropsEmits } from "reka-ui";
+import { tv, type VariantProps, type ClassValue } from "tailwind-variants";
 
 const toggle = tv({
   base: [
@@ -81,7 +81,8 @@ const props = withDefaults(defineProps<Props>(), {
   size: "default",
 });
 
-const forwarded = useForwardProps(props);
+const emit = defineEmits<ToggleEmits>();
+const forwarded = useForwardPropsEmits(props, emit);
 </script>
 
 <template>
