@@ -1,8 +1,8 @@
 import { accessGlobal } from "../../plugin/virtual";
-import { configure, dismiss, push } from "./state";
+import { configure, dismiss, normalize, push } from "./state";
 import type {
   SonnerId,
-  SonnerMessage,
+  SonnerInput,
   SonnerOptions,
   SonnerType,
 } from "./state";
@@ -11,6 +11,7 @@ import Sonner from "../../components/Ui/Sonner/Sonner.vue";
 export type {
   SonnerConfig,
   SonnerId,
+  SonnerInput,
   SonnerMessage,
   SonnerOptions,
   SonnerPosition,
@@ -20,9 +21,6 @@ export type {
 
 // Auto-register the toaster into the virtual layer once.
 accessGlobal(Sonner);
-
-/** A message given either as a title or as a full message object. */
-export type SonnerInput = string | SonnerMessage;
 
 type PromiseMessage<T> = SonnerInput | ((value: T) => SonnerInput);
 
@@ -35,15 +33,6 @@ export interface SonnerPromiseOptions<T> {
   error: PromiseMessage<unknown>;
   /** Called once the promise settles. */
   finally?: () => void;
-}
-
-function normalize(
-  input: SonnerInput,
-  options?: SonnerOptions,
-): SonnerMessage {
-  return typeof input === "string"
-    ? { ...options, title: input }
-    : { ...input, ...options };
 }
 
 function show(type: SonnerType) {

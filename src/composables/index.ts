@@ -1,5 +1,6 @@
 export * from "./useConfirm";
 export * from "./useSonner";
+export * from "./useDock";
 export * from "./useTableColumns";
 export * from "./useTable";
 export * from "./useRemoteTable";

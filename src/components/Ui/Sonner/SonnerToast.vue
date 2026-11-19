@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import { useLocale } from "../../../composables/useLocale";
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { AnimatePresence, motion } from "motion-v";
 import type { PanInfo } from "motion-v";
 import { tv } from "tailwind-variants";
 import { useResizeObserver } from "@vueuse/core";
-import { autoClose, dismiss, state } from "../../../composables/useSonner/state";
-import type { SonnerToast } from "../../../composables/useSonner/state";
+import {
+  autoClose,
+  dismiss,
+  runDockAction,
+  state,
+} from "../../../composables/useSonner/state";
+import type {
+  DockAction,
+  SonnerDock,
+  SonnerToast,
+} from "../../../composables/useSonner/state";
 import UiIcon from "../Icon/Icon.vue";
+import UiButton from "../Button/Button.vue";
 
 /** Horizontal drag distance after which the toast is dismissed. */
 const SWIPE_THRESHOLD = 80;
 
 const props = defineProps<{
-  toast: SonnerToast;
+  toast: SonnerToast | SonnerDock;
   index: number;
   count: number;
   top: boolean;
@@ -37,24 +47,32 @@ const icon = tv({
       warning: "bg-warning/10 text-warning-600 dark:text-warning-400",
       error: "bg-destructive/10 text-destructive-600 dark:text-destructive-400",
       loading: "bg-muted text-theme",
+      dock: "bg-muted text-foreground",
     },
   },
 });
 
-const DEFAULT_ICONS: Record<SonnerToast["type"], string | null> = {
+const DEFAULT_ICONS: Record<(SonnerToast | SonnerDock)["type"], string | null> = {
   default: null,
   info: "lucide:info",
   success: "lucide:check-circle",
   warning: "lucide:alert-triangle",
   error: "lucide:alert-circle",
   loading: "lucide:loader",
+  dock: null,
 };
 
 const iconName = computed(
   () => props.toast.icon ?? DEFAULT_ICONS[props.toast.type],
 );
 const isFront = computed(() => props.index === 0);
-const dismissible = computed(() => props.toast.dismissible !== false);
+const dock = computed(() =>
+  props.toast.type === "dock" ? props.toast : null,
+);
+// A dock goes away only when its condition does.
+const dismissible = computed(
+  () => !dock.value && (props.toast as SonnerToast).dismissible !== false,
+);
 const contentVisible = computed(() => isFront.value || props.expanded);
 
 // Measure the natural height so the stack can lay toasts out.
@@ -86,7 +104,7 @@ let startedAt = 0;
 let remaining = 0;
 
 const duration = () =>
-  props.toast.type === "loading"
+  props.toast.type === "loading" || props.toast.type === "dock"
     ? Infinity
     : (props.toast.duration ?? state.config.duration);
 
@@ -122,6 +140,19 @@ function close() {
   if (dismissible.value) dismiss(props.toast.id);
 }
 
+// By index, the dock content is rebuilt on every change of its condition.
+const running = reactive(new Set<number>());
+
+async function onAction(action: DockAction, index: number) {
+  if (!dock.value) return;
+  running.add(index);
+  try {
+    await runDockAction(dock.value, action);
+  } finally {
+    running.delete(index);
+  }
+}
+
 function onDragEnd(_event: PointerEvent, info: PanInfo) {
   if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) close();
 }
@@ -131,7 +162,7 @@ const { t } = useLocale();
 
 <template>
   <motion.li
-    data-slot="sonner-toast"
+    :data-slot="dock ? 'sonner-dock' : 'sonner-toast'"
     :data-type="toast.type"
     :data-front="isFront || undefined"
     :role="toast.type === 'error' ? 'alert' : 'status'"
@@ -157,38 +188,58 @@ const { t } = useLocale();
     <div
       ref="content"
       :class="[
-        'flex items-center gap-3 p-4 transition-opacity duration-200',
+        'p-4 transition-opacity duration-200',
         contentVisible ? 'opacity-100' : 'pointer-events-none opacity-0',
       ]"
     >
-      <AnimatePresence mode="wait" :initial="false">
-        <motion.span
-          v-if="iconName"
-          :key="`${toast.type}-${iconName}`"
-          :class="icon({ type: toast.type })"
-          :initial="{ opacity: 0, scale: 0.6 }"
-          :animate="{ opacity: 1, scale: 1 }"
-          :exit="{ opacity: 0, scale: 0.6 }"
-          :transition="{ type: 'spring', stiffness: 500, damping: 25 }"
-        >
-          <UiIcon
-            :name="iconName"
-            :class="toast.type === 'loading' ? 'animate-spin' : undefined"
-          />
-        </motion.span>
-      </AnimatePresence>
+      <div class="flex items-center gap-3">
+        <AnimatePresence mode="wait" :initial="false">
+          <motion.span
+            v-if="iconName"
+            :key="`${toast.type}-${iconName}`"
+            :class="icon({ type: toast.type })"
+            :initial="{ opacity: 0, scale: 0.6 }"
+            :animate="{ opacity: 1, scale: 1 }"
+            :exit="{ opacity: 0, scale: 0.6 }"
+            :transition="{ type: 'spring', stiffness: 500, damping: 25 }"
+          >
+            <UiIcon
+              :name="iconName"
+              :class="toast.type === 'loading' ? 'animate-spin' : undefined"
+            />
+          </motion.span>
+        </AnimatePresence>
 
-      <div class="min-w-0 flex-1">
-        <p data-slot="sonner-title" class="text-sm font-medium leading-snug">
-          {{ toast.title }}
-        </p>
-        <p
-          v-if="toast.description"
-          data-slot="sonner-description"
-          class="mt-0.5 text-xs leading-snug text-theme"
+        <div class="min-w-0 flex-1">
+          <p data-slot="sonner-title" class="text-sm font-medium leading-snug">
+            {{ toast.title }}
+          </p>
+          <p
+            v-if="toast.description"
+            data-slot="sonner-description"
+            class="mt-0.5 text-xs leading-snug text-theme"
+          >
+            {{ toast.description }}
+          </p>
+        </div>
+      </div>
+
+      <div
+        v-if="dock?.actions?.length"
+        data-slot="sonner-dock-actions"
+        class="mt-3 flex flex-wrap justify-end gap-2"
+      >
+        <UiButton
+          v-for="(action, i) in dock.actions"
+          :key="i"
+          size="sm"
+          :variant="action.variant ?? 'outline'"
+          :loading="running.has(i)"
+          @click="onAction(action, i)"
         >
-          {{ toast.description }}
-        </p>
+          <UiIcon v-if="action.icon" :name="action.icon" />
+          {{ action.label }}
+        </UiButton>
       </div>
     </div>
 
