@@ -9,6 +9,7 @@ import {
   toCalendarDate,
   toCalendarDateTime,
   toTime,
+  toZoned,
   type DateValue,
 } from "@internationalized/date";
 
@@ -24,6 +25,9 @@ export interface DateInputRange {
 }
 
 const ZONED = /([zZ]|[+-]\d{2}:?\d{2})$/;
+
+/** Whether an ISO string names its zone (`Z`, `+01:00`), as UTC moments from a backend do. */
+export const isZoned = (value: string | null | undefined) => !!value && ZONED.test(value.trim());
 
 /**
  * Reads an ISO string into the value the field edits. Lenient about what backends send:
@@ -72,11 +76,16 @@ function formatTime(value: { hour: number; minute: number; second: number }, sec
   return seconds ? `${time}:${pad(value.second)}` : time;
 }
 
-/** Writes the field's value back as an ISO string: `2026-11-16`, `2026-11-16T14:30` or `14:30`. */
+/**
+ * Writes the field's value back as an ISO string: `2026-11-16`, `2026-11-16T14:30` or `14:30`.
+ * With `utcFrom`, a date-time is clock time in that zone and goes back as the UTC moment it is,
+ * `2026-11-16T13:30:00.000Z`.
+ */
 export function serializeValue(
   value: DateValue | Time | null | undefined,
   kind: DateInputKind,
   seconds = false,
+  utcFrom?: string,
 ): string | null {
   if (!value) return null;
 
@@ -86,6 +95,10 @@ export function serializeValue(
   if (kind === "date") return date;
 
   const dateTime = value instanceof CalendarDateTime ? value : toCalendarDateTime(value as CalendarDate);
+  if (utcFrom) {
+    const moment = toZoned(seconds ? dateTime : dateTime.set({ second: 0, millisecond: 0 }), utcFrom);
+    return moment.toDate().toISOString();
+  }
   return `${date}T${formatTime(dateTime, seconds)}`;
 }
 

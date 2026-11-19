@@ -26,6 +26,7 @@ import { useLocale } from "../../../composables/useLocale";
 import { useDate } from "../../../composables/useDate";
 import {
   parseValue,
+  isZoned,
   serializeValue,
   timeOf,
   toDay,
@@ -159,8 +160,10 @@ const { timeZone, today } = useDate();
 const parse = (value: string | null | undefined) => parseValue(value, kind.value, timeZone.value);
 // Picking happens in the browser, where today is always known.
 const pickDay = () => today.value!;
+/** A date-time that came in as UTC goes back as UTC, the way the server keeps it. */
+const utc = ref(false);
 const serialize = (value: DateValue | Time | null | undefined) =>
-  serializeValue(value, kind.value, props.seconds);
+  serializeValue(value, kind.value, props.seconds, utc.value ? timeZone.value : undefined);
 
 const minValue = computed(() => parse(props.min) ?? undefined);
 const maxValue = computed(() => parse(props.max) ?? undefined);
@@ -218,17 +221,27 @@ watch(
   ([value]) => {
     if (props.range) {
       const next = typeof value === "object" ? value : null;
+      if (next?.start || next?.end) utc.value = isZoned(next.start) || isZoned(next.end);
       if (!same(serializeRange(parseRange(next)), current.value)) setRangeFromOutside(parseRange(next));
     } else {
       const next = typeof value === "string" ? value : null;
+      if (next) utc.value = isZoned(next);
       if (!same(serialize(parse(next)), current.value)) single.value = parse(next);
     }
   },
   { immediate: true },
 );
 
+// The same value written differently (`…00Z` / `…00.000000Z` from a backend) is not a change.
+const normalizedModel = () =>
+  props.range
+    ? serializeRange(parseRange(typeof props.modelValue === "object" ? props.modelValue : null))
+    : serialize(parse(typeof props.modelValue === "string" ? props.modelValue : null));
+
 watch(current, (value) => {
-  if (!same(value, props.modelValue)) emit("update:modelValue", value);
+  if (!same(value, props.modelValue) && !same(value, normalizedModel())) {
+    emit("update:modelValue", value);
+  }
 });
 
 /* ---------------------------------------------------------------- field models */
