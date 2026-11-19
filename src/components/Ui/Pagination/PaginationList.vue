@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PaginationListProps } from "reka-ui";
 import { PaginationList, useForwardProps } from "reka-ui";
-import { tv , type ClassValue } from "tailwind-variants";
+import { tv, type ClassValue } from "tailwind-variants";
 
 const paginationList = tv({
   base: "flex flex-row items-center gap-1",
@@ -17,10 +17,11 @@ const forwarded = useForwardProps(props);
 
 <template>
   <PaginationList
+    v-slot="slotProps"
     data-slot="pagination-list"
     v-bind="forwarded"
     :class="[paginationList({ class: props.class })]"
   >
-    <slot />
+    <slot v-bind="slotProps" />
   </PaginationList>
 </template>
