@@ -39,3 +39,9 @@ export const _useShortcuts = () => {
 }
 
 export const useShortcuts = createSharedComposable(_useShortcuts)
+export { defineShortcuts } from './defineShortcuts'
+export type {
+  ShortcutConfig,
+  ShortcutsConfig,
+  ShortcutsOptions,
+} from './defineShortcuts'
