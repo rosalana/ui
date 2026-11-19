@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { DateValue } from "@internationalized/date";
-import { getLocalTimeZone, today } from "@internationalized/date";
 import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
 import { AnimatePresence, motion } from "motion-v";
 import { onClickOutside, unrefElement } from "@vueuse/core";
 import UiIcon from "../Icon/Icon.vue";
 import { calendarHeadingButton, calendarNavButton, pickerOption } from "./calendar";
 import { useLocale } from "../../../composables/useLocale";
+import { useDate } from "../../../composables/useDate";
 
 /**
  * Quick jump for the calendar heading: the year switches with the arrows, the month is picked
@@ -52,7 +52,8 @@ function close() {
   trigger.value?.focus();
 }
 
-const now = today(getLocalTimeZone());
+// Marks the current month; unknown on the server, so nothing is marked there.
+const { today: now } = useDate();
 
 const { locale, t } = useLocale(() => props.locale);
 
@@ -152,7 +153,7 @@ function pick(month: number) {
           class="capitalize"
           :class="pickerOption({
             selected: isSelected(index + 1),
-            current: now.year === year && now.month === index + 1,
+            current: now?.year === year && now?.month === index + 1,
           })"
           :data-selected="isSelected(index + 1) || undefined"
           :disabled="isOutOfRange(index + 1)"

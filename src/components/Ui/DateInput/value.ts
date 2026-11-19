@@ -2,15 +2,13 @@ import {
   CalendarDate,
   CalendarDateTime,
   Time,
-  getLocalTimeZone,
-  parseAbsoluteToLocal,
+  parseAbsolute,
   parseDate,
   parseDateTime,
   parseTime,
   toCalendarDate,
   toCalendarDateTime,
   toTime,
-  today,
   type DateValue,
 } from "@internationalized/date";
 
@@ -29,10 +27,14 @@ const ZONED = /([zZ]|[+-]\d{2}:?\d{2})$/;
 
 /**
  * Reads an ISO string into the value the field edits. Lenient about what backends send:
- * `2026-11-16`, `2026-11-16 14:30`, `2026-11-16T14:30:00.000000Z` (converted to local time)
- * or `14:30`. Anything unreadable becomes null.
+ * `2026-11-16`, `2026-11-16 14:30`, `2026-11-16T14:30:00.000000Z` (converted to clock time in
+ * `timeZone`, the app's) or `14:30`. Anything unreadable becomes null.
  */
-export function parseValue(value: string | null | undefined, kind: DateInputKind): DateInputValue | null {
+export function parseValue(
+  value: string | null | undefined,
+  kind: DateInputKind,
+  timeZone: string,
+): DateInputValue | null {
   if (!value) return null;
   const text = value.trim().replace(" ", "T");
 
@@ -44,7 +46,7 @@ export function parseValue(value: string | null | undefined, kind: DateInputKind
     }
 
     const dateTime = ZONED.test(text)
-      ? toCalendarDateTime(parseAbsoluteToLocal(text.replace(/\.\d+/, "")))
+      ? toCalendarDateTime(parseAbsolute(text.replace(/\.\d+/, ""), timeZone))
       : text.includes("T")
         ? parseDateTime(stripFraction(text))
         : toCalendarDateTime(parseDate(text));
@@ -112,10 +114,14 @@ export function timeOf(value: DateInputValue | null | undefined): Time | null {
 
 /**
  * Puts a time picked in the time picker into the current value. A date-time without a day yet
- * starts today.
+ * starts on `today`.
  */
-export function withPickedTime(time: Time, current: DateInputValue | null | undefined, kind: DateInputKind) {
+export function withPickedTime(
+  time: Time,
+  current: DateInputValue | null | undefined,
+  kind: DateInputKind,
+  today: CalendarDate,
+) {
   if (kind === "time") return time;
-  const day = toDay(current) ?? today(getLocalTimeZone());
-  return toCalendarDateTime(day, time);
+  return toCalendarDateTime(toDay(current) ?? today, time);
 }

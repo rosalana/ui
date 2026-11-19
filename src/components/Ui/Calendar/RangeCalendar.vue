@@ -16,10 +16,11 @@ import {
   useForwardPropsEmits,
 } from "reka-ui";
 import { computed, shallowRef, watch } from "vue";
-import { getLocalTimeZone, today, type DateValue } from "@internationalized/date";
+import type { DateValue } from "@internationalized/date";
 import type { ClassValue } from "tailwind-variants";
 import UiIcon from "../Icon/Icon.vue";
 import { useLocale } from "../../../composables/useLocale";
+import { useDate } from "../../../composables/useDate";
 import CalendarMonthPicker from "./CalendarMonthPicker.vue";
 import CalendarMonthTrack from "./CalendarMonthTrack.vue";
 import {
@@ -55,10 +56,23 @@ const forwarded = useForwardPropsEmits(delegated, emit);
 const { locale } = useLocale(() => props.locale);
 
 
-/** The month in view, kept here so the month / year picker can move it. */
-const placeholder = shallowRef<DateValue>(
-  props.placeholder ?? props.defaultPlaceholder ?? props.modelValue?.start ?? props.defaultValue?.start ?? today(getLocalTimeZone()),
+const { today } = useDate();
+
+/**
+ * The month in view, kept here so the month / year picker can move it. Without a date from the
+ * app it opens on today, which the server doesn't know: until mounted nothing is shown then.
+ */
+const placeholder = shallowRef<DateValue | undefined>(
+  props.placeholder ??
+    props.defaultPlaceholder ??
+    props.modelValue?.start ??
+    props.defaultValue?.start ??
+    today.value,
 );
+
+watch(today, (value) => {
+  if (!placeholder.value && value) placeholder.value = value;
+});
 
 watch(
   () => props.placeholder,
@@ -78,7 +92,9 @@ function jumpTo(value: DateValue) {
 </script>
 
 <template>
+  <div v-if="!placeholder" data-slot="range-calendar" :class="calendarRoot({ class: props.class })" />
   <RangeCalendarRoot
+    v-else
     v-slot="{ grid, weekDays }"
     data-slot="range-calendar"
     v-bind="forwarded"

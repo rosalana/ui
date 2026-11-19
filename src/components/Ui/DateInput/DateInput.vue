@@ -23,6 +23,7 @@ import Calendar from "../Calendar/Calendar.vue";
 import RangeCalendar from "../Calendar/RangeCalendar.vue";
 import TimePicker from "../TimePicker/TimePicker.vue";
 import { useLocale } from "../../../composables/useLocale";
+import { useDate } from "../../../composables/useDate";
 import {
   parseValue,
   serializeValue,
@@ -153,7 +154,11 @@ const granularity = computed(() => {
 
 const { locale, t } = useLocale(() => props.locale);
 
-const parse = (value: string | null | undefined) => parseValue(value, kind.value);
+// Zoned values (UTC from the server) show as clock time in the app's time zone.
+const { timeZone, today } = useDate();
+const parse = (value: string | null | undefined) => parseValue(value, kind.value, timeZone.value);
+// Picking happens in the browser, where today is always known.
+const pickDay = () => today.value!;
 const serialize = (value: DateValue | Time | null | undefined) =>
   serializeValue(value, kind.value, props.seconds);
 
@@ -301,7 +306,7 @@ const rangeCalendarModel = computed({
 const pickedTime = computed({
   get: () => timeOf(single.value),
   set: (time: Time | null) => {
-    if (time) single.value = withPickedTime(time, single.value, kind.value);
+    if (time) single.value = withPickedTime(time, single.value, kind.value, pickDay());
   },
 });
 
@@ -310,7 +315,7 @@ const startTimeModel = computed({
   set: (time: Time | null) => {
     if (!time) return;
     setRangeFromOutside({
-      start: withPickedTime(time, rangeValue.value?.start, kind.value),
+      start: withPickedTime(time, rangeValue.value?.start, kind.value, pickDay()),
       end: rangeValue.value?.end ?? null,
     });
   },
@@ -322,7 +327,7 @@ const endTimeModel = computed({
     if (!time) return;
     setRangeFromOutside({
       start: rangeValue.value?.start ?? null,
-      end: withPickedTime(time, rangeValue.value?.end, kind.value),
+      end: withPickedTime(time, rangeValue.value?.end, kind.value, pickDay()),
     });
   },
 });

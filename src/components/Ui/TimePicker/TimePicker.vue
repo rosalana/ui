@@ -4,6 +4,7 @@ import { computed } from "vue";
 import { tv, type ClassValue } from "tailwind-variants";
 import TimePickerColumn from "./TimePickerColumn.vue";
 import { useLocale } from "../../../composables/useLocale";
+import { useDate } from "../../../composables/useDate";
 
 const timePicker = tv({
   base: "relative inline-flex items-center gap-1 p-2 select-none",
@@ -61,11 +62,17 @@ const twelveHour = computed(() => {
   return cycle === "h12" || cycle === "h11";
 });
 
+const { now } = useDate();
+
+/**
+ * Shown while there is no value: the placeholder, or the current time in the browser. The
+ * server doesn't know it, so there (and until mounted while hydrating) the wheels show midnight.
+ */
 const fallback = computed(() => {
   if (props.placeholder) return props.placeholder;
-  const now = new Date();
-  const minute = Math.floor(now.getMinutes() / props.minuteStep) * props.minuteStep;
-  return new Time(now.getHours(), minute);
+  if (!now.value) return new Time(0, 0);
+  const minute = Math.floor(now.value.minute / props.minuteStep) * props.minuteStep;
+  return new Time(now.value.hour, minute);
 });
 
 const shown = computed(() => props.modelValue ?? fallback.value);
