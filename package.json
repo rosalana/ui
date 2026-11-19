@@ -54,7 +54,10 @@
     "dev": "npm run build -- --watch",
     "build": "vite build && vue-tsc --declaration --emitDeclarationOnly",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build"
+    "prepublishOnly": "npm run clean && npm run build",
+    "workbench:build": "vite build --config workbench/vite.config.ts",
+    "workbench:typecheck": "vue-tsc --noEmit -p workbench/tsconfig.json",
+    "workbench:check": "node workbench/tooling/check.mjs"
   },
   "author": "michaelbany <mobany526@gmail.com>",
   "license": "MIT",

@@ -1,10 +1,15 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
+    "baseUrl": "..",
+    "paths": {
+      "@rosalana/ui": ["src/index.ts"],
+      "@rosalana/ui/helpers": ["src/helpers/index.ts"],
+      "workbench/*": ["workbench/*"]
+    },
     "noEmit": true,
-    "emitDeclarationOnly": false,
-    "declaration": false
+    "emitDeclarationOnly": false
   },
   "include": ["./**/*.ts", "./**/*.vue"]
 }

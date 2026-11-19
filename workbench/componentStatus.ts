@@ -18,6 +18,7 @@ export const DONE: string[] = [
   "Card",
   "Checkbox",
   "Chip",
+  "CodeBlock",
   "ColorPicker",
   "Combobox",
   "Command",
@@ -26,6 +27,7 @@ export const DONE: string[] = [
   "Dock",
   "DropdownMenu",
   "DropFile",
+  "FrameSelection",
   "Icon",
   "Input",
   "Label",
@@ -43,8 +45,12 @@ export const DONE: string[] = [
   "Switch",
   "Table",
   "TimePicker",
+  "Toggle",
+  "ToggleGroup",
   "Tooltip",
   "Tag",
+  "Textarea",
+  "Toc",
   "UploadFiles",
   "UploadImage",
 ];
@@ -55,9 +61,8 @@ export const UNTOUCHED: string[] = [
   "Pagination",
   "Resizable",
   "Sheet",
-  "Textarea",
 ];
 
 // Everything else is NOT implemented:
 // Collapsible, ContextMenu, HoverCard,
-// Menubar, Progress, RadioGroup, Tabs, Toggle, ToggleGroup
+// Menubar, Progress, RadioGroup, Tabs
