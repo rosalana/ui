@@ -13,6 +13,8 @@ const en = {
   "codeBlock.preview": "Preview",
   "codeBlock.code": "Code",
 
+  "toc.label": "Table of contents",
+
   "command.title": "Command palette",
   "command.description": "Search for an action and select a result.",
   close: "Close",
@@ -153,6 +155,8 @@ const cs: UiMessages = {
   "codeBlock.copied": "Zkopírováno",
   "codeBlock.preview": "Náhled",
   "codeBlock.code": "Kód",
+
+  "toc.label": "Obsah",
 
   "command.title": "Paleta příkazů",
   "command.description": "Vyhledejte akci a vyberte výsledek.",

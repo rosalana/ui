@@ -310,6 +310,9 @@ export { default as UiToggle } from "./Ui/Toggle/Toggle.vue";
 export { default as UiCodeBlock } from "./Ui/CodeBlock/CodeBlock.vue";
 export { default as UiCodeBlockGroup } from "./Ui/CodeBlock/CodeBlockGroup.vue";
 export { default as UiCodeBlockPreview } from "./Ui/CodeBlock/CodeBlockPreview.vue";
+export { default as UiToc } from "./Ui/Toc/Toc.vue";
+export { default as UiTocIsland } from "./Ui/Toc/TocIsland.vue";
+export type { TocHeading } from "./Ui/Toc/types";
 export { default as UiToggleGroup } from "./Ui/ToggleGroup/ToggleGroup.vue";
 export { default as UiToggleGroupItem } from "./Ui/ToggleGroup/ToggleGroupItem.vue";
 
