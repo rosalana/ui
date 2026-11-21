@@ -24,7 +24,7 @@ sonner.configure({ position: 'top-center', visible: 4 });`,
     section(
       "dock",
       "Next to a dock",
-      "A dock created with useDock sits at the edge of the same stack and toasts stack above it. The page can keep its end clear with padding-bottom: var(--dock-height, 0px).",
+      "Docks created with useDock have their own stack at the edge of the same stack, and toasts stack above them. The page can keep its end clear with padding-bottom: var(--dock-height, 0px).",
     ),
   ],
   examples: [

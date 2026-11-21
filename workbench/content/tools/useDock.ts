@@ -22,7 +22,7 @@ useDock(
     section(
       "lifecycle",
       "When it shows and when it goes",
-      "The dock shows while the condition holds and goes away when it stops holding or the component unmounts, e.g. on navigating to another page. The user can't close it: to let them dismiss it, add an action that changes the state, like Clear for a selection. Only the newest dock is shown; when it goes, the one before it comes back.",
+      "The dock shows while the condition holds and goes away when it stops holding or the component unmounts, e.g. on navigating to another page. The user can't close it: to let them dismiss it, add an action that changes the state, like Clear for a selection. Several docks stack in their own stack like toasts: the newest in front, the older ones peeking out behind it until the pointer rests on the stack.",
     ),
     section(
       "actions",
@@ -32,7 +32,7 @@ useDock(
     section(
       "toasts",
       "Toasts and layout",
-      "The dock lives in the toast stack, at its edge, and toasts stack above it. The page can keep its end clear of the dock with padding-bottom: var(--dock-height, 0px).",
+      "The docks live in the toast stack, at its edge, and toasts stack above them. The page can keep its end clear of the docks with padding-bottom: var(--dock-height, 0px).",
     ),
   ],
   examples: [
