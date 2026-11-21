@@ -122,7 +122,7 @@ export interface SonnerConfig {
 interface SonnerState {
   /** Newest toast first. */
   toasts: SonnerToast[];
-  /** Newest dock last, only the last one is shown. */
+  /** Newest dock last, they stack like toasts with the newest in front. */
   docks: SonnerDock[];
   config: SonnerConfig;
 }

@@ -39,85 +39,85 @@ const heights = reactive<Record<SonnerId, number>>({});
 const visibility = useDocumentVisibility();
 
 const toasts = computed(() => state.toasts.slice(0, state.config.visible));
-/** Only the newest dock is shown, older ones wait under it. */
-const dock = computed(() => state.docks.at(-1));
+/** Docks have their own stack at the edge, the newest in front. */
+const docks = computed(() =>
+  state.docks.slice(-state.config.visible).reverse(),
+);
 const isTop = computed(() => state.config.position.startsWith("top"));
 const expanded = computed(() => state.config.expand || hovered.value);
 const paused = computed(() => hovered.value || visibility.value === "hidden");
 
-const frontHeight = computed(() =>
-  toasts.value[0] ? (heights[toasts.value[0].id] ?? 0) : 0,
-);
-const dockHeight = computed(() =>
-  dock.value ? (heights[dock.value.id] ?? 0) : 0,
-);
-/** The dock stays at the edge, toasts stack behind it. */
-const base = computed(() => (dock.value ? dockHeight.value + GAP : 0));
-
-/** Distance of each toast from the dock (or the edge) when the stack is expanded. */
-const offsets = computed(() => {
+/** Layout of one stack: offsets of its items and its height. */
+function layout(list: (Toast | SonnerDock)[]) {
+  const front = list[0] ? (heights[list[0].id] ?? 0) : 0;
   let offset = 0;
-  return toasts.value.map((toast) => {
+  const offsets = list.map((item) => {
     const current = offset;
-    offset += (heights[toast.id] ?? 0) + GAP;
+    offset += (heights[item.id] ?? 0) + GAP;
     return current;
   });
-});
+  const collapsed = list.length ? front + (list.length - 1) * PEEK : 0;
+  const height = !list.length
+    ? 0
+    : expanded.value
+      ? offset - GAP
+      : collapsed;
+  return { front, offsets, collapsed, height };
+}
 
-const toastsHeight = computed(() => {
-  const count = toasts.value.length;
-  if (!count) return 0;
-  if (expanded.value) {
-    const last = toasts.value[count - 1];
-    return offsets.value[count - 1] + (heights[last.id] ?? 0);
-  }
-  return frontHeight.value + (count - 1) * PEEK;
-});
+const toastStack = computed(() => layout(toasts.value));
+const dockStack = computed(() => layout(docks.value));
+
+/** The docks stay at the edge, toasts stack behind them. */
+const base = computed(() =>
+  docks.value.length ? dockStack.value.height + GAP : 0,
+);
 
 const listHeight = computed(() =>
-  toasts.value.length ? base.value + toastsHeight.value : dockHeight.value,
+  toasts.value.length
+    ? base.value + toastStack.value.height
+    : dockStack.value.height,
 );
 
 interface Item {
   toast: Toast | SonnerDock;
   index: number;
-  count: number;
   expanded: boolean;
   offset: number;
   collapsedHeight: number;
 }
 
-// One list for toasts and the dock, so a dock turning into a toast
+// One list for toasts and docks, so a dock turning into a toast
 // keeps its element and animates to its new place.
+// Ordered back to front (older toasts, toasts, docks): the DOM order is
+// the paint order, and a leaving item keeps its place while it animates
+// out, so it never pops above the items that stay.
 const items = computed<Item[]>(() => {
-  const count = toasts.value.length;
-  const list: Item[] = toasts.value.map((toast, index) => ({
-    toast,
-    index,
-    count,
-    expanded: expanded.value,
-    offset:
-      base.value + (expanded.value ? offsets.value[index] : index * PEEK),
-    collapsedHeight: frontHeight.value,
-  }));
+  const stack = (
+    list: (Toast | SonnerDock)[],
+    { offsets, front }: ReturnType<typeof layout>,
+    start: number,
+  ): Item[] =>
+    list
+      .map((toast, index) => ({
+        toast,
+        index,
+        expanded: expanded.value,
+        offset: start + (expanded.value ? offsets[index] : index * PEEK),
+        collapsedHeight: front,
+      }))
+      .reverse();
 
-  if (dock.value) {
-    list.push({
-      toast: dock.value,
-      index: 0,
-      count: count + 1,
-      expanded: true,
-      offset: 0,
-      collapsedHeight: 0,
-    });
-  }
-
-  return list;
+  return [
+    ...stack(toasts.value, toastStack.value, base.value),
+    ...stack(docks.value, dockStack.value, 0),
+  ];
 });
 
 // Lets the app keep its content clear of the dock: padding-bottom: var(--dock-height).
+// The collapsed height, so the page doesn't jump while the stack is hovered.
 watch(
-  dockHeight,
+  () => dockStack.value.collapsed,
   (height) => {
     const root = document.documentElement.style;
     if (height) root.setProperty("--dock-height", `calc(${height}px + 2.25rem)`);
@@ -167,7 +167,6 @@ const { t } = useLocale();
           :key="item.toast.id"
           :toast="item.toast"
           :index="item.index"
-          :count="item.count"
           :top="isTop"
           :expanded="item.expanded"
           :paused="paused"

@@ -25,7 +25,6 @@ const SWIPE_THRESHOLD = 80;
 const props = defineProps<{
   toast: SonnerToast | SonnerDock;
   index: number;
-  count: number;
   top: boolean;
   expanded: boolean;
   paused: boolean;
@@ -173,7 +172,6 @@ const { t } = useLocale();
       'shadow-[0_2px_8px_-3px,0_4px_20px_-4px] shadow-muted/40',
     ]"
     :style="{
-      zIndex: count - index,
       transformOrigin: top ? 'top center' : 'bottom center',
     }"
     :initial="{ opacity: 0, y: top ? -24 : 24, scale: 0.96 }"
