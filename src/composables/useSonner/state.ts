@@ -1,4 +1,5 @@
-import { reactive } from "vue";
+import { isVNode, markRaw, reactive } from "vue";
+import type { Component, VNode } from "vue";
 
 /**
  * Visual type of a toast.
@@ -98,7 +99,25 @@ export interface DockMessage {
   actions?: DockAction[];
 }
 
-export interface SonnerDock extends DockMessage {
+/**
+ * Custom content of a dock: a component or a VNode made with `h()`.
+ * It replaces the title, description, icon and actions, the dock only
+ * gives it its surface.
+ */
+export type DockContent = Component | VNode;
+
+/** What a dock shows: a message with actions, or custom content. */
+export type DockInput = DockMessage | DockContent;
+
+export function isDockContent(input: DockInput): input is DockContent {
+  return isVNode(input) || typeof input === "function" || !("title" in input);
+}
+
+export interface SonnerDock extends Omit<DockMessage, "title"> {
+  /** Title of a message dock, missing on a dock with custom content. */
+  title?: string;
+  /** Custom content rendered in place of the message. */
+  content?: DockContent;
   id: SonnerId;
   type: "dock";
   version: number;
@@ -204,14 +223,24 @@ function removeDock(id: SonnerId) {
 }
 
 /** Shows a new dock, or updates the dock with the given id if it is still open. */
-export function showDock(id: SonnerId | null, message: DockMessage): SonnerId {
+export function showDock(id: SonnerId | null, input: DockInput): SonnerId {
   const existing = id !== null ? findDock(id) : undefined;
+  // Raw, the content is rendered as it is, not made reactive.
+  const message: Partial<SonnerDock> = isDockContent(input)
+    ? { title: undefined, content: markRaw(input) }
+    : { ...input, content: undefined };
 
   if (existing) {
     // Reset optional fields so the previous content doesn't leak.
     Object.assign(
       existing,
-      { description: undefined, icon: undefined, actions: undefined },
+      {
+        title: undefined,
+        description: undefined,
+        icon: undefined,
+        actions: undefined,
+        content: undefined,
+      },
       message,
       { closing: false },
     );

@@ -190,7 +190,9 @@ const { t } = useLocale();
         contentVisible ? 'opacity-100' : 'pointer-events-none opacity-0',
       ]"
     >
-      <div class="flex items-center gap-3">
+      <component :is="dock.content" v-if="dock?.content" />
+
+      <div v-else class="flex items-center gap-3">
         <AnimatePresence mode="wait" :initial="false">
           <motion.span
             v-if="iconName"

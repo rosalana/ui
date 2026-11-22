@@ -1,6 +1,7 @@
 import {
   getCurrentInstance,
   getCurrentScope,
+  markRaw,
   onMounted,
   onScopeDispose,
   toValue,
@@ -9,12 +10,14 @@ import {
 import type { MaybeRefOrGetter, WatchStopHandle } from "vue";
 // Importing useSonner registers the toaster the dock lives in.
 import "../useSonner";
-import { closeDock, showDock } from "../useSonner/state";
-import type { DockMessage, SonnerId } from "../useSonner/state";
+import { closeDock, isDockContent, showDock } from "../useSonner/state";
+import type { DockInput, SonnerId } from "../useSonner/state";
 
 export type {
   DockAction,
   DockActionVariant,
+  DockContent,
+  DockInput,
   DockMessage,
 } from "../useSonner/state";
 
@@ -33,17 +36,30 @@ export type {
  *   () => ({ title: `${selected.value.length} selected`, actions: [...] }),
  * )
  * ```
+ *
+ * Instead of a message it can show custom content, a component or a VNode
+ * made with `h()`. The content handles its own behavior, the dock only
+ * gives it its surface.
+ *
+ * ```ts
+ * useDock(editing, () => h(UnsavedChanges, { onSave: save }))
+ * ```
  */
 export function useDock(
   when: MaybeRefOrGetter<boolean>,
-  message: MaybeRefOrGetter<DockMessage>,
+  message: MaybeRefOrGetter<DockInput>,
 ) {
   let id: SonnerId | null = null;
   let stop: WatchStopHandle | undefined;
 
   function start() {
     stop = watch(
-      () => (toValue(when) ? toValue(message) : null),
+      () => {
+        if (!toValue(when)) return null;
+        const content = toValue(message);
+        // Raw, so the deep watch doesn't walk into a component.
+        return isDockContent(content) ? markRaw(content) : content;
+      },
       (content) => {
         if (content) id = showDock(id, content);
         else if (id !== null) closeDock(id);
