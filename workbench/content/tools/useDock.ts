@@ -30,6 +30,16 @@ useDock(
       "An action that returns a promise shows a spinner until it settles, and the dock stays until then even if the condition stops holding meanwhile. A success toast shown while an action runs, for example the flash message of the request's response, replaces the dock in place. Without one the dock just leaves. An error toast never replaces it: the state is unchanged, so the dock stays.",
     ),
     section(
+      "content",
+      "Custom content",
+      "Instead of a message, the dock can show anything: pass a component, or a getter returning a VNode made with h(). The content replaces the title, icon and actions, and the dock gives it only its surface and padding. Its behavior is the content's own: a button in it has no spinner and no success toast replaces the dock. The getter follows the refs it reads like any other content, so the content can show live state.",
+      `import { h } from 'vue';
+import { useDock } from '@rosalana/ui';
+import UploadProgress from './UploadProgress.vue';
+
+useDock(uploading, () => h(UploadProgress, { progress: progress.value, onCancel: cancel }));`,
+    ),
+    section(
       "toasts",
       "Toasts and layout",
       "The docks live in the toast stack, at its edge, and toasts stack above them. The page can keep its end clear of the docks with padding-bottom: var(--dock-height, 0px).",
@@ -41,6 +51,12 @@ useDock(
       title: "Bulk actions for a selection",
       description:
         "Select matches to get the dock. Copy links shows a toast above the dock, which stays while the selection does. Archive waits for the request, then its flash message replaces the dock.",
+    },
+    {
+      file: "Custom",
+      title: "Custom content",
+      description:
+        "Upload the photos to get a dock with a progress bar and Cancel, content the message dock doesn't have. The dock leaves once the upload finishes or is canceled.",
     },
     {
       file: "Condition",
