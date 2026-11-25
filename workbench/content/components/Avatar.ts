@@ -21,6 +21,12 @@ export default {
     { file: "Sizes", title: "Sizes" },
     { file: "Fallback", title: "Fallbacks", description: "Initials, a custom modifier, no name and a slot." },
     {
+      file: "SlowPictures",
+      title: "Pictures on a slow connection",
+      description:
+        "Team members whose pictures arrive one by one. Each avatar spins until its picture is there, a broken one falls back to the initials and a member without a picture shows them at once.",
+    },
+    {
       file: "Loading",
       title: "Uploading a picture",
       description: "A spinner covers the avatar while the new picture is on its way.",
