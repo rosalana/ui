@@ -20,7 +20,7 @@ const panel = tv({
 
 interface Props {
   headings: TocHeading[];
-  /** Distance from the top of the viewport at which a heading counts as being read. */
+  /** Distance from the top of the scrolling area (the viewport when the page scrolls) at which a heading counts as being read. */
   offset?: number;
   /** Write the heading's id to the URL hash on a jump. Turn off for a hash-based router. */
   hash?: boolean;

@@ -4,7 +4,7 @@ import { SplitterGroup, useForwardPropsEmits } from "reka-ui";
 import { tv , type ClassValue } from "tailwind-variants";
 
 const resizablePanelGroup = tv({
-  base: "flex size-full data-[panel-group-direction=vertical]:flex-col",
+  base: "flex size-full data-[orientation=vertical]:flex-col",
 });
 
 interface Props extends SplitterGroupProps {

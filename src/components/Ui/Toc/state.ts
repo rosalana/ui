@@ -5,7 +5,7 @@ import type { TocHeading } from "./types";
 
 export interface TocOptions {
   headings: TocHeading[];
-  /** Distance from the top of the viewport at which a heading counts as being read. */
+  /** Distance from the top of the scrolling area (the viewport when the page scrolls) at which a heading counts as being read. */
   offset: number;
   /** Write the heading's id to the URL hash on a jump. */
   hash: boolean;
@@ -18,6 +18,23 @@ export interface TocState {
 
 export const tocKey: InjectionKey<TocState> =
   Symbol("Toc");
+
+/** The element the heading scrolls in: its nearest scrollable ancestor, or the page. */
+function scrollContainer(element: HTMLElement): HTMLElement {
+  for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+    const { overflowY } = getComputedStyle(parent);
+    if (/(auto|scroll|overlay)/.test(overflowY) && parent.scrollHeight > parent.clientHeight) {
+      return parent;
+    }
+  }
+  return document.scrollingElement as HTMLElement;
+}
+
+/** Top edge of the visible part of the container, in viewport coordinates. */
+function containerTop(container: HTMLElement): number {
+  if (container === document.scrollingElement) return 0;
+  return container.getBoundingClientRect().top + container.clientTop;
+}
 
 /** Tracks the section being read and jumps to a heading. Call in setup. */
 export function useTocState(
@@ -33,7 +50,9 @@ export function useTocState(
 
     for (const heading of headings) {
       const element = document.getElementById(heading.id);
-      if (element && element.getBoundingClientRect().top <= offset) {
+      if (!element) continue;
+      const top = element.getBoundingClientRect().top - containerTop(scrollContainer(element));
+      if (top <= offset) {
         last = heading.id;
       }
     }
@@ -68,7 +87,15 @@ export function useTocState(
     jumping = true;
     // Nothing to scroll (already in place) ends the jump right away too.
     settle();
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    // Only the heading's own container scrolls, never the page around it.
+    const element = document.getElementById(id);
+    if (element) {
+      const container = scrollContainer(element);
+      const margin = parseFloat(getComputedStyle(element).scrollMarginTop) || 0;
+      const top =
+        container.scrollTop + element.getBoundingClientRect().top - containerTop(container) - margin;
+      container.scrollTo({ top, behavior: "smooth" });
+    }
     if (options().hash) history.replaceState(history.state, "", `#${id}`);
     active.value = id;
     onSelect(id);
