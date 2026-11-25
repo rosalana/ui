@@ -173,7 +173,7 @@ function onSelect(id: string) {
       class="max-lg:hidden"
       :headings="headings"
       :hash="false"
-      :offset="140"
+      :offset="76"
       @select="onSelect"
     />
   </div>

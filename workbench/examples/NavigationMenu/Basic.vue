@@ -18,7 +18,7 @@ const sections = [
 
 <template>
   <!-- The docs run without Inertia, the code shows the app version. The fixed height keeps room for the open panel. -->
-  <div class="flex h-64 w-full justify-center">
+  <div class="flex h-64 w-full items-start justify-center">
     <UiNavigationMenu>
       <UiNavigationMenuList>
         <UiNavigationMenuItem>

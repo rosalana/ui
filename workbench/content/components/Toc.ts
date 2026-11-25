@@ -15,7 +15,7 @@ export default {
     section(
       "tracking",
       "How the active section is chosen",
-      "The active heading is the last one whose top edge has scrolled above offset, measured from the top of the viewport. Set it to the height of a fixed header so a heading counts as read once it slides under it. The page may scroll in any container. select fires after a heading is chosen, and hash controls whether its id is written to the URL.",
+      "The active heading is the last one whose top edge has scrolled above offset, measured from the top of the area the headings scroll in: the viewport when the page scrolls, or the scrolling container around the article. Set it to the height of a fixed header so a heading counts as read once it slides under it. Clicking a heading scrolls only that area, never the page around it. select fires after a heading is chosen, and hash controls whether its id is written to the URL.",
     ),
   ],
   examples: [

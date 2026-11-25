@@ -11,7 +11,7 @@ import {
 
 <template>
   <!-- Static links for the docs; in an app, set active from the current route -->
-  <div class="flex h-48 w-full justify-center">
+  <div class="flex h-48 w-full items-start justify-center">
     <UiNavigationMenu>
       <UiNavigationMenuList>
         <UiNavigationMenuItem>

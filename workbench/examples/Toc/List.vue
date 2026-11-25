@@ -12,7 +12,10 @@ const headings: TocHeading[] = [
 </script>
 
 <template>
-  <div class="grid w-full max-w-xl grid-cols-[minmax(0,1fr)_10rem] gap-6">
+  <!-- The docs scroll the article in this box; the code shows it on a whole page. -->
+  <div
+    class="grid h-80 w-full max-w-xl grid-cols-[minmax(0,1fr)_10rem] gap-6 overflow-y-auto rounded-xl border border-border p-6"
+  >
     <article class="space-y-4 text-sm text-theme">
       <h2 id="list-overview" class="text-base font-semibold text-foreground">Overview</h2>
       <p>
@@ -45,12 +48,11 @@ const headings: TocHeading[] = [
         The winners take home the cup and a prize for the whole team. The
         top scorer gets a trophy of their own.
       </p>
-      <div class="h-32" />
+      <div class="h-56" />
     </article>
 
-    <!-- Sticks beside the article while the page scrolls -->
-    <aside class="sticky top-24 self-start">
-      <UiToc :headings="headings" :offset="100" :hash="false" />
+    <aside class="sticky top-0 self-start">
+      <UiToc :headings="headings" :offset="24" :hash="false" />
     </aside>
   </div>
 </template>

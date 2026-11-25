@@ -12,9 +12,9 @@ const headings: TocHeading[] = [
 </script>
 
 <template>
-  <!-- The docs pin the island inside this frame; the code shows it fixed to the screen. -->
+  <!-- The docs scroll the article in this box and pin the island to it; the code shows it fixed to the screen. -->
   <div class="relative w-full max-w-xl">
-    <article class="space-y-4 pr-16 text-sm text-theme">
+    <article class="h-80 space-y-4 overflow-y-auto rounded-xl border border-border p-6 pr-16 text-sm text-theme">
       <h2 id="island-intro" class="text-base font-semibold text-foreground">Getting started</h2>
       <p>
         A team needs a name, a home ground and at least seven players before it
@@ -43,12 +43,12 @@ const headings: TocHeading[] = [
         After the final whistle both captains enter the score. If the two
         entries differ, an organizer settles it.
       </p>
-      <div class="h-40" />
+      <div class="h-56" />
     </article>
 
     <UiTocIsland
       :headings="headings"
-      :offset="100"
+      :offset="24"
       :hash="false"
       class="absolute top-1/2 right-2"
     />

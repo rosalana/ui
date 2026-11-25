@@ -22,7 +22,6 @@ export default {
       file: "Effects",
       title: "All effects",
       description: "The same line in every effect. Reset replays them.",
-      preview: "fill",
     },
     {
       file: "Options",
